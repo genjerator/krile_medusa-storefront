@@ -1,7 +1,5 @@
 "use client"
 
-import FilterRadioGroup from "@modules/common/components/filter-radio-group"
-
 export type SortOptions = "price_asc" | "price_desc" | "created_at"
 
 type SortProductsProps = {
@@ -11,18 +9,9 @@ type SortProductsProps = {
 }
 
 const sortOptions = [
-  {
-    value: "created_at",
-    label: "Latest Arrivals",
-  },
-  {
-    value: "price_asc",
-    label: "Price: Low -> High",
-  },
-  {
-    value: "price_desc",
-    label: "Price: High -> Low",
-  },
+  { value: "created_at", label: "Latest Arrivals" },
+  { value: "price_asc", label: "Price: Low → High" },
+  { value: "price_desc", label: "Price: High → Low" },
 ]
 
 const SortProducts = ({
@@ -30,18 +19,22 @@ const SortProducts = ({
   sortBy,
   setQueryParams,
 }: SortProductsProps) => {
-  const handleChange = (value: SortOptions) => {
-    setQueryParams("sortBy", value)
-  }
-
   return (
-    <FilterRadioGroup
-      title="Sort by"
-      items={sortOptions}
-      value={sortBy}
-      handleChange={handleChange}
-      data-testid={dataTestId}
-    />
+    <div className="flex items-center gap-x-2">
+      <span className="text-sm text-ui-fg-muted whitespace-nowrap">Sort by</span>
+      <select
+        value={sortBy}
+        onChange={(e) => setQueryParams("sortBy", e.target.value as SortOptions)}
+        data-testid={dataTestId}
+        className="text-sm border border-ui-border-base rounded-md px-3 py-1.5 bg-ui-bg-base text-ui-fg-base focus:outline-none focus:ring-1 focus:ring-ui-border-interactive cursor-pointer"
+      >
+        {sortOptions.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
   )
 }
 

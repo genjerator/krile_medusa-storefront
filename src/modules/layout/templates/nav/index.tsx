@@ -2,6 +2,7 @@ import { Suspense } from "react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
+import MobileMenu from "./mobile-menu"
 
 const NAV_LINKS = [
   { label: "Ihr Produkt", href: "/store" },
@@ -12,7 +13,7 @@ const NAV_LINKS = [
 export default function Nav() {
   return (
     <div className="sticky top-0 inset-x-0 z-50">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-brand-navy border-ui-border-base">
+      <header className="relative h-16 mx-auto duration-200 bg-brand-navy">
         <nav className="content-container flex items-center justify-between w-full h-full">
 
           {/* Logo */}
@@ -24,8 +25,8 @@ export default function Nav() {
             Planeta
           </LocalizedClientLink>
 
-          {/* Nav links */}
-          <div className="flex items-center gap-x-8 h-full">
+          {/* Desktop nav links */}
+          <div className="hidden small:flex items-center gap-x-8 h-full">
             {NAV_LINKS.map((link) => (
               <LocalizedClientLink
                 key={link.href}
@@ -37,10 +38,10 @@ export default function Nav() {
             ))}
           </div>
 
-          {/* Right: account + cart */}
-          <div className="flex items-center gap-x-6">
+          {/* Right: account + cart + hamburger */}
+          <div className="flex items-center gap-x-4">
             <LocalizedClientLink
-              className="text-white text-sm hover:text-white/70"
+              className="hidden small:block text-white text-sm hover:text-white/70"
               href="/account"
               data-testid="nav-account-link"
             >
@@ -59,6 +60,8 @@ export default function Nav() {
             >
               <CartButton />
             </Suspense>
+
+            <MobileMenu />
           </div>
 
         </nav>

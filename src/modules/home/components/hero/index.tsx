@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { JSX } from "react"
 import { Button, Heading } from "@medusajs/ui"
 
@@ -44,6 +44,7 @@ const AUTOPLAY_INTERVAL_MS = 5000
 
 const Hero = (): JSX.Element => {
   const [current, setCurrent] = useState<number>(0)
+  const touchStartX = useRef<number | null>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -65,8 +66,25 @@ const Hero = (): JSX.Element => {
     setCurrent((prev) => (prev + 1) % SLIDES.length)
   }
 
+  const onTouchStart = (e: React.TouchEvent): void => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const onTouchEnd = (e: React.TouchEvent): void => {
+    if (touchStartX.current === null) return
+    const diff = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? goNext() : goPrev()
+    }
+    touchStartX.current = null
+  }
+
   return (
-    <div className="h-[75vh] w-full border-b border-ui-border-base relative overflow-hidden">
+    <div
+      className="h-[35vh] small:h-[75vh] w-full border-b border-ui-border-base relative overflow-hidden"
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Slide track */}
       <div
         className="flex h-full transition-transform duration-700 ease-in-out"
@@ -80,13 +98,13 @@ const Hero = (): JSX.Element => {
             <span>
               <Heading
                 level="h1"
-                className="text-3xl leading-10 text-white font-normal"
+                className="text-lg leading-7 small:text-3xl small:leading-10 text-white font-normal"
               >
                 {slide.heading}
               </Heading>
               <Heading
                 level="h2"
-                className="text-3xl leading-10 text-white/80 font-normal"
+                className="text-sm leading-6 small:text-3xl small:leading-10 text-white/80 font-normal"
               >
                 {slide.subtitle}
               </Heading>
