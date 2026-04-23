@@ -81,7 +81,7 @@ const Hero = (): JSX.Element => {
 
   return (
     <div
-      className="h-[35vh] small:h-[75vh] w-full border-b border-ui-border-base relative overflow-hidden"
+      className="h-[35vh] w-full border-b border-ui-border-base relative overflow-hidden"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
