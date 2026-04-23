@@ -5,6 +5,22 @@ const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
 
+// Maps URL prefixes to Medusa locale codes for the Translation Module
+const LOCALE_MAP: Record<string, string> = {
+  de: "de-DE",
+  at: "de-DE",
+  ch: "de-DE",
+  en: "en-US",
+  gb: "en-US",
+  us: "en-US",
+}
+
+// Virtual language codes that are not real ISO country codes.
+// Maps to a real country code used for region lookup.
+const VIRTUAL_TO_COUNTRY: Record<string, string> = {
+  en: "de",
+}
+
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
   regionMapUpdated: Date.now(),
@@ -57,6 +73,14 @@ async function getRegionMap(cacheId: string) {
     })
 
     regionMapCache.regionMapUpdated = Date.now()
+
+    // Inject virtual language codes that aren't real ISO country codes
+    for (const [langCode, countryCode] of Object.entries(VIRTUAL_TO_COUNTRY)) {
+      const region = regionMapCache.regionMap.get(countryCode)
+      if (region) {
+        regionMapCache.regionMap.set(langCode, region)
+      }
+    }
   }
 
   return regionMapCache.regionMap
@@ -119,8 +143,21 @@ export async function middleware(request: NextRequest) {
   const urlHasCountryCode =
     countryCode && request.nextUrl.pathname.split("/")[1].includes(countryCode)
 
+  const locale = countryCode ? (LOCALE_MAP[countryCode] ?? null) : null
+  const currentLocale = request.cookies.get("_medusa_locale")?.value
+
   // if one of the country codes is in the url and the cache id is set, return next
   if (urlHasCountryCode && cacheIdCookie) {
+    if (locale && currentLocale !== locale) {
+      const res = NextResponse.next()
+      res.cookies.set("_medusa_locale", locale, {
+        maxAge: 60 * 60 * 24 * 365,
+        httpOnly: false,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      })
+      return res
+    }
     return NextResponse.next()
   }
 
@@ -129,7 +166,14 @@ export async function middleware(request: NextRequest) {
     response.cookies.set("_medusa_cache_id", cacheId, {
       maxAge: 60 * 60 * 24,
     })
-
+    if (locale) {
+      response.cookies.set("_medusa_locale", locale, {
+        maxAge: 60 * 60 * 24 * 365,
+        httpOnly: false,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "production",
+      })
+    }
     return response
   }
 

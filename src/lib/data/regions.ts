@@ -35,12 +35,19 @@ export const retrieveRegion = async (id: string) => {
     .catch(medusaError)
 }
 
+// Virtual language codes → real ISO country code fallback for region lookup
+const LANGUAGE_COUNTRY_FALLBACK: Record<string, string> = {
+  en: "de",
+}
+
 const regionMap = new Map<string, HttpTypes.StoreRegion>()
 
 export const getRegion = async (countryCode: string) => {
   try {
-    if (regionMap.has(countryCode)) {
-      return regionMap.get(countryCode)
+    const resolvedCode = LANGUAGE_COUNTRY_FALLBACK[countryCode] ?? countryCode
+
+    if (regionMap.has(resolvedCode)) {
+      return regionMap.get(resolvedCode)
     }
 
     const regions = await listRegions()
@@ -55,8 +62,8 @@ export const getRegion = async (countryCode: string) => {
       })
     })
 
-    const region = countryCode
-      ? regionMap.get(countryCode)
+    const region = resolvedCode
+      ? regionMap.get(resolvedCode)
       : regionMap.get("us")
 
     return region

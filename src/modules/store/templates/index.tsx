@@ -23,10 +23,10 @@ const StoreTemplate = ({
       className="flex flex-col py-6 content-container"
       data-testid="category-container"
     >
-      <div className="mb-4 text-2xl-semi">
-        <h1 data-testid="store-page-title">All products</h1>
+      <div className="flex items-center justify-between mb-4 border-b border-ui-border-base pb-3">
+        <h1 className="text-2xl-semi" data-testid="store-page-title">All products</h1>
+        <RefinementList sortBy={sort} />
       </div>
-      <RefinementList sortBy={sort} />
       <Suspense fallback={<SkeletonProductGrid />}>
         <PaginatedProducts
           sortBy={sort}
