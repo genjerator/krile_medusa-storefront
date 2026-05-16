@@ -32,7 +32,7 @@ export default async function Home(props: {
   return (
     <>
       <Hero />
-      <FeaturedFour region={region} />
+      <FeaturedFour />
       {collections.length > 0 && (
         <div className="py-12">
           <ul className="flex flex-col gap-x-6">

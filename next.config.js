@@ -1,6 +1,9 @@
 const checkEnvVariables = require("./check-env-variables")
+const createNextIntlPlugin = require("next-intl/plugin")
 
 checkEnvVariables()
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
 
 /**
  * Medusa Cloud-related environment variables
@@ -46,6 +49,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "krilemedusa-production.up.railway.app",
       },
+      {
+        protocol: "https",
+        hostname: "krile-medusa-313003894447-eu-central-1-an.s3.eu-central-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "dpc56b2hptc18.cloudfront.net",
+      },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
             {
@@ -59,4 +70,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withNextIntl(nextConfig)

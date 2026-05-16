@@ -1,41 +1,53 @@
-import { HttpTypes } from "@medusajs/types"
 import { Text } from "@medusajs/ui"
-import { listProducts } from "@lib/data/products"
-import InteractiveLink from "@modules/common/components/interactive-link"
-import ProductPreview from "@modules/products/components/product-preview"
 
-type FeaturedFourProps = {
-  region: HttpTypes.StoreRegion
-}
+type VideoItem = { id: number; src: string; title: string; poster?: string }
 
-export default async function FeaturedFour({ region }: FeaturedFourProps) {
-  const {
-    response: { products },
-  } = await listProducts({
-    regionId: region.id,
-    queryParams: {
-      limit: 4,
-      fields: "*variants.calculated_price",
-    },
-  })
+const VIDEOS: VideoItem[] = [
+  { id: 1, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Bull+%26+Claw_EN+with+subtitles.mp4", title: "Customer Video Bull & Claw", poster: "/video-1-poster.png" },
+  { id: 2, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Metzgerei+Wenisch_EN.mp4", title: "Customer Video Metzgerei Wenisch", poster: "/video-2-poster.png" },
+  { id: 3, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Suinco.mp4", title: "Customer Video Suinco", poster: "/video-3-poster.png" },
+  { id: 4, src: "https://dpc56b2hptc18.cloudfront.net/Customer+Video+Waldburger.mp4", title: "Customer Video Waldburger", poster: "/video-4-poster.png" },
+  { id: 5, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+C+200.mp4", title: "Sales Video C 200", poster: "/video-5-poster.png" },
+  { id: 6, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+BASELINE+P+200.mp4", title: "Sales Video BASELINE P 200", poster: "/video-6-poster.png" },
+]
 
-  if (!products.length) {
-    return null
-  }
-
+export default function FeaturedFour() {
   return (
-    <div className="content-container py-12 small:py-24">
-      <div className="flex justify-between mb-8">
-        <Text className="txt-xlarge">Featured Products</Text>
-        <InteractiveLink href="/store">View all</InteractiveLink>
+    <div className="content-container py-12 small:py-20">
+      <div className="flex flex-col items-center text-center mb-10 gap-4">
+        <Text className="txt-xlarge font-semibold">VAKUUMVERPACKT KONSERVIEREN</Text>
+        <p className="text-ui-fg-subtle text-sm leading-relaxed max-w-2xl">
+          Technik, die Ihre Küche radikal verändert.<br />
+          Technologie, die die Haltbarkeit der Produkte verlängert.<br />
+          Sicherheit, die Geschmack und Qualität garantiert.<br />
+          <br />
+          Smart Integration of Appliances for high quality and sustainable Food processing
+        </p>
       </div>
-      <ul className="grid grid-cols-2 small:grid-cols-4 gap-x-6 gap-y-24 small:gap-y-36">
-        {products.map((product) => (
-          <li key={product.id}>
-            <ProductPreview product={product} region={region} isFeatured />
-          </li>
+
+      <div className="grid grid-cols-1 small:grid-cols-3 gap-4">
+        {VIDEOS.map((video) => (
+          <div
+            key={video.id}
+            className="relative aspect-video rounded-lg overflow-hidden bg-ui-bg-subtle shadow-sm"
+          >
+            {video.src ? (
+              <video
+                src={video.src}
+                title={video.title}
+                poster={video.poster}
+                controls
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-ui-fg-muted text-sm">
+                {video.title}
+              </div>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

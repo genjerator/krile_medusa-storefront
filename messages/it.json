@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "products": "Il Vostro Prodotto",
+    "training": "Servizio",
+    "contact": "Contatto",
+    "informations": "Informazioni",
+    "account": "Account",
+    "cart": "Carrello"
+  },
+  "store": {
+    "title": "Tutti i Prodotti"
+  },
+  "footer": {
+    "rights": "Tutti i diritti riservati"
+  }
+}

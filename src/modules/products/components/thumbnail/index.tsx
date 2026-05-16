@@ -46,13 +46,23 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   )
 }
 
+const isValidImageUrl = (url?: string): boolean => {
+  if (!url) return false
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
 const ImageOrPlaceholder = ({
   image,
   size,
 }: Pick<ThumbnailProps, "size"> & { image?: string }) => {
-  return image ? (
+  return isValidImageUrl(image) ? (
     <Image
-      src={image}
+      src={image!}
       alt="Thumbnail"
       className="absolute inset-0 object-cover object-center"
       draggable={false}

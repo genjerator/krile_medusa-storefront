@@ -1,16 +1,21 @@
 import { Suspense } from "react"
+import Image from "next/image"
+import { getTranslations } from "next-intl/server"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
+import LanguageSwitcher from "@modules/layout/components/language-switcher"
 import MobileMenu from "./mobile-menu"
 
-const NAV_LINKS = [
-  { label: "Ihr Produkt", href: "/store" },
-  { label: "Training", href: "/training" },
-  { label: "Kontakt", href: "/kontakt" },
-]
+export default async function Nav() {
+  const t = await getTranslations("nav")
 
-export default function Nav() {
+  const NAV_LINKS = [
+    { label: t("products"), href: "/store" },
+    { label: t("training"), href: "/service" },
+    { label: t("contact"), href: "/kontakt" },
+    { label: t("informations"), href: "/informations" },
+  ]
   return (
     <div className="sticky top-0 inset-x-0 z-50">
       <header className="relative h-16 mx-auto duration-200 bg-brand-navy">
@@ -19,10 +24,17 @@ export default function Nav() {
           {/* Logo */}
           <LocalizedClientLink
             href="/"
-            className="txt-compact-xlarge-plus text-white hover:text-white/70 uppercase shrink-0"
+            className="shrink-0 hover:opacity-80 transition-opacity"
             data-testid="nav-store-link"
           >
-            Planeta
+            <Image
+              src="/planeta_logo.png"
+              alt="Planeta"
+              width={60}
+              height={20}
+              className="h-5 w-auto object-contain"
+              priority
+            />
           </LocalizedClientLink>
 
           {/* Desktop nav links */}
@@ -38,14 +50,15 @@ export default function Nav() {
             ))}
           </div>
 
-          {/* Right: account + cart + hamburger */}
+          {/* Right: language + account + cart + hamburger */}
           <div className="flex items-center gap-x-4">
+            <LanguageSwitcher />
             <LocalizedClientLink
               className="hidden small:block text-white text-sm hover:text-white/70"
               href="/account"
               data-testid="nav-account-link"
             >
-              Account
+              {t("account")}
             </LocalizedClientLink>
             <Suspense
               fallback={

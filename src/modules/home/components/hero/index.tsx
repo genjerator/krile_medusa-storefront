@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from "react"
 import type { JSX } from "react"
+import Image from "next/image"
 import { Button, Heading } from "@medusajs/ui"
 
 type Slide = {
   readonly id: number
   readonly bg: string
+  readonly image?: string
   readonly heading: string
   readonly subtitle: string
   readonly ctaLabel: string
@@ -16,7 +18,8 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     id: 0,
-    bg: "bg-gradient-to-br from-slate-900 to-slate-700",
+    bg: "bg-gradient-to-br from-slate-900 to-slate-500",
+    image: "/p-series.png",
     heading: "New Season Arrivals",
     subtitle: "Discover the latest trends crafted for every occasion.",
     ctaLabel: "Shop Now",
@@ -24,20 +27,13 @@ const SLIDES: Slide[] = [
   },
   {
     id: 1,
-    bg: "bg-gradient-to-br from-rose-800 to-orange-500",
+    bg: "bg-gradient-to-br from-slate-900 to-slate-300",
+    image: "/C-Series.png",
     heading: "Summer Sale — Up to 40% Off",
     subtitle: "Limited time offers on our most-loved collections.",
     ctaLabel: "View Deals",
     ctaHref: "/store",
-  },
-  {
-    id: 2,
-    bg: "bg-gradient-to-br from-emerald-800 to-teal-500",
-    heading: "Free Shipping on Orders Over $75",
-    subtitle: "Shop confidently with fast, tracked delivery worldwide.",
-    ctaLabel: "Start Shopping",
-    ctaHref: "/store",
-  },
+  }
 ]
 
 const AUTOPLAY_INTERVAL_MS = 5000
@@ -93,25 +89,38 @@ const Hero = (): JSX.Element => {
         {SLIDES.map((slide) => (
           <div
             key={slide.id}
-            className={`min-w-full h-full flex flex-col justify-center items-center text-center small:p-32 gap-6 ${slide.bg}`}
+            className={`min-w-full h-full relative flex flex-col justify-center items-center text-center small:p-32 gap-6 ${slide.bg}`}
           >
-            <span>
-              <Heading
-                level="h1"
-                className="text-lg leading-7 small:text-3xl small:leading-10 text-white font-normal"
-              >
-                {slide.heading}
-              </Heading>
-              <Heading
-                level="h2"
-                className="text-sm leading-6 small:text-3xl small:leading-10 text-white/80 font-normal"
-              >
-                {slide.subtitle}
-              </Heading>
-            </span>
-            <a href={slide.ctaHref}>
-              <Button variant="secondary">{slide.ctaLabel}</Button>
-            </a>
+            {slide.image && (
+              <Image
+                src={slide.image}
+                alt={slide.heading}
+                fill
+                className="object-cover object-center"
+                priority={slide.id === 0}
+              />
+            )}
+            {!slide.image && (
+              <div className="relative z-10 flex flex-col items-center gap-6">
+                <span>
+                  <Heading
+                    level="h1"
+                    className="text-lg leading-7 small:text-3xl small:leading-10 text-white font-normal"
+                  >
+                    {slide.heading}
+                  </Heading>
+                  <Heading
+                    level="h2"
+                    className="text-sm leading-6 small:text-3xl small:leading-10 text-white/80 font-normal"
+                  >
+                    {slide.subtitle}
+                  </Heading>
+                </span>
+                <a href={slide.ctaHref}>
+                  <Button variant="secondary">{slide.ctaLabel}</Button>
+                </a>
+              </div>
+            )}
           </div>
         ))}
       </div>

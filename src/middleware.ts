@@ -13,12 +13,18 @@ const LOCALE_MAP: Record<string, string> = {
   en: "en-US",
   gb: "en-US",
   us: "en-US",
+  it: "it-IT",
+  fr: "fr-FR",
+  ru: "ru-RU",
 }
 
 // Virtual language codes that are not real ISO country codes.
 // Maps to a real country code used for region lookup.
 const VIRTUAL_TO_COUNTRY: Record<string, string> = {
   en: "de",
+  it: "de",
+  fr: "de",
+  ru: "de",
 }
 
 const regionMapCache = {

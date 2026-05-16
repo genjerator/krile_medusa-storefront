@@ -38,6 +38,9 @@ export const retrieveRegion = async (id: string) => {
 // Virtual language codes → real ISO country code fallback for region lookup
 const LANGUAGE_COUNTRY_FALLBACK: Record<string, string> = {
   en: "de",
+  it: "de",
+  fr: "de",
+  ru: "de",
 }
 
 const regionMap = new Map<string, HttpTypes.StoreRegion>()

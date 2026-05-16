@@ -1,16 +1,19 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
-const NAV_LINKS = [
-  { label: "Ihr Produkt", href: "/store" },
-  { label: "Training", href: "/training" },
-  { label: "Kontakt", href: "/kontakt" },
-]
 
 export default function MobileMenu() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const t = useTranslations("nav")
+
+  const NAV_LINKS = [
+    { label: t("products"), href: "/store" },
+    { label: t("training"), href: "/service" },
+    { label: t("contact"), href: "/kontakt" },
+    { label: t("informations"), href: "/informations" },
+  ]
 
   return (
     <>
@@ -49,7 +52,7 @@ export default function MobileMenu() {
               className="text-white text-sm hover:text-white/70 transition-colors"
               onClick={() => setMenuOpen(false)}
             >
-              Account
+              {t("account")}
             </LocalizedClientLink>
           </div>
         </div>

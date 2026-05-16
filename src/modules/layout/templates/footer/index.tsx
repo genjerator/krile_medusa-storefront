@@ -19,7 +19,7 @@ export default async function Footer() {
       <div className="content-container flex flex-col w-full gap-3">
         <div className="flex flex-row items-start">
           <div className="flex flex-row gap-12">
-            {topLevelCategories.length > 0 && (
+            {/* topLevelCategories.length > 0 && (
               <div className="flex flex-col gap-2">
                 <span className="txt-compact-small font-semibold text-ui-fg-base uppercase tracking-wider">
                   Categories
@@ -38,7 +38,7 @@ export default async function Footer() {
                   ))}
                 </ul>
               </div>
-            )}
+            ) */}
 
             {collections && collections.length > 0 && (
               <div className="flex flex-col gap-2">
