@@ -18,6 +18,8 @@ type Props = {
 }
 
 export async function generateStaticParams() {
+  return []
+
   const product_categories = await listCategories()
 
   if (!product_categories) {
