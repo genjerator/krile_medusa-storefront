@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 
 const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
-const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "de"
+const DEFAULT_REGION = "de"
 
 // Maps URL prefixes to Medusa locale codes for the Translation Module
 const LOCALE_MAP: Record<string, string> = {
@@ -134,78 +134,37 @@ async function getCountryCode(
  * Middleware to handle region selection and onboarding status.
  */
 export async function middleware(request: NextRequest) {
-  let redirectUrl = request.nextUrl.href
-
-  let response = NextResponse.redirect(redirectUrl, 307)
-
-  let cacheIdCookie = request.cookies.get("_medusa_cache_id")
-
-  let cacheId = cacheIdCookie?.value || crypto.randomUUID()
-
-  const regionMap = await getRegionMap(cacheId)
-
-  const countryCode = regionMap && (await getCountryCode(request, regionMap))
-
-  const urlHasCountryCode =
-    countryCode && request.nextUrl.pathname.split("/")[1].includes(countryCode)
-
-  const locale = countryCode ? (LOCALE_MAP[countryCode] ?? null) : null
-  const currentLocale = request.cookies.get("_medusa_locale")?.value
-
-  // if one of the country codes is in the url and the cache id is set, return next
-  if (urlHasCountryCode && cacheIdCookie) {
-    if (locale && currentLocale !== locale) {
-      const res = NextResponse.next()
-      res.cookies.set("_medusa_locale", locale, {
-        maxAge: 60 * 60 * 24 * 365,
-        httpOnly: false,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-      })
-      return res
-    }
-    return NextResponse.next()
-  }
-
-  // if one of the country codes is in the url and the cache id is not set, set the cache id and redirect
-  if (urlHasCountryCode && !cacheIdCookie) {
-    response.cookies.set("_medusa_cache_id", cacheId, {
-      maxAge: 60 * 60 * 24,
-    })
-    if (locale) {
-      response.cookies.set("_medusa_locale", locale, {
-        maxAge: 60 * 60 * 24 * 365,
-        httpOnly: false,
-        sameSite: "strict",
-        secure: process.env.NODE_ENV === "production",
-      })
-    }
-    return response
-  }
-
   // check if the url is a static asset
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
   }
 
-  const redirectPath =
-    request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
+  let cacheIdCookie = request.cookies.get("_medusa_cache_id")
+  let cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
-  const queryString = request.nextUrl.search ? request.nextUrl.search : ""
+  const regionMap = await getRegionMap(cacheId)
+  const countryCode = (regionMap && (await getCountryCode(request, regionMap))) || DEFAULT_REGION
+  const locale = LOCALE_MAP[countryCode] ?? "de-DE"
 
-  // If no country code is set, we redirect to the relevant region.
-  if (!urlHasCountryCode && countryCode) {
-    redirectUrl = `${request.nextUrl.origin}/${countryCode}${redirectPath}${queryString}`
-    response = NextResponse.redirect(`${redirectUrl}`, 307)
-  } else if (!urlHasCountryCode && !countryCode) {
-    // Handle case where no valid country code exists (empty regions)
-    return new NextResponse(
-      "No valid regions configured. Please set up regions with countries in your Medusa Admin.",
-      { status: 500 }
-    )
+  const urlFirstSegment = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
+  const urlHasCountryCode = regionMap.has(urlFirstSegment)
+
+  // If URL already has a country code, serve normally
+  if (urlHasCountryCode) {
+    const res = NextResponse.next()
+    res.cookies.set("_medusa_locale", locale, { maxAge: 60 * 60 * 24 * 365, httpOnly: false, sameSite: "strict", secure: process.env.NODE_ENV === "production" })
+    if (!cacheIdCookie) res.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
+    return res
   }
 
-  return response
+  // No country code in URL — rewrite to /de/... without redirecting
+  const path = request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
+  const query = request.nextUrl.search || ""
+  const rewriteUrl = new URL(`/${DEFAULT_REGION}${path}${query}`, request.url)
+  const res = NextResponse.rewrite(rewriteUrl)
+  res.cookies.set("_medusa_locale", locale, { maxAge: 60 * 60 * 24 * 365, httpOnly: false, sameSite: "strict", secure: process.env.NODE_ENV === "production" })
+  if (!cacheIdCookie) res.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
+  return res
 }
 
 export const config = {
