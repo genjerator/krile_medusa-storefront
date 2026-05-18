@@ -3,12 +3,12 @@ import { Text } from "@medusajs/ui"
 type VideoItem = { id: number; src: string; title: string; poster?: string }
 
 const VIDEOS: VideoItem[] = [
-  { id: 1, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Bull+%26+Claw_EN+with+subtitles.mp4", title: "Customer Video Bull & Claw", poster: "/video-1-poster.png" },
-  { id: 2, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Metzgerei+Wenisch_EN.mp4", title: "Customer Video Metzgerei Wenisch", poster: "/video-2-poster.png" },
-  { id: 3, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Suinco.mp4", title: "Customer Video Suinco", poster: "/video-3-poster.png" },
-  { id: 4, src: "https://dpc56b2hptc18.cloudfront.net/Customer+Video+Waldburger.mp4", title: "Customer Video Waldburger", poster: "/video-4-poster.png" },
-  { id: 5, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+C+200.mp4", title: "Sales Video C 200", poster: "/video-5-poster.png" },
-  { id: 6, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+BASELINE+P+200.mp4", title: "Sales Video BASELINE P 200", poster: "/video-6-poster.png" },
+  { id: 1, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Bull+%26+Claw_EN+with+subtitles.mp4", title: "Customer Video Bull & Claw", poster: "/video-1-poster.webp" },
+  { id: 2, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Metzgerei+Wenisch_EN.mp4", title: "Customer Video Metzgerei Wenisch", poster: "/video-2-poster.webp" },
+  { id: 3, src: "https://dpc56b2hptc18.cloudfront.net/Customer+video+Suinco.mp4", title: "Customer Video Suinco", poster: "/video-3-poster.webp" },
+  { id: 4, src: "https://dpc56b2hptc18.cloudfront.net/Customer+Video+Waldburger.mp4", title: "Customer Video Waldburger", poster: "/video-4-poster.webp" },
+  { id: 5, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+C+200.mp4", title: "Sales Video C 200", poster: "/video-5-poster.webp" },
+  { id: 6, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+BASELINE+P+200.mp4", title: "Sales Video BASELINE P 200", poster: "/video-6-poster.webp" },
 ]
 
 export default function FeaturedFour() {
