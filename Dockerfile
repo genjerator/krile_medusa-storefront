@@ -4,7 +4,7 @@ RUN npm install -g pnpm@10.33.0
 FROM base AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --shamefully-hoist && pnpm approve-builds --all
 
 FROM base AS builder
 WORKDIR /app
