@@ -52,10 +52,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "krile-medusa-313003894447-eu-central-1-an.s3.eu-central-1.amazonaws.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "dpc56b2hptc18.cloudfront.net",
+        pathname: "/**",
       },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
