@@ -12,5 +12,42 @@
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten"
+  },
+  "technicalData": {
+    "sections": {
+      "ausstattung": "Ausstattung",
+      "siegelvarianten": "Siegelvarianten",
+      "zubehoer": "Zubehör"
+    },
+    "fields": {
+      "laenge_siegelschiene_mm": "Länge der Siegelschiene (nutzbar) in mm",
+      "kammertiefe_breite_mm": "Kammertiefe / -breite in mm",
+      "anzahl_siegelschienen": "Anzahl der Siegelschienen",
+      "kammerhoehe_mm": "Kammerhöhe in mm",
+      "sichtfenster_sicherheitsglas": "Sichtfenster aus Sicherheitsglas",
+      "vakuumpumpe_m3h": "Vakuumpumpe in m³/h",
+      "anschluss_externe_vakuumpumpe": "Anschluss für externe Vakuumpumpe",
+      "maschinenmasze_geschlossen_mm": "Maschinenmaße B×T×H (geschlossen) in mm",
+      "maschinenmasze_geoeffnet_mm": "Maschinenmaße B×T×H (geöffnet) in mm",
+      "gewicht_kg": "Gewicht in kg",
+      "absaugdrossel": "Absaugdrossel",
+      "schutzgaseinrichtung": "Schutzgaseinrichtung",
+      "doppelnaht_trennsiegelung": "Doppelnaht-Trennsiegelung",
+      "doppelnaht_siegelung": "Doppelnaht-Siegelung",
+      "einfachsiegelung": "Einfachsiegelung",
+      "einfachsiegelung_oben_unten": "Einfachsiegelung oben und unten",
+      "doppelnaht_siegelung_oben_unten": "Doppelnaht-Siegelung oben und unten",
+      "spannung": "Spannung",
+      "schraeg_einsatz": "Schrägeinsatz",
+      "edelstahl_fahrgestell": "Edelstahl-Fahrgestell",
+      "beutelaufblasgeraet_ba01": "Beutelaufblasgerät (BA 01)",
+      "fleischgabel": "Fleischgabel",
+      "einfuellhilfe_banknoten": "Einfüllhilfe für Banknoten",
+      "schrumpftank_se60": "Schrumpftank (SE 60)",
+      "gasmischer": "Gasmischer"
+    },
+    "values": {
+      "optional": "Optional"
+    }
   }
 }

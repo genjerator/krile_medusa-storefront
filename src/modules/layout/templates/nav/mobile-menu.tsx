@@ -9,7 +9,7 @@ export default function MobileMenu() {
   const t = useTranslations("nav")
 
   const NAV_LINKS = [
-    { label: t("products"), href: "/store" },
+    { label: t("products"), href: "/products" },
     { label: t("training"), href: "/service" },
     { label: t("contact"), href: "/kontakt" },
     { label: t("informations"), href: "/informations" },

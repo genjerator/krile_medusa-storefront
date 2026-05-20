@@ -1,0 +1,61 @@
+import { listProductsWithSort } from "@lib/data/products"
+import { getRegion } from "@lib/data/regions"
+import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { Pagination } from "@modules/store/components/pagination"
+import ProductCard from "@modules/products/components/product-card"
+
+const PRODUCT_LIMIT = 12
+
+export default async function ProductsGrid({
+  sortBy,
+  page,
+  countryCode,
+}: {
+  sortBy?: SortOptions
+  page: number
+  countryCode: string
+}) {
+  const region = await getRegion(countryCode)
+
+  if (!region) return null
+
+  const queryParams: Record<string, unknown> = { limit: PRODUCT_LIMIT }
+
+  if (sortBy === "created_at") {
+    queryParams["order"] = "created_at"
+  }
+
+  const {
+    response: { products, count },
+  } = await listProductsWithSort({
+    page,
+    queryParams,
+    sortBy,
+    countryCode,
+  })
+
+  const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+
+  return (
+    <>
+      <p className="text-sm text-ui-fg-muted mb-4">{count} Produkte gefunden</p>
+      <ul
+        className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-4"
+        data-testid="products-list"
+      >
+        {products.map((p, i) => (
+          <li key={p.id}>
+            <ProductCard product={p} region={region} isNew={i < 2} />
+          </li>
+        ))}
+      </ul>
+      {totalPages > 1 && (
+        <Pagination
+          data-testid="product-pagination"
+          page={page}
+          totalPages={totalPages}
+        />
+      )}
+    </>
+  )
+}

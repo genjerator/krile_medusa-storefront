@@ -12,5 +12,42 @@
   },
   "footer": {
     "rights": "All rights reserved"
+  },
+  "technicalData": {
+    "sections": {
+      "ausstattung": "Equipment",
+      "siegelvarianten": "Sealing Variants",
+      "zubehoer": "Accessories"
+    },
+    "fields": {
+      "laenge_siegelschiene_mm": "Sealing bar length (usable) in mm",
+      "kammertiefe_breite_mm": "Chamber depth / width in mm",
+      "anzahl_siegelschienen": "Number of sealing bars",
+      "kammerhoehe_mm": "Chamber height in mm",
+      "sichtfenster_sicherheitsglas": "Safety glass window",
+      "vakuumpumpe_m3h": "Vacuum pump in m³/h",
+      "anschluss_externe_vakuumpumpe": "Connection for external vacuum pump",
+      "maschinenmasze_geschlossen_mm": "Machine dimensions W×D×H (lid closed) in mm",
+      "maschinenmasze_geoeffnet_mm": "Machine dimensions W×D×H (lid open) in mm",
+      "gewicht_kg": "Weight in kg",
+      "absaugdrossel": "Suction throttle",
+      "schutzgaseinrichtung": "Protective gas unit",
+      "doppelnaht_trennsiegelung": "Double seam / separating seal",
+      "doppelnaht_siegelung": "Double seam seal",
+      "einfachsiegelung": "Single seal",
+      "einfachsiegelung_oben_unten": "Single seal top and bottom",
+      "doppelnaht_siegelung_oben_unten": "Double seam seal top and bottom",
+      "spannung": "Voltage",
+      "schraeg_einsatz": "Tilted insert",
+      "edelstahl_fahrgestell": "Stainless steel trolley",
+      "beutelaufblasgeraet_ba01": "Bag inflating device (BA 01)",
+      "fleischgabel": "Meat fork",
+      "einfuellhilfe_banknoten": "Filling aid for banknotes",
+      "schrumpftank_se60": "Shrink tank (SE 60)",
+      "gasmischer": "Gas mixer"
+    },
+    "values": {
+      "optional": "Optional"
+    }
   }
 }
