@@ -119,8 +119,8 @@ export default function ProductDetailActions({
         </div>
       </div>
 
-      {/* CTA buttons */}
-      <div className="space-y-3">
+      {/* CTA buttons — sticky on mobile */}
+      <div className="space-y-3 medium:static fixed bottom-0 left-0 right-0 medium:p-0 p-3 bg-white medium:bg-transparent border-t medium:border-0 border-ui-border-base z-40">
         <button
           onClick={handleAddToCart}
           disabled={!inStock || !selectedVariant || isAdding || !isValidVariant}

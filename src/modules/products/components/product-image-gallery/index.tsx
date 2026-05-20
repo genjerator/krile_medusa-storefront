@@ -47,14 +47,18 @@ export default function ProductImageGallery({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <Image
-          src={validImages[active].url}
-          alt={title}
-          fill
-          className="object-contain p-6 transition-opacity duration-200"
-          sizes="(max-width: 768px) 100vw, 500px"
-          priority
-        />
+        {validImages.map((img, i) => (
+          <Image
+            key={img.id ?? i}
+            src={img.url}
+            alt={`${title} ${i + 1}`}
+            fill
+            className={`object-contain p-6 transition-opacity duration-200 ${active === i ? "opacity-100" : "opacity-0"}`}
+            sizes="(max-width: 768px) 100vw, 500px"
+            priority={i === 0}
+            loading={i === 0 ? undefined : "eager"}
+          />
+        ))}
 
         {/* Arrows — only if >1 image */}
         {validImages.length > 1 && (
@@ -113,6 +117,7 @@ export default function ProductImageGallery({
                 fill
                 className="object-contain p-1"
                 sizes="80px"
+                loading="lazy"
               />
             </button>
           ))}
