@@ -17,7 +17,8 @@
     "sections": {
       "ausstattung": "Equipment",
       "siegelvarianten": "Sealing Variants",
-      "zubehoer": "Accessories"
+      "zubehoer": "Accessories",
+      "doppelkammer": "Double Chamber Machines"
     },
     "fields": {
       "laenge_siegelschiene_mm": "Sealing bar length (usable) in mm",
@@ -44,7 +45,9 @@
       "fleischgabel": "Meat fork",
       "einfuellhilfe_banknoten": "Filling aid for banknotes",
       "schrumpftank_se60": "Shrink tank (SE 60)",
-      "gasmischer": "Gas mixer"
+      "gasmischer": "Gas mixer",
+      "wassergekühlte_siegeleinrichtung": "Water-cooled sealing unit",
+      "fleischgabel_kaliber": "Meat fork for calibre products"
     },
     "values": {
       "optional": "Optional"

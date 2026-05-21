@@ -10,16 +10,22 @@ export default async function ProductsGrid({
   sortBy,
   page,
   countryCode,
+  categoryId,
 }: {
   sortBy?: SortOptions
   page: number
   countryCode: string
+  categoryId?: string | string[]
 }) {
   const region = await getRegion(countryCode)
 
   if (!region) return null
 
   const queryParams: Record<string, unknown> = { limit: PRODUCT_LIMIT }
+
+  if (categoryId) {
+    queryParams["category_id"] = Array.isArray(categoryId) ? categoryId : [categoryId]
+  }
 
   if (sortBy === "created_at") {
     queryParams["order"] = "created_at"

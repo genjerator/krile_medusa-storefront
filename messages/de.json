@@ -17,7 +17,8 @@
     "sections": {
       "ausstattung": "Ausstattung",
       "siegelvarianten": "Siegelvarianten",
-      "zubehoer": "Zubehör"
+      "zubehoer": "Zubehör",
+      "doppelkammer": "Doppelkammermaschinen"
     },
     "fields": {
       "laenge_siegelschiene_mm": "Länge der Siegelschiene (nutzbar) in mm",
@@ -44,7 +45,9 @@
       "fleischgabel": "Fleischgabel",
       "einfuellhilfe_banknoten": "Einfüllhilfe für Banknoten",
       "schrumpftank_se60": "Schrumpftank (SE 60)",
-      "gasmischer": "Gasmischer"
+      "gasmischer": "Gasmischer",
+      "wassergekühlte_siegeleinrichtung": "Wassergekühlte Siegeleinrichtung",
+      "fleischgabel_kaliber": "Fleischgabel für Kaliberprodukte"
     },
     "values": {
       "optional": "Optional"

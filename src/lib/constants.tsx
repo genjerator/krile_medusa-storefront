@@ -48,7 +48,7 @@ export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
 }
 export const isManual = (providerId?: string) => {
-  return providerId?.startsWith("pp_system_default")
+  return providerId?.startsWith("pp_system_default") || providerId?.startsWith("pp_manual_")
 }
 
 // Add currencies that don't need to be divided by 100
