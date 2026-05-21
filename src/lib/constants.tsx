@@ -14,6 +14,10 @@ export const paymentInfoMap: Record<
     title: "Credit card",
     icon: <CreditCard />,
   },
+  pp_paypal_paypal: {
+    title: "PayPal",
+    icon: <PayPal />,
+  },
   "pp_medusa-payments_default": {
     title: "Credit card",
     icon: <CreditCard />,
@@ -49,6 +53,10 @@ export const isPaypal = (providerId?: string) => {
 }
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default") || providerId?.startsWith("pp_manual_")
+}
+
+export const isPayPal = (providerId?: string) => {
+  return providerId?.startsWith("pp_paypal_")
 }
 
 // Add currencies that don't need to be divided by 100
