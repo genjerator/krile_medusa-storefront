@@ -13,13 +13,15 @@ export default async function ProductCard({
   isNew?: boolean
 }) {
   const { cheapestPrice } = getProductPrice({ product })
-  const metadata = (product as any).metadata ?? {}
   const thumbnail = product.thumbnail || product.images?.[0]?.url
 
   return (
-    <div className="bg-white rounded-lg border border-ui-border-base hover:shadow-lg transition-shadow duration-200 flex flex-col overflow-hidden">
+    <LocalizedClientLink
+      href={`/product/${product.handle}`}
+      className="group bg-white rounded-lg border border-ui-border-base hover:border-blue-200 hover:shadow-md hover:bg-ui-bg-subtle transition-all duration-200 flex flex-col overflow-hidden"
+    >
       {/* Image */}
-      <div className="relative bg-ui-bg-subtle p-4 aspect-[4/3]">
+      <div className="relative bg-ui-bg-subtle group-hover:bg-white transition-colors duration-200 p-4 aspect-[4/3]">
         <div className="relative w-full h-full">
           {thumbnail ? (
             <Image
@@ -45,60 +47,20 @@ export default async function ProductCard({
           {product.title}
         </h3>
 
-        {/* Specs */}
-        {(metadata.sealing_bars || metadata.vacuum_pump_m3h) && (
-          <div className="flex items-center gap-4 mb-3 text-xs text-ui-fg-subtle">
-            {metadata.sealing_bars && (
-              <div className="flex items-center gap-1">
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                </svg>
-                <span>{metadata.sealing_bars}</span>
-              </div>
-            )}
-            {metadata.vacuum_pump_m3h && (
-              <div className="flex items-center gap-1">
-                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <span>{metadata.vacuum_pump_m3h} m³/h</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Price + buttons */}
-        <div className="mt-auto">
+        {/* Price + arrow */}
+        <div className="mt-auto flex items-center justify-between">
           {cheapestPrice && (
-            <div className="mb-3">
-              <p className="text-lg font-bold text-blue-700">
-                {cheapestPrice.calculated_price}
-              </p>
-            </div>
+            <p className="text-lg font-bold text-blue-700">
+              {cheapestPrice.calculated_price}
+            </p>
           )}
-
-          <div className="flex gap-2">
-            <LocalizedClientLink
-              href={`/product/${product.handle}`}
-              className="flex-1 flex items-center justify-between px-3 py-2 text-sm border border-ui-border-base rounded hover:bg-ui-bg-subtle transition-colors text-ui-fg-base"
-            >
-              <span>Details ansehen</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </LocalizedClientLink>
-            <LocalizedClientLink
-              href={`/product/${product.handle}`}
-              className="bg-brand-navy text-white px-3 py-2 rounded hover:bg-blue-900 transition-colors shrink-0"
-              aria-label="In den Warenkorb"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </LocalizedClientLink>
-          </div>
+          <span className="text-ui-fg-muted group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-200">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </span>
         </div>
       </div>
-    </div>
+    </LocalizedClientLink>
   )
 }
