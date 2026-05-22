@@ -72,8 +72,11 @@ export default function ProductDetailActions({
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return
     setIsAdding(true)
-    await addToCart({ variantId: selectedVariant.id, quantity, countryCode })
-    setIsAdding(false)
+    try {
+      await addToCart({ variantId: selectedVariant.id, quantity, countryCode })
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   return (
