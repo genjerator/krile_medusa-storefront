@@ -140,7 +140,7 @@ export default function Checkout2Client({
 
       {/* ── Left: Address + Versandmethode ───────────────────────────────── */}
       <div className="flex flex-col gap-y-6">
-        <Addresses cart={cart} customer={customer} />
+        <Addresses cart={cart} customer={customer} alwaysOpen />
         {isPayPal(selectedPayment) && paypalApproved && paypalAddress && (
           <div className="p-4 border border-green-200 rounded-lg bg-green-50">
             <Text className="txt-small font-medium text-green-700 mb-1">✓ Von PayPal übernommen:</Text>

@@ -17,15 +17,17 @@ import { SubmitButton } from "../submit-button"
 const Addresses = ({
   cart,
   customer,
+  alwaysOpen,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  alwaysOpen?: boolean
 }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOpen = searchParams.get("step") === "address"
+  const isOpen = alwaysOpen || searchParams.get("step") === "address"
 
   const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
     cart?.shipping_address && cart?.billing_address
