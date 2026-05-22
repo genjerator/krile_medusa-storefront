@@ -48,7 +48,13 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       next,
       cache: "force-cache",
     })
-    .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
+    .then(({ cart }: { cart: HttpTypes.StoreCart }) => {
+      if ((cart as any).completed_at) {
+        removeCartId()
+        return null
+      }
+      return cart
+    })
     .catch(() => null)
 }
 
