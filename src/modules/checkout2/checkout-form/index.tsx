@@ -130,6 +130,7 @@ export default function Checkout2Client({
       await placeOrder()
     } catch (e: any) {
       if (e?.digest?.startsWith("NEXT_REDIRECT")) throw e
+      console.error("[Jetzt kaufen] error:", e?.message, e?.digest, e)
       setError(e.message)
       setLoading(false)
     }

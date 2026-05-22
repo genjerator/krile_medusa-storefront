@@ -29,11 +29,7 @@ const Addresses = ({
 
   const isOpen = alwaysOpen || searchParams.get("step") === "address"
 
-  const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
-    cart?.shipping_address && cart?.billing_address
-      ? compareAddresses(cart?.shipping_address, cart?.billing_address)
-      : true
-  )
+  const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(true)
 
   const handleEdit = () => {
     router.push(pathname + "?step=address")
