@@ -7,6 +7,22 @@
     "account": "Konto",
     "cart": "Warenkorb"
   },
+  "cart": {
+    "title": "Warenkorb",
+    "goToCart": "Zum Warenkorb",
+    "item": "Artikel",
+    "quantity": "Menge",
+    "price": "Preis",
+    "total": "Gesamt",
+    "summary": "Zusammenfassung",
+    "subtotal": "Zwischensumme (exkl. Versand und Steuern)",
+    "shipping": "Versand",
+    "taxes": "Steuern",
+    "discount": "Rabatt",
+    "goToCheckout": "Zur Kasse",
+    "subtotalExclTaxes": "Zwischensumme (exkl. Steuern)",
+    "variant": "Variante"
+  },
   "store": {
     "title": "Alle Produkte"
   },

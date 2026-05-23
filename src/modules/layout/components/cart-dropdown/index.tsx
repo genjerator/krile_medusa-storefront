@@ -15,6 +15,7 @@ import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Fragment, useEffect, useRef, useState } from "react"
 
 const CartDropdown = ({
@@ -22,6 +23,7 @@ const CartDropdown = ({
 }: {
   cart?: HttpTypes.StoreCart | null
 }) => {
+  const t = useTranslations("cart")
   const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
     undefined
   )
@@ -103,7 +105,7 @@ const CartDropdown = ({
             data-testid="nav-cart-dropdown"
           >
             <div className="p-4 flex items-center justify-center">
-              <h3 className="text-large-semi">Cart</h3>
+              <h3 className="text-large-semi">{t("title")}</h3>
             </div>
             {cartState && cartState.items?.length ? (
               <>
@@ -151,7 +153,7 @@ const CartDropdown = ({
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
                                 >
-                                  Quantity: {item.quantity}
+                                  {t("quantity")}: {item.quantity}
                                 </span>
                               </div>
                               <div className="flex justify-end">
@@ -177,8 +179,7 @@ const CartDropdown = ({
                 <div className="p-4 flex flex-col gap-y-4 text-small-regular">
                   <div className="flex items-center justify-between">
                     <span className="text-ui-fg-base font-semibold">
-                      Subtotal{" "}
-                      <span className="font-normal">(excl. taxes)</span>
+                      {t("subtotalExclTaxes")}
                     </span>
                     <span
                       className="text-large-semi"
@@ -197,7 +198,7 @@ const CartDropdown = ({
                       size="large"
                       data-testid="go-to-cart-button"
                     >
-                      Go to cart
+                      {t("goToCart")}
                     </Button>
                   </LocalizedClientLink>
                 </div>

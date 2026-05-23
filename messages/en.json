@@ -7,6 +7,22 @@
     "account": "Account",
     "cart": "Cart"
   },
+  "cart": {
+    "title": "Cart",
+    "goToCart": "Go to cart",
+    "item": "Item",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "summary": "Summary",
+    "subtotal": "Subtotal (excl. shipping and taxes)",
+    "shipping": "Shipping",
+    "taxes": "Taxes",
+    "discount": "Discount",
+    "goToCheckout": "Go to checkout",
+    "subtotalExclTaxes": "Subtotal (excl. taxes)",
+    "variant": "Variant"
+  },
   "store": {
     "title": "All Products"
   },
