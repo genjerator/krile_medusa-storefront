@@ -11,6 +11,7 @@ import {
 } from "@lib/data/cart"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { Button, Heading, Text, Badge, clx } from "@medusajs/ui"
+import { useTranslations } from "next-intl"
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import RadioUI from "@modules/common/components/radio"
@@ -31,6 +32,7 @@ export default function Checkout2Client({
   shippingMethods: HttpTypes.StoreCartShippingOption[]
   paymentMethods: { id: string; is_enabled: boolean }[]
 }) {
+  const t = useTranslations("checkout")
   const [selectedPayment, setSelectedPayment] = useState("")
   const [selectedShipping, setSelectedShipping] = useState(
     initialShipping.length === 1 ? initialShipping[0].id : ""
@@ -144,16 +146,16 @@ export default function Checkout2Client({
         <Addresses cart={cart} customer={customer} alwaysOpen />
         {isPayPal(selectedPayment) && paypalApproved && paypalAddress && (
           <div className="p-4 border border-green-200 rounded-lg bg-green-50">
-            <Text className="txt-small font-medium text-green-700 mb-1">✓ Von PayPal übernommen:</Text>
+            <Text className="txt-small font-medium text-green-700 mb-1">{t("paypalTaken")}</Text>
             <Text className="txt-small text-green-600">{paypalAddress}</Text>
           </div>
         )}
 
         {/* Versandmethode */}
         <div className="bg-white border border-ui-border-base rounded-lg p-5">
-          <Heading level="h2" className="text-xl-semi mb-4">Versandmethode</Heading>
+          <Heading level="h2" className="text-xl-semi mb-4">{t("shippingMethod")}</Heading>
           {shippingMethods.length === 0 ? (
-            <Text className="txt-small text-ui-fg-muted">Keine Versandoptionen verfügbar.</Text>
+            <Text className="txt-small text-ui-fg-muted">{t("noShippingOptions")}</Text>
           ) : (
             <div className="flex flex-col gap-2">
               {shippingMethods.map((option) => (
@@ -186,7 +188,7 @@ export default function Checkout2Client({
 
         {/* Order summary — top */}
         <div className="bg-white border border-ui-border-base rounded-lg p-5">
-          <Heading level="h2" className="text-xl-semi mb-4">Bestellübersicht</Heading>
+          <Heading level="h2" className="text-xl-semi mb-4">{t("orderSummary")}</Heading>
           <CartTotals totals={cart} />
           <Divider className="my-4" />
           <ItemsPreviewTemplate cart={cart} />
@@ -194,7 +196,7 @@ export default function Checkout2Client({
 
         {/* Payment method */}
         <div className="bg-white border border-ui-border-base rounded-lg p-5">
-          <Heading level="h2" className="text-xl-semi mb-4">Zahlungsmethode</Heading>
+          <Heading level="h2" className="text-xl-semi mb-4">{t("paymentMethod")}</Heading>
           <div className="flex flex-col gap-2">
             {paymentMethods
               .filter(m => isManual(m.id) || isPayPal(m.id))
@@ -211,7 +213,7 @@ export default function Checkout2Client({
                 >
                   <RadioUI checked={selectedPayment === m.id} />
                   <span className="txt-compact-small font-medium">
-                    {paymentInfoMap[m.id]?.title || (isPayPal(m.id) ? "PayPal" : "Vorkasse")}
+                    {paymentInfoMap[m.id]?.title || (isPayPal(m.id) ? "PayPal" : t("prepayment"))}
                   </span>
                 </div>
               ))}
@@ -237,7 +239,7 @@ export default function Checkout2Client({
 
           {paypalApproved && (
             <div className="mt-3 flex items-center gap-2">
-              <Badge color="green" size="2xsmall">✓ PayPal bestätigt</Badge>
+              <Badge color="green" size="2xsmall">{t("paypalConfirmed")}</Badge>
             </div>
           )}
         </div>
@@ -251,10 +253,10 @@ export default function Checkout2Client({
           isLoading={loading}
           disabled={!canPlaceOrder || loading}
         >
-          Jetzt kaufen
+          {t("buyNow")}
         </Button>
         <Text className="txt-small text-ui-fg-muted text-center">
-          Mit Klick bestätigen Sie unsere AGB und Datenschutzerklärung.
+          {t("termsHint")}
         </Text>
 
       </div>
