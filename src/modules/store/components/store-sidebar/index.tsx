@@ -1,14 +1,17 @@
-import { listCategories } from "@lib/data/categories"
+import { listCategories, listCategoryIdsWithProducts } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
 
 export default async function StoreSidebar() {
-  const categories = await listCategories()
+  const [categories, activeCategoryIds] = await Promise.all([
+    listCategories(),
+    listCategoryIdsWithProducts(),
+  ])
 
   const hasProducts = (cat: HttpTypes.StoreProductCategory): boolean => {
-    const direct = (cat as any).products?.length > 0
+    const direct = activeCategoryIds.has(cat.id)
     const fromChildren = (cat as any).category_children?.some(
-      (child: HttpTypes.StoreProductCategory) => (child as any).products?.length > 0
+      (child: HttpTypes.StoreProductCategory) => activeCategoryIds.has(child.id)
     )
     return direct || fromChildren
   }
@@ -34,11 +37,6 @@ export default async function StoreSidebar() {
             className="shrink-0 text-sm font-medium px-3 py-1.5 rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors whitespace-nowrap"
           >
             {cat.name}
-            {(cat as any).products?.length > 0 && (
-              <span className="ml-1.5 text-xs text-ui-fg-muted">
-                {(cat as any).products.length}
-              </span>
-            )}
           </LocalizedClientLink>
         ))}
       </div>
@@ -59,7 +57,7 @@ export default async function StoreSidebar() {
               )}
             </LocalizedClientLink>
             {(cat as any).category_children?.filter(
-              (child: HttpTypes.StoreProductCategory) => (child as any).products?.length > 0
+              (child: HttpTypes.StoreProductCategory) => activeCategoryIds.has(child.id)
             ).map((child: HttpTypes.StoreProductCategory) => (
               <LocalizedClientLink
                 key={child.id}
