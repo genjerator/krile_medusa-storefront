@@ -7,6 +7,11 @@ import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  title: {
+    template: "%s | planeta industries",
+    default: "planeta industries",
+  },
+  description: "planeta industries",
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
