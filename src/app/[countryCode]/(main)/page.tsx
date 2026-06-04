@@ -7,7 +7,25 @@ import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
   title: "planeta industries",
-  description: "planeta industries",
+  description: "Hochleistungs-Vakuumverpackungsmaschinen für Lebensmittel-, Pharma- und Industrieumgebungen. Modular, effizient, langlebig.",
+  openGraph: {
+    title: "planeta industries – Vakuumverpackungsmaschinen",
+    description: "Hochleistungs-Vakuumverpackungsmaschinen für Lebensmittel-, Pharma- und Industrieumgebungen. Modular, effizient, langlebig.",
+    url: "/",
+    images: [
+      {
+        url: "/p-series.webp",
+        width: 2048,
+        height: 531,
+        alt: "planeta industries P-Series Vakuumverpackungsmaschinen",
+      },
+    ],
+  },
+  twitter: {
+    title: "planeta industries – Vakuumverpackungsmaschinen",
+    description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
+    images: ["/p-series.webp"],
+  },
 }
 
 export default async function Home(props: {

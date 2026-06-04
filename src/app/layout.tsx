@@ -11,7 +11,39 @@ export const metadata: Metadata = {
     template: "%s | planeta industries",
     default: "planeta industries",
   },
-  description: "planeta industries",
+  description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion. Entwickelt für Lebensmittel-, Pharma- und Industrieumgebungen.",
+  keywords: ["Vakuumverpackungsmaschinen", "vacuum packaging", "P-Series", "C-Series", "industrial packaging", "planeta industries"],
+  authors: [{ name: "planeta industries" }],
+  creator: "planeta industries",
+  publisher: "planeta industries",
+  openGraph: {
+    type: "website",
+    siteName: "planeta industries",
+    title: "planeta industries",
+    description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
+    images: [
+      {
+        url: "/p-series.webp",
+        width: 2048,
+        height: 531,
+        alt: "planeta industries – Vakuumverpackungsmaschinen",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "planeta industries",
+    description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
+    images: ["/p-series.webp"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
