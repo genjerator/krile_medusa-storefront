@@ -15,7 +15,40 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  compress: true,
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        // Next.js static assets — already immutable, but explicit for clarity
+        source: "/_next/static/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Images in /public
+        source: "/:path*.(jpg|jpeg|png|gif|webp|svg|ico|avif)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        // Fonts in /public
+        source: "/:path*.(woff|woff2|ttf|otf|eot)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, immutable" },
+        ],
+      },
+      {
+        // Videos in /public
+        source: "/:path*.(mp4|webm|ogg)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000" },
+        ],
+      },
+    ]
+  },
   logging: {
     fetches: {
       fullUrl: true,

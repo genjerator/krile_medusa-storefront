@@ -28,10 +28,10 @@ export default async function Nav() {
             data-testid="nav-store-link"
           >
             <Image
-              src="/planeta_logo_blue.png"
+              src="/planeta_logo_blue.webp"
               alt="Planeta"
               width={160}
-              height={20}
+              height={53}
               priority
             />
           </LocalizedClientLink>
