@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: {
     title: "planeta industries – Vakuumverpackungsmaschinen",
     description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
-    images: ["/p-series.webp"],
+    images: ["/og-image.jpg"],
   },
 }
 

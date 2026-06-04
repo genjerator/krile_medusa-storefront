@@ -13,9 +13,9 @@ export const metadata: Metadata = {
     url: "/products",
     images: [
       {
-        url: "/C-Series.webp",
-        width: 2048,
-        height: 850,
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
         alt: "planeta industries – Produktübersicht",
       },
     ],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   twitter: {
     title: "Produkte | planeta industries",
     description: "Entdecken Sie unsere hochwertigen Vakuumverpackungsmaschinen.",
-    images: ["/C-Series.webp"],
+    images: ["/og-image.jpg"],
   },
 }
 
