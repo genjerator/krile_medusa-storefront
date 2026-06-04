@@ -14,10 +14,10 @@ export const metadata: Metadata = {
     url: "/",
     images: [
       {
-        url: "/p-series.webp",
-        width: 2048,
-        height: 531,
-        alt: "planeta industries P-Series Vakuumverpackungsmaschinen",
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "planeta industries – Vakuumverpackungsmaschinen",
       },
     ],
   },
