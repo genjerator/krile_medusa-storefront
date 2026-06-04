@@ -62,7 +62,7 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-ui-border-base pt-2">
+        <div className="">
           <Text className="txt-compact-small text-ui-fg-muted">
             © {new Date().getFullYear()} Planeta. All rights reserved.
           </Text>

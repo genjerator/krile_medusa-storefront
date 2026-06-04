@@ -79,6 +79,30 @@
   "footer": {
     "rights": "Alle Rechte vorbehalten"
   },
+  "heroV2": {
+    "slide0": {
+      "label": "P-Serie Industriesysteme",
+      "heading": "Vakuumverpackungsmaschinen für die Industrieproduktion",
+      "subheading": "Entwickelt für den Dauerbetrieb in Lebensmittel-, Pharma- und Industrieumgebungen. Gebaut für Zuverlässigkeit, Effizienz und lange Lebensdauer.",
+      "primaryCta": "Maschinen entdecken",
+      "secondaryCta": "Angebot anfragen",
+      "trust": "✔ Modulares Industriedesign • ✔ Hochdrehmomentsysteme • ✔ EU-Ingenieursstandards"
+    },
+    "slide1": {
+      "label": "C-Serie Kompaktlinie",
+      "heading": "Skalierbare Vakuumlösungen für jedes Produktionsvolumen",
+      "subheading": "Von Tisch- bis Standgeräten – die C-Serie passt sich Ihrer Anlage mit gleichbleibender Siegelqualität und minimalen Ausfallzeiten an.",
+      "primaryCta": "C-Serie ansehen",
+      "secondaryCta": "Angebot anfragen",
+      "trust": "✔ Platzsparendes Design • ✔ Einfache Integration • ✔ Zertifiziert für Lebensmittelkontakt"
+    },
+    "modal": {
+      "title": "Demnächst verfügbar",
+      "description": "Unsere Online-Angebotsanfrage wird derzeit entwickelt. Wenden Sie sich bitte direkt an uns.",
+      "contactButton": "Zum Kontakt",
+      "close": "Schließen"
+    }
+  },
   "technicalData": {
     "sections": {
       "ausstattung": "Ausstattung",

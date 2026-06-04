@@ -6,11 +6,11 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "planeta industries",
+  title: "Home V2",
   description: "planeta industries",
 }
 
-export default async function Home(props: {
+export default async function Home2(props: {
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await props.params

@@ -1,4 +1,7 @@
-import { Text } from "@medusajs/ui"
+"use client"
+
+import { useState, useEffect } from "react"
+import ContentBox from "@modules/common/components/content-box"
 
 type VideoItem = { id: number; src: string; title: string; poster?: string }
 
@@ -11,11 +14,34 @@ const VIDEOS: VideoItem[] = [
   { id: 6, src: "https://dpc56b2hptc18.cloudfront.net/Sales+video+BASELINE+P+200.mp4", title: "Sales Video BASELINE P 200", poster: "/video-6-poster.webp" },
 ]
 
+const SMALL = 1024
+
 export default function FeaturedFour() {
+  const [isDesktop, setIsDesktop] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(3)
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${SMALL}px)`)
+    const update = (e: MediaQueryList | MediaQueryListEvent) => {
+      setIsDesktop(e.matches)
+      setVisibleCount(e.matches ? 3 : 1)
+    }
+    update(mq)
+    mq.addEventListener("change", update)
+    return () => mq.removeEventListener("change", update)
+  }, [])
+
+  const initialCount = isDesktop ? 3 : 1
+  const step = isDesktop ? 3 : 1
+  const hasMore = visibleCount < VIDEOS.length
+  const isExpanded = visibleCount > initialCount
+
   return (
-    <div className="content-container py-12 small:py-20">
-      <div className="flex flex-col items-center text-center mb-10 gap-4">
-        <Text className="txt-xlarge font-semibold">VAKUUMVERPACKT KONSERVIEREN</Text>
+    <div className="content-container py-6">
+
+      {/* Text section */}
+      <div className="flex flex-col items-center text-center mb-8 gap-4">
+        <p className="text-xl font-semibold text-ui-fg-base">VAKUUMVERPACKT KONSERVIEREN</p>
         <p className="text-ui-fg-subtle text-sm leading-relaxed max-w-2xl">
           Technik, die Ihre Küche radikal verändert.<br />
           Technologie, die die Haltbarkeit der Produkte verlängert.<br />
@@ -25,28 +51,49 @@ export default function FeaturedFour() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 small:grid-cols-3 gap-4">
-        {VIDEOS.map((video) => (
-          <div
-            key={video.id}
-            className="relative aspect-video rounded-lg overflow-hidden bg-ui-bg-subtle shadow-sm"
-          >
-            {video.src ? (
+      {/* Outer box */}
+      <div className="rounded-xl border border-ui-border-base bg-white shadow-sm p-4 small:p-6">
+
+        {/* Header: title left */}
+        <h2 className="text-lg font-semibold text-ui-fg-base mb-4">Videos</h2>
+
+        {/* Video grid */}
+        <div className="grid grid-cols-1 small:grid-cols-3 gap-4">
+          {VIDEOS.slice(0, visibleCount).map((video) => (
+            <ContentBox key={video.id} title={video.title} aspectRatio="video">
               <video
                 src={video.src}
-                title={video.title}
                 poster={video.poster}
                 controls
                 preload="metadata"
                 className="w-full h-full object-cover"
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-ui-fg-muted text-sm">
-                {video.title}
-              </div>
+            </ContentBox>
+          ))}
+        </div>
+
+        {/* Footer: more videos / hide buttons */}
+        {(hasMore || isExpanded) && (
+          <div className="flex justify-end gap-2 mt-4">
+            {isExpanded && (
+              <button
+                onClick={() => setVisibleCount(initialCount)}
+                className="px-5 py-2 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-red-400 hover:text-red-500 transition-colors"
+              >
+                Hide
+              </button>
+            )}
+            {hasMore && (
+              <button
+                onClick={() => setVisibleCount((v) => Math.min(v + step, VIDEOS.length))}
+                className="px-5 py-2 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors"
+              >
+                More videos
+              </button>
             )}
           </div>
-        ))}
+        )}
+
       </div>
     </div>
   )

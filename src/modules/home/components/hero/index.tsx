@@ -19,7 +19,7 @@ const SLIDES: Slide[] = [
   {
     id: 0,
     bg: "bg-gradient-to-br from-slate-900 to-slate-500",
-    image: "/p-series.png",
+    image: "/p-series.webp",
     heading: "New Season Arrivals",
     subtitle: "Discover the latest trends crafted for every occasion.",
     ctaLabel: "Shop Now",
@@ -28,12 +28,12 @@ const SLIDES: Slide[] = [
   {
     id: 1,
     bg: "bg-gradient-to-br from-slate-900 to-slate-300",
-    image: "/C-Series.png",
+    image: "/C-Series.webp",
     heading: "Summer Sale — Up to 40% Off",
     subtitle: "Limited time offers on our most-loved collections.",
     ctaLabel: "View Deals",
     ctaHref: "/store",
-  }
+  },
 ]
 
 const AUTOPLAY_INTERVAL_MS = 5000
@@ -46,32 +46,20 @@ const Hero = (): JSX.Element => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % SLIDES.length)
     }, AUTOPLAY_INTERVAL_MS)
-
     return () => clearInterval(timer)
   }, [])
 
-  const goTo = (index: number): void => {
-    setCurrent(index)
-  }
-
-  const goPrev = (): void => {
-    setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
-  }
-
-  const goNext = (): void => {
-    setCurrent((prev) => (prev + 1) % SLIDES.length)
-  }
+  const goTo = (index: number): void => setCurrent(index)
+  const goPrev = (): void => setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
+  const goNext = (): void => setCurrent((prev) => (prev + 1) % SLIDES.length)
 
   const onTouchStart = (e: React.TouchEvent): void => {
     touchStartX.current = e.touches[0].clientX
   }
-
   const onTouchEnd = (e: React.TouchEvent): void => {
     if (touchStartX.current === null) return
     const diff = touchStartX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? goNext() : goPrev()
-    }
+    if (Math.abs(diff) > 50) diff > 0 ? goNext() : goPrev()
     touchStartX.current = null
   }
 
@@ -81,7 +69,6 @@ const Hero = (): JSX.Element => {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      {/* Slide track */}
       <div
         className="flex h-full transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
@@ -96,6 +83,7 @@ const Hero = (): JSX.Element => {
                 src={slide.image}
                 alt={slide.heading}
                 fill
+                sizes="100vw"
                 className="object-cover object-center"
                 priority={slide.id === 0}
               />
@@ -125,53 +113,28 @@ const Hero = (): JSX.Element => {
         ))}
       </div>
 
-      {/* Left arrow */}
       <button
         type="button"
         onClick={goPrev}
         aria-label="Previous slide"
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5L8.25 12l7.5-7.5"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </button>
 
-      {/* Right arrow */}
       <button
         type="button"
         onClick={goNext}
         aria-label="Next slide"
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.25 4.5l7.5 7.5-7.5 7.5"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
         </svg>
       </button>
 
-      {/* Dot indicators */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {SLIDES.map((slide) => (
           <button
@@ -180,9 +143,7 @@ const Hero = (): JSX.Element => {
             onClick={() => goTo(slide.id)}
             aria-label={`Go to slide ${slide.id + 1}`}
             className={`w-2.5 h-2.5 rounded-full transition-colors ${
-              current === slide.id
-                ? "bg-white"
-                : "bg-white/40 hover:bg-white/70"
+              current === slide.id ? "bg-white" : "bg-white/40 hover:bg-white/70"
             }`}
           />
         ))}

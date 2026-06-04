@@ -79,6 +79,30 @@
   "footer": {
     "rights": "All rights reserved"
   },
+  "heroV2": {
+    "slide0": {
+      "label": "P-Series Industrial Systems",
+      "heading": "Vacuum Packaging Machines for Industrial Production",
+      "subheading": "Engineered for continuous operation in food, pharmaceutical and industrial environments. Built for reliability, efficiency and long service life.",
+      "primaryCta": "Explore Machines",
+      "secondaryCta": "Request Quote",
+      "trust": "✔ Modular industrial design • ✔ High torque systems • ✔ EU engineering standards"
+    },
+    "slide1": {
+      "label": "C-Series Compact Line",
+      "heading": "Scalable Vacuum Solutions for Every Production Volume",
+      "subheading": "From countertop to floor-standing systems — the C-Series adapts to your facility with consistent sealing quality and minimal downtime.",
+      "primaryCta": "View C-Series",
+      "secondaryCta": "Request Quote",
+      "trust": "✔ Space-efficient design • ✔ Easy integration • ✔ Certified for food-grade use"
+    },
+    "modal": {
+      "title": "Coming Soon",
+      "description": "Our online quote request is currently under development. In the meantime, please reach out to us directly.",
+      "contactButton": "Go to Contact",
+      "close": "Close"
+    }
+  },
   "technicalData": {
     "sections": {
       "ausstattung": "Equipment",

@@ -44,7 +44,7 @@ export default async function ProductsGrid({
 
   return (
     <>
-      <p className="text-sm text-ui-fg-muted mb-4">{count} Produkte gefunden</p>
+
       <ul
         className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-4"
         data-testid="products-list"

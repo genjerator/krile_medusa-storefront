@@ -45,20 +45,20 @@ export default function CategoryTemplate({
   return (
     <div>
       {/* Header banner */}
-      <div className="bg-brand-navy text-white py-6 medium:py-10 px-4 medium:px-6">
-        <div className="max-w-[1400px] mx-auto">
+      <div className="bg-brand-navy text-white py-6 medium:py-10 pt-0">
+        <div className="content-container">
           <h1 className="text-2xl medium:text-4xl font-bold mb-1 medium:mb-2">
             {category.name}
           </h1>
           {category.description && (
-            <p className="text-white/70 text-sm max-w-lg leading-relaxed">
+            <p className="text-white/70 text-sm leading-relaxed">
               {category.description}
             </p>
           )}
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 medium:px-6 py-4 medium:py-6">
+      <div className="content-container py-4 medium:py-6">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-ui-fg-muted mb-4 flex-wrap">
           <LocalizedClientLink href="/" className="hover:text-ui-fg-base transition-colors">
