@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   publisher: "planeta industries",
   openGraph: {
     type: "website",
-    siteName: "planeta industries",
+    siteName: "Planeta Industries",
     title: "planeta industries",
     description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
     images: [
@@ -44,6 +44,10 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+  alternates: {
+    canonical: "https://www.planetaindustries.de",
+  },
+  themeColor: "#0F1E46",
 }
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
@@ -65,6 +69,25 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             gtag('config', 'G-CN1PX0WWDT');
           `}
         </Script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Planeta Industries",
+              "url": "https://www.planetaindustries.de",
+              "logo": "https://www.planetaindustries.de/planeta_logo.png",
+              "description": "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion. Entwickelt für Lebensmittel-, Pharma- und Industrieumgebungen.",
+
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "availableLanguage": ["German", "English"]
+              }
+            })
+          }}
+        />
         <NextIntlClientProvider messages={messages}>
           <main className="relative">{props.children}</main>
         </NextIntlClientProvider>
