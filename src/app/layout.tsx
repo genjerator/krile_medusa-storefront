@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/planeta-og.jpg",
         width: 1200,
         height: 630,
         alt: "planeta industries – Vakuumverpackungsmaschinen",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "planeta industries",
     description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
-    images: ["/og-image.png"],
+    images: ["/planeta-og.jpg"],
   },
   robots: {
     index: true,
