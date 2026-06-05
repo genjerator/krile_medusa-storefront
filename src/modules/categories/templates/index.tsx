@@ -94,7 +94,9 @@ export default function CategoryTemplate({
                 </span>
               </Suspense>
             </div>
-            <SortSelect sortBy={sort} />
+            <Suspense fallback={null}>
+              <SortSelect sortBy={sort} />
+            </Suspense>
           </div>
         </div>
       </div>
