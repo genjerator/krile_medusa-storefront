@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#0F1E46" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Bag outline — slightly tapered at top where sealed -->
+  <path d="M16 14 L48 14 L50 54 L14 54 Z"/>
+  <!-- Seal bar at top -->
+  <line x1="16" y1="20" x2="48" y2="20"/>
+  <!-- Vacuum wrinkle lines suggesting compressed contents -->
+  <path d="M20 30 Q32 27 44 30"/>
+  <path d="M19 36 Q32 33 45 36"/>
+  <path d="M20 42 Q32 39 44 42"/>
+  <!-- Side edge notches (typical on vacuum bags) -->
+  <line x1="14" y1="24" x2="10" y2="24"/>
+  <line x1="50" y1="24" x2="54" y2="24"/>
+</svg>

@@ -46,7 +46,7 @@ export default async function ProductsGrid({
     <>
 
       <ul
-        className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 large:grid-cols-4 gap-4"
+        className="grid grid-cols-1 small:grid-cols-2 medium:grid-cols-3 gap-4"
         data-testid="products-list"
       >
         {products.map((p, i) => (

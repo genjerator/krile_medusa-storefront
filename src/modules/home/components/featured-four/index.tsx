@@ -45,9 +45,7 @@ export default function FeaturedFour() {
         <p className="text-ui-fg-subtle text-sm leading-relaxed max-w-2xl">
           Technik, die Ihre Küche radikal verändert.<br />
           Technologie, die die Haltbarkeit der Produkte verlängert.<br />
-          Sicherheit, die Geschmack und Qualität garantiert.<br />
-          <br />
-          Smart Integration of Appliances for high quality and sustainable Food processing
+          Sicherheit, die Geschmack und Qualität garantiert.
         </p>
       </div>
 
@@ -74,21 +72,27 @@ export default function FeaturedFour() {
 
         {/* Footer: more videos / hide buttons */}
         {(hasMore || isExpanded) && (
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end items-center gap-4 mt-4">
             {isExpanded && (
               <button
                 onClick={() => setVisibleCount(initialCount)}
-                className="px-5 py-2 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-red-400 hover:text-red-500 transition-colors"
+                className="group flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-slate-400 hover:text-red-400 transition-colors"
               >
+                <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
                 Hide
               </button>
             )}
             {hasMore && (
               <button
                 onClick={() => setVisibleCount((v) => Math.min(v + step, VIDEOS.length))}
-                className="px-5 py-2 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors"
+                className="group flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-slate-400 hover:text-slate-900 transition-colors"
               >
                 More videos
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             )}
           </div>

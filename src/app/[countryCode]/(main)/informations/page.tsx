@@ -23,10 +23,10 @@ export default function InformationsPage() {
           <dd className="text-ui-fg-base">Savings Bank MM-LI-MN</dd>
 
           <dt className="text-ui-fg-muted">BIC / SWIFT</dt>
-          <dd className="text-ui-fg-base font-mono">BYLADEM1MLM</dd>
+          <dd className="text-ui-fg-base font-sans">BYLADEM1MLM</dd>
 
           <dt className="text-ui-fg-muted">IBAN</dt>
-          <dd className="text-ui-fg-base font-mono">DE10 7315 0000 1002 0935 14</dd>
+          <dd className="text-ui-fg-base font-sans">DE10 7315 0000 1002 0935 14</dd>
         </dl>
       </section>
 

@@ -5,6 +5,8 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import ProductsGrid from "@modules/products/templates/products-grid"
+import ProductCount from "@modules/products/templates/product-count"
+import SortSelect from "@modules/products/components/sort-select"
 import StoreSidebar from "@modules/store/components/store-sidebar"
 
 export default function CategoryTemplate({
@@ -51,50 +53,67 @@ export default function CategoryTemplate({
             {category.name}
           </h1>
           {category.description && (
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-white/70 text-sm leading-relaxed mb-4">
               {category.description}
             </p>
           )}
+
+          {/* Breadcrumb + count + sort inside blue bar */}
+          <div className="flex items-center justify-between mt-4 gap-6 medium:gap-8">
+            <div className="flex items-center gap-4 flex-1 min-w-0 flex-wrap">
+              <nav className="flex items-center gap-2 text-sm text-white/60 flex-wrap">
+                <LocalizedClientLink href="/" className="hover:text-white transition-colors">
+                  Startseite
+                </LocalizedClientLink>
+                <span>›</span>
+                <LocalizedClientLink href="/products" className="hover:text-white transition-colors">
+                  Produkte
+                </LocalizedClientLink>
+                {parents.reverse().map((parent) => (
+                  <React.Fragment key={parent.id}>
+                    <span>›</span>
+                    <LocalizedClientLink
+                      href={`/categories/${parent.handle}`}
+                      className="hover:text-white transition-colors"
+                    >
+                      {parent.name}
+                    </LocalizedClientLink>
+                  </React.Fragment>
+                ))}
+                <span>›</span>
+                <span className="text-white/90 font-medium">{category.name}</span>
+              </nav>
+              <Suspense fallback={null}>
+                <ProductCount
+                  sortBy={sort}
+                  page={pageNumber}
+                  countryCode={countryCode}
+                  categoryId={categoryIds}
+                />
+              </Suspense>
+            </div>
+            <SortSelect sortBy={sort} />
+          </div>
         </div>
       </div>
 
       <div className="content-container py-4 medium:py-6">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-ui-fg-muted mb-4 flex-wrap">
-          <LocalizedClientLink href="/" className="hover:text-ui-fg-base transition-colors">
-            Startseite
-          </LocalizedClientLink>
-          <span>›</span>
-          <LocalizedClientLink href="/products" className="hover:text-ui-fg-base transition-colors">
-            Produkte
-          </LocalizedClientLink>
-          {parents.reverse().map((parent) => (
-            <React.Fragment key={parent.id}>
-              <span>›</span>
-              <LocalizedClientLink
-                href={`/categories/${parent.handle}`}
-                className="hover:text-ui-fg-base transition-colors"
-              >
-                {parent.name}
-              </LocalizedClientLink>
-            </React.Fragment>
-          ))}
-          <span>›</span>
-          <span className="text-ui-fg-base font-medium">{category.name}</span>
-        </nav>
 
-        {/* Subcategories */}
+        {/* Subcategories — aligned with product grid */}
         {(category.category_children?.length ?? 0) > 0 && (
-          <div className="flex gap-2 flex-wrap mb-6">
-            {category.category_children!.map((child) => (
-              <LocalizedClientLink
-                key={child.id}
-                href={`/categories/${child.handle}`}
-                className="px-3 py-1.5 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors"
-              >
-                {child.name}
-              </LocalizedClientLink>
-            ))}
+          <div className="flex gap-6 medium:gap-8 mb-6">
+            <div className="hidden medium:block medium:w-56 medium:shrink-0" />
+            <div className="flex gap-2 flex-wrap flex-1">
+              {category.category_children!.map((child) => (
+                <LocalizedClientLink
+                  key={child.id}
+                  href={`/categories/${child.handle}`}
+                  className="px-3 py-1.5 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors"
+                >
+                  {child.name}
+                </LocalizedClientLink>
+              ))}
+            </div>
           </div>
         )}
 

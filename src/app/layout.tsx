@@ -2,8 +2,15 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
+import { Inter } from "next/font/google"
 import Script from "next/script"
 import "styles/globals.css"
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -55,8 +62,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const messages = await getMessages()
 
   return (
-    <html lang={locale} data-mode="light">
-      <body cz-shortcut-listen="true">
+    <html lang={locale} data-mode="light" className={inter.variable}>
+      <body className={inter.className}>
         <Script
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"

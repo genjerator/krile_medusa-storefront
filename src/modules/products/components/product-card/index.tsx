@@ -18,7 +18,7 @@ export default async function ProductCard({
   return (
     <LocalizedClientLink
       href={`/product/${product.handle}`}
-      className="group bg-white rounded-lg border border-ui-border-base hover:border-blue-200 hover:shadow-md hover:bg-ui-bg-subtle transition-all duration-200 flex flex-col overflow-hidden"
+      className="group bg-white rounded-lg border border-blue-100 shadow-[0_2px_12px_rgba(15,30,70,0.08)] hover:border-blue-300 hover:shadow-[0_6px_24px_rgba(15,30,70,0.18)] transition-all duration-200 flex flex-col overflow-hidden"
     >
       {/* Image */}
       <div className="relative bg-ui-bg-subtle group-hover:bg-white transition-colors duration-200 p-4 aspect-[4/3]">

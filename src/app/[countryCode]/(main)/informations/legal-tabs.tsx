@@ -190,7 +190,7 @@ const TABS = [
             E-Mail: <a href="mailto:info@planetex.de" className="text-brand-navy hover:underline">info@planetex.de</a>
           </p>
           <p className="mb-3">Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Waren (*) / die Erbringung der folgenden Dienstleistung (*)</p>
-          <div className="flex flex-col gap-3 font-mono text-xs text-ui-fg-base">
+          <div className="flex flex-col gap-3 font-sans text-xs text-ui-fg-base">
             <div className="border-b border-ui-border-base pb-1">_______________________________________________</div>
             <div className="border-b border-ui-border-base pb-1">_______________________________________________</div>
             <p className="not-italic text-sm">Bestellt am ___________________ (*) / erhalten am ___________________ (*)</p>

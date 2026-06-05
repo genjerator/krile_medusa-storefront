@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import HeroV2 from "@modules/home/components/hero-v2"
+import CategoryCards from "@modules/home/components/category-cards"
 import FeaturedFour from "@modules/home/components/featured-four"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import { listCollections } from "@lib/data/collections"
@@ -40,6 +41,7 @@ export default async function Home(props: {
   return (
     <>
       <HeroV2 />
+      <CategoryCards />
       <FeaturedFour />
       {collections.length > 0 && (
         <div className="py-12">
