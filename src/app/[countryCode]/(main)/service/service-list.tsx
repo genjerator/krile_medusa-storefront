@@ -58,7 +58,7 @@ const SERVICE_ITEMS: ServiceItem[] = [
     content: (
       <div className="pb-4 pl-4 border-l-2 border-brand-navy ml-1">
         <a
-          href="/Reparaturformular.pdf"
+          href="/Reparaturformular_fi.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-sm text-brand-navy hover:underline"
