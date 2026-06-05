@@ -101,23 +101,6 @@ export default function CategoryTemplate({
 
       <div className="content-container py-4 medium:py-6">
 
-        {/* Subcategories — aligned with product grid */}
-        {(category.category_children?.length ?? 0) > 0 && (
-          <div className="flex gap-6 medium:gap-8 mb-6">
-            <div className="hidden medium:block medium:w-56 medium:shrink-0" />
-            <div className="flex gap-2 flex-wrap flex-1">
-              {category.category_children!.map((child) => (
-                <LocalizedClientLink
-                  key={child.id}
-                  href={`/categories/${child.handle}`}
-                  className="px-3 py-1.5 text-sm font-medium rounded-full border border-ui-border-base bg-white hover:border-blue-600 hover:text-blue-600 transition-colors"
-                >
-                  {child.name}
-                </LocalizedClientLink>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Main layout */}
         <div className="flex flex-col medium:flex-row gap-6 medium:gap-8">
