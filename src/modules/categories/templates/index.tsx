@@ -47,7 +47,7 @@ export default function CategoryTemplate({
   return (
     <div>
       {/* Header banner */}
-      <div className="bg-brand-navy text-white py-6 medium:py-10 pt-0">
+      <div className="sticky top-16 z-40 bg-brand-navy text-white py-6 medium:py-10 pt-0">
         <div className="content-container">
           <h1 className="text-2xl medium:text-4xl font-bold mb-1 medium:mb-2">
             {category.name}
@@ -84,12 +84,14 @@ export default function CategoryTemplate({
                 <span className="text-white/90 font-medium">{category.name}</span>
               </nav>
               <Suspense fallback={null}>
-                <ProductCount
-                  sortBy={sort}
-                  page={pageNumber}
-                  countryCode={countryCode}
-                  categoryId={categoryIds}
-                />
+                <span className="text-white/60">
+                  <ProductCount
+                    sortBy={sort}
+                    page={pageNumber}
+                    countryCode={countryCode}
+                    categoryId={categoryIds}
+                  />
+                </span>
               </Suspense>
             </div>
             <SortSelect sortBy={sort} />
