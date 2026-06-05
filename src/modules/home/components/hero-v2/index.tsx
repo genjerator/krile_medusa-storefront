@@ -67,19 +67,23 @@ export default function HeroV2() {
           {SLIDE_CONFIGS.map((slide) => {
             const key = `slide${slide.id}` as "slide0" | "slide1"
             return (
-              <div key={slide.id} className={`relative min-w-full h-full ${slide.gradient}`}>
+              <div key={slide.id} className="relative min-w-full h-full bg-slate-900">
 
+                {/* Machine image — full brightness, right-aligned */}
                 <Image
                   src={slide.image}
                   alt={t(`${key}.heading`)}
                   fill
                   sizes="100vw"
-                  className="object-cover object-center scale-105 mix-blend-overlay opacity-40"
+                  className="object-cover object-center opacity-80"
                   priority={slide.id === 0}
                 />
 
+                {/* Left-side gradient so text stays readable */}
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/50 to-transparent" />
+
                 <div className="relative z-10 h-full content-container flex items-center">
-                  <div className="w-full py-10 px-8 rounded-xl bg-white/10 backdrop-blur-sm">
+                  <div className="w-full py-10 px-8">
 
                     <div className="flex items-center gap-2 mb-5">
                       <span className="w-6 h-px bg-white/50" />
