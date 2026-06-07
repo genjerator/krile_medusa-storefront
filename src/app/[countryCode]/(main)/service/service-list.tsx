@@ -112,7 +112,7 @@ export default function ServiceList() {
                 onClick={() => setOpen(open === item.label ? null : item.label)}
                 className="w-full flex items-center justify-between py-4 text-ui-fg-base hover:text-brand-navy transition-colors group"
               >
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="font-heading font-semibold uppercase tracking-widest text-xs">{item.label}</span>
                 <ChevronIcon className={`text-ui-fg-muted group-hover:text-brand-navy transition-transform ${open === item.label ? "rotate-90" : ""}`} />
               </button>
               {open === item.label && (
@@ -142,7 +142,7 @@ export default function ServiceList() {
               rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
               className="flex items-center justify-between py-4 text-ui-fg-base hover:text-brand-navy transition-colors group"
             >
-              <span className="text-sm font-medium">{item.label}</span>
+              <span className="font-heading font-semibold uppercase tracking-widest text-xs">{item.label}</span>
               <ChevronIcon className="text-ui-fg-muted group-hover:text-brand-navy" />
             </a>
           )}

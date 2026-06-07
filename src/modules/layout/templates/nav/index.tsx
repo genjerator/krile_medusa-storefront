@@ -42,7 +42,7 @@ export default async function Nav() {
               <LocalizedClientLink
                 key={link.href}
                 href={link.href}
-                className="text-white text-sm font-medium tracking-wide hover:text-white/70 transition-colors whitespace-nowrap"
+                className="font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors whitespace-nowrap"
               >
                 {link.label}
               </LocalizedClientLink>
@@ -53,7 +53,7 @@ export default async function Nav() {
           <div className="flex items-center gap-x-4">
             <LanguageSwitcher />
             <LocalizedClientLink
-              className="hidden small:block text-white text-sm font-medium tracking-wide hover:text-white/70 transition-colors"
+              className="hidden small:block font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors"
               href="/account"
               data-testid="nav-account-link"
             >
@@ -62,7 +62,7 @@ export default async function Nav() {
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="text-white text-sm font-medium tracking-wide hover:text-white/70 transition-colors flex gap-2"
+                  className="font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors flex gap-2"
                   href="/cart"
                   data-testid="nav-cart-link"
                 >

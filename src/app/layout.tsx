@@ -2,7 +2,7 @@ import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
-import { Inter } from "next/font/google"
+import { Inter, Montserrat } from "next/font/google"
 import Script from "next/script"
 import "styles/globals.css"
 
@@ -10,6 +10,12 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+})
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
 })
 
 export const metadata: Metadata = {
@@ -62,7 +68,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const messages = await getMessages()
 
   return (
-    <html lang={locale} data-mode="light" className={inter.variable}>
+    <html lang={locale} data-mode="light" className={`${inter.variable} ${montserrat.variable}`}>
       <body className={inter.className}>
         <Script
           id="Cookiebot"

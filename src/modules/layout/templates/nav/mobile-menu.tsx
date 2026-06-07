@@ -41,7 +41,7 @@ export default function MobileMenu() {
               <LocalizedClientLink
                 key={link.href}
                 href={link.href}
-                className="text-white text-sm hover:text-white/70 transition-colors"
+                className="font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}

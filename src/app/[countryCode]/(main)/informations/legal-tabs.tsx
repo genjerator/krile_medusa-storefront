@@ -227,7 +227,7 @@ export default function LegalTabs() {
             key={tab.id}
             type="button"
             onClick={() => setActive(tab.id)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px
+            className={`px-4 py-2.5 font-heading font-semibold uppercase tracking-widest text-xs transition-colors border-b-2 -mb-px
               ${active === tab.id
                 ? "border-brand-navy text-brand-navy"
                 : "border-transparent text-ui-fg-muted hover:text-ui-fg-base"

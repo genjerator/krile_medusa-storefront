@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 export default function InformationsPage() {
   return (
     <div className="content-container py-16 max-w-2xl">
-      <h1 className="text-3xl font-semibold text-ui-fg-base mb-10">Allgemeine Information</h1>
+      <h1 className="heading-product text-ui-fg-base mb-10">Allgemeine Information</h1>
 
       <section>
-        <h2 className="text-xl font-semibold text-ui-fg-base mb-4">Payment Methods</h2>
+        <h2 className="heading-section text-ui-fg-base mb-4">Payment Methods</h2>
 
-        <h3 className="text-base font-semibold text-ui-fg-base mb-3">Bank details</h3>
+        <h3 className="font-heading font-semibold uppercase tracking-widest text-xs text-ui-fg-base mb-3">Bank details</h3>
         <dl className="grid grid-cols-[max-content_1fr] gap-x-8 gap-y-2 text-sm">
           <dt className="text-ui-fg-muted">Owner</dt>
           <dd className="text-ui-fg-base">Planeta GmbH &amp; Co. KG</dd>

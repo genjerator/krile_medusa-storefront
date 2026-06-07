@@ -2,7 +2,30 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --color-brand: #0F1E46;
+  --color-brand-hover: #1a2f6b;
+}
+
 @layer utilities {
+  .heading-page {
+    font-family: var(--font-montserrat), Montserrat, sans-serif;
+    @apply text-3xl small:text-5xl font-bold tracking-tight leading-tight;
+  }
+  .heading-section {
+    font-family: var(--font-montserrat), Montserrat, sans-serif;
+    @apply text-2xl small:text-3xl font-bold uppercase tracking-widest leading-snug;
+  }
+  .heading-product {
+    font-family: var(--font-montserrat), Montserrat, sans-serif;
+    @apply text-2xl small:text-4xl font-bold tracking-tight leading-tight;
+  }
+  .heading-card {
+    font-family: var(--font-montserrat), Montserrat, sans-serif;
+    @apply text-sm font-semibold uppercase tracking-[0.08em] leading-snug;
+  }
+
+
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;

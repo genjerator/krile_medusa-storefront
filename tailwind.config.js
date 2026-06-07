@@ -62,6 +62,12 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
+        heading: [
+          "var(--font-montserrat)",
+          "Montserrat",
+          "Inter",
+          "sans-serif",
+        ],
         sans: [
           "Inter",
           "-apple-system",
