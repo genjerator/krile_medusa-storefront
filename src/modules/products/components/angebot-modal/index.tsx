@@ -3,6 +3,8 @@
 import { sdk } from "@lib/config"
 import { useState } from "react"
 
+const MESSAGE_MAX_LENGTH = 256
+
 type AngebotModalProps = {
   productId: string
   productTitle: string
@@ -103,11 +105,15 @@ export default function AngebotModal({
               <textarea
                 required
                 value={message}
-                onChange={(e) => setMessage(e.target.value)}
+                onChange={(e) => setMessage(e.target.value.slice(0, MESSAGE_MAX_LENGTH))}
+                maxLength={MESSAGE_MAX_LENGTH}
                 placeholder="Ihre Frage oder Anfrage..."
                 rows={4}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent resize-none"
               />
+              <p className="mt-1 text-right text-xs text-gray-400">
+                {message.length}/{MESSAGE_MAX_LENGTH}
+              </p>
             </div>
 
             {error && (

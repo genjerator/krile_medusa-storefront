@@ -1,4 +1,6 @@
-export default function StoreHero() {
+import { ReactNode } from "react"
+
+export default function StoreHero({ children }: { children?: ReactNode }) {
   return (
     <div className="bg-brand-navy text-white py-6 medium:py-10 pt-0">
       <div className="content-container">
@@ -7,6 +9,7 @@ export default function StoreHero() {
           Entdecken Sie unsere hochwertigen Vakuumverpackungsmaschinen
           für professionelle Anwendungen.
         </p>
+        {children}
       </div>
     </div>
   )

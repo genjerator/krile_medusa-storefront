@@ -22,30 +22,34 @@ export default function ProductsTemplate({
 
   return (
     <div>
-      <StoreHero />
-
-      <div className="content-container py-4 medium:py-6">
-
-        {/* Breadcrumb + count + sort bar — mirrors sidebar/grid column widths */}
-        <div className="flex items-center justify-between mb-4 medium:mb-6 gap-6 medium:gap-8">
-          <div className="flex items-center gap-6 medium:gap-8 flex-1 min-w-0">
-            <nav className="medium:w-56 medium:shrink-0 flex items-center gap-2 text-sm text-ui-fg-muted">
-              <LocalizedClientLink href="/" className="hover:text-ui-fg-base transition-colors">
+      <StoreHero>
+        {/* Breadcrumb + count + sort bar */}
+        <div className="flex items-center justify-between mt-4 gap-6 medium:gap-8">
+          <div className="flex items-center gap-4 flex-1 min-w-0 flex-wrap">
+            <nav className="flex items-center gap-2 text-sm text-white/60 flex-wrap">
+              <LocalizedClientLink href="/" className="hover:text-white transition-colors">
                 Startseite
               </LocalizedClientLink>
               <span>›</span>
-              <span className="text-ui-fg-base font-medium">Produkte</span>
+              <span className="text-white/90 font-medium">Produkte</span>
             </nav>
             <Suspense fallback={null}>
-              <ProductCount
-                sortBy={sort}
-                page={pageNumber}
-                countryCode={countryCode}
-              />
+              <span className="text-white/60">
+                <ProductCount
+                  sortBy={sort}
+                  page={pageNumber}
+                  countryCode={countryCode}
+                />
+              </span>
             </Suspense>
           </div>
-          <SortSelect sortBy={sort} />
+          <Suspense fallback={null}>
+            <SortSelect sortBy={sort} />
+          </Suspense>
         </div>
+      </StoreHero>
+
+      <div className="content-container py-4 medium:py-6">
 
         {/* Main layout: grid first, sidebar below on mobile / left on desktop */}
         <div className="flex flex-col medium:flex-row gap-6 medium:gap-8">
