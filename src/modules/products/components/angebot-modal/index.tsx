@@ -18,6 +18,8 @@ export default function AngebotModal({
 }: AngebotModalProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [company, setCompany] = useState("")
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -29,9 +31,13 @@ export default function AngebotModal({
     setError(null)
 
     try {
+      const fullMessage = company.trim()
+        ? `Firma: ${company.trim()}\n\n${message}`.slice(0, MESSAGE_MAX_LENGTH)
+        : message
+
       await sdk.client.fetch("/store/inquiries", {
         method: "POST",
-        body: { product_id: productId, name, email, message },
+        body: { product_id: productId, name, email, phone: phone || undefined, message: fullMessage },
       })
       setSuccess(true)
     } catch {
@@ -97,6 +103,26 @@ export default function AngebotModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ihre@email.de"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Ihre Telefonnummer"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Firma</label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Ihr Unternehmen"
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
               />
             </div>
