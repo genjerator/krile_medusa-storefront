@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { isEqual } from "lodash"
 import { addToCart } from "@lib/data/cart"
 import { getProductPrice } from "@lib/util/get-product-price"
+import AngebotModal from "@modules/products/components/angebot-modal"
 
 const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["options"]) =>
   variantOptions?.reduce((acc: Record<string, string>, varopt: any) => {
@@ -28,6 +29,7 @@ export default function ProductDetailActions({
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [angebotOpen, setAngebotOpen] = useState(false)
 
   // Preselect if only 1 variant
   useEffect(() => {
@@ -134,13 +136,27 @@ export default function ProductDetailActions({
           </svg>
           {isAdding ? "Wird hinzugefügt..." : !selectedVariant ? "Variante auswählen" : !inStock ? "Nicht verfügbar" : "In den Warenkorb"}
         </button>
-        {/* <button className="w-full border border-ui-border-base text-ui-fg-base py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-ui-bg-subtle transition-colors">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Angebot anfordern
-        </button> */}
+        {(cheapestPrice?.calculated_price_number ?? 0) >= 1000 && (
+          <button
+            type="button"
+            onClick={() => setAngebotOpen(true)}
+            className="w-full border border-ui-border-base text-ui-fg-base py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-ui-bg-subtle transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Angebot anfordern
+          </button>
+        )}
       </div>
+
+      {angebotOpen && (
+        <AngebotModal
+          productId={product.id!}
+          productTitle={product.title ?? ""}
+          onClose={() => setAngebotOpen(false)}
+        />
+      )}
 
       {/* SKU */}
       <p className="text-sm text-ui-fg-muted">
