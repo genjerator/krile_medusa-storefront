@@ -142,5 +142,25 @@
     "values": {
       "optional": "Optional"
     }
+  },
+  "angebotModal": {
+    "title": "Angebot anfragen",
+    "close": "Schließen",
+    "successTitle": "Anfrage gesendet!",
+    "successMessage": "Wir melden uns so bald wie möglich bei Ihnen.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Ihr Name",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "phoneLabel": "Telefon",
+    "phonePlaceholder": "Ihre Telefonnummer",
+    "companyLabel": "Firma",
+    "companyPlaceholder": "Ihr Unternehmen",
+    "messageLabel": "Nachricht",
+    "messagePlaceholder": "Ihre Frage oder Anfrage...",
+    "cancel": "Abbrechen",
+    "submit": "Anfrage senden",
+    "submitting": "Senden...",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }

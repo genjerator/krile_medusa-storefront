@@ -142,5 +142,25 @@
     "values": {
       "optional": "Optional"
     }
+  },
+  "angebotModal": {
+    "title": "Request Quote",
+    "close": "Close",
+    "successTitle": "Request sent!",
+    "successMessage": "We'll get back to you as soon as possible.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "Your phone number",
+    "companyLabel": "Company",
+    "companyPlaceholder": "Your company",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your question or request...",
+    "cancel": "Cancel",
+    "submit": "Send request",
+    "submitting": "Sending...",
+    "error": "Something went wrong. Please try again."
   }
 }
