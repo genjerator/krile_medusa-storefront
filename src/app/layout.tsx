@@ -69,14 +69,16 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   return (
     <html lang={locale} data-mode="light" className={`${inter.variable} ${montserrat.variable}`}>
-      <body className={inter.className}>
-        <Script
+      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+      <head>
+        <script
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
           data-cbid="2686c025-1e16-4fd7-8bdc-b6badb011f71"
           data-blockingmode="auto"
-          strategy="beforeInteractive"
         />
+      </head>
+      <body className={inter.className}>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-CN1PX0WWDT"
           strategy="afterInteractive"

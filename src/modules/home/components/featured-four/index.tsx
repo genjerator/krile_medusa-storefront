@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import ContentBox from "@modules/common/components/content-box"
 
 type VideoItem = { id: number; src: string; title: string; poster?: string }
@@ -17,6 +18,7 @@ const VIDEOS: VideoItem[] = [
 const SMALL = 1024
 
 export default function FeaturedFour() {
+  const t = useTranslations("featuredFour")
   const [isDesktop, setIsDesktop] = useState(true)
   const [visibleCount, setVisibleCount] = useState(3)
 
@@ -81,7 +83,7 @@ export default function FeaturedFour() {
                 <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-                Hide
+                {t("hide")}
               </button>
             )}
             {hasMore && (
@@ -89,7 +91,7 @@ export default function FeaturedFour() {
                 onClick={() => setVisibleCount((v) => Math.min(v + step, VIDEOS.length))}
                 className="group flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-slate-400 hover:text-slate-900 transition-colors"
               >
-                More videos
+                {t("moreVideos")}
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>

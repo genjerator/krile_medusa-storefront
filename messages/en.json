@@ -162,5 +162,9 @@
     "submit": "Send request",
     "submitting": "Sending...",
     "error": "Something went wrong. Please try again."
+  },
+  "featuredFour": {
+    "moreVideos": "More videos",
+    "hide": "Hide"
   }
 }

@@ -162,5 +162,9 @@
     "submit": "Anfrage senden",
     "submitting": "Senden...",
     "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "featuredFour": {
+    "moreVideos": "Mehr Videos",
+    "hide": "Ausblenden"
   }
 }
