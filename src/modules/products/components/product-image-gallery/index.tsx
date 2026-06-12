@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 
 export default function ProductImageGallery({
@@ -12,6 +12,7 @@ export default function ProductImageGallery({
   title: string
 }) {
   const [active, setActive] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const touchStartX = useRef<number | null>(null)
   const validImages = images?.filter((i) => i.url) ?? []
 
@@ -27,6 +28,26 @@ export default function ProductImageGallery({
 
   const prev = () => setActive((i) => (i - 1 + validImages.length) % validImages.length)
   const next = () => setActive((i) => (i + 1) % validImages.length)
+
+  // Lock body scroll + keyboard navigation while the lightbox is open
+  useEffect(() => {
+    if (!lightboxOpen) return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightboxOpen(false)
+      else if (e.key === "ArrowLeft") prev()
+      else if (e.key === "ArrowRight") next()
+    }
+
+    document.addEventListener("keydown", onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+
+    return () => {
+      document.removeEventListener("keydown", onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [lightboxOpen, validImages.length])
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
@@ -53,7 +74,8 @@ export default function ProductImageGallery({
             src={img.url}
             alt={`${title} ${i + 1}`}
             fill
-            className={`object-contain p-6 transition-opacity duration-200 ${active === i ? "opacity-100" : "opacity-0"}`}
+            onClick={() => setLightboxOpen(true)}
+            className={`object-contain p-6 transition-opacity duration-200 cursor-zoom-in ${active === i ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             sizes="(max-width: 768px) 100vw, 500px"
             priority={i === 0}
             loading={i === 0 ? undefined : "eager"}
@@ -121,6 +143,81 @@ export default function ProductImageGallery({
               />
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Fullscreen lightbox */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          role="dialog"
+          aria-modal="true"
+        >
+          {/* Close button */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Schließen"
+            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Image — stop propagation so clicking it doesn't close */}
+          <div
+            className="relative w-full h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={validImages[active].url}
+              alt={`${title} ${active + 1}`}
+              fill
+              className="object-contain p-4 medium:p-10 cursor-zoom-out"
+              sizes="100vw"
+              onClick={() => setLightboxOpen(false)}
+              priority
+            />
+          </div>
+
+          {validImages.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prev() }}
+                aria-label="Vorheriges Bild"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); next() }}
+                aria-label="Nächstes Bild"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {validImages.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={(e) => { e.stopPropagation(); setActive(i) }}
+                    aria-label={`Bild ${i + 1}`}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      active === i ? "bg-white" : "bg-white/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
