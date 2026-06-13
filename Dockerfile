@@ -27,10 +27,14 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/pnpm-lock.yaml ./
-COPY --from=builder /app/.next ./.next
+ENV PORT=8000
+ENV HOSTNAME=0.0.0.0
+
+# Standalone output: ship only the traced runtime files, not the full node_modules.
+# .next/standalone already bundles a minimal node_modules + server.js.
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
+
 EXPOSE 8000
-CMD ["pnpm", "start"]
+CMD ["node", "server.js"]
