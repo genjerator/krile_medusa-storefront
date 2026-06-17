@@ -108,7 +108,8 @@
       "ausstattung": "Equipment",
       "siegelvarianten": "Sealing Variants",
       "zubehoer": "Accessories",
-      "doppelkammer": "Double Chamber Machines"
+      "doppelkammer": "Double Chamber Machines",
+      "technische_daten": "Technische Daten"
     },
     "fields": {
       "laenge_siegelschiene_mm": "Sealing bar length (usable) in mm",
@@ -137,7 +138,36 @@
       "schrumpftank_se60": "Shrink tank (SE 60)",
       "gasmischer": "Gas mixer",
       "wassergekühlte_siegeleinrichtung": "Water-cooled sealing unit",
-      "fleischgabel_kaliber": "Meat fork for calibre products"
+      "fleischgabel_kaliber": "Meat fork for calibre products",
+      "abmessung": "Abmessung",
+      "gewicht": "Gewicht",
+      "material": "Material",
+      "pumpe": "Pumpe",
+      "vakuumier_leistung": "Vakuumier-Leistung",
+      "umdrehung": "Umdrehung",
+      "trafo": "Trafo",
+      "pumpvolumen": "Pumpvolumen",
+      "steuerung": "Steuerung",
+      "motor": "Motor",
+      "zusatzliche_information": "Zusätzliche Information",
+      "artikelnummer": "Artikelnummer",
+      "inhalt": "Inhalt",
+      "lange": "Länge",
+      "breite": "Breite",
+      "hohe": "Höhe",
+      "kg_brutto": "Kg Brutto",
+      "kg_netto": "Kg Netto",
+      "max_kapazitat_des_kessels": "Max. Kapazität des Kessels",
+      "leistung_dampferzeuger": "Leistung Dampferzeuger",
+      "leistung_bugeltisch": "Leistung Bügeltisch",
+      "bugeltischoberflache": "Bügeltischoberfläche",
+      "motor_mit_doppelschaltung": "Motor mit Doppelschaltung",
+      "leistung_bugeleisen": "Leistung Bügeleisen",
+      "dampfdruck": "Dampfdruck",
+      "zubehor_in_der_verpackung": "Zubehör in der Verpackung",
+      "dicke": "Dicke",
+      "durchmesser": "Durchmesser",
+      "fullmenge": "Füllmenge"
     },
     "values": {
       "optional": "Optional"

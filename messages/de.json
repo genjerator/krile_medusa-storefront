@@ -108,7 +108,8 @@
       "ausstattung": "Ausstattung",
       "siegelvarianten": "Siegelvarianten",
       "zubehoer": "Zubehör",
-      "doppelkammer": "Doppelkammermaschinen"
+      "doppelkammer": "Doppelkammermaschinen",
+      "technische_daten": "Technische Daten"
     },
     "fields": {
       "laenge_siegelschiene_mm": "Länge der Siegelschiene (nutzbar) in mm",
@@ -137,7 +138,36 @@
       "schrumpftank_se60": "Schrumpftank (SE 60)",
       "gasmischer": "Gasmischer",
       "wassergekühlte_siegeleinrichtung": "Wassergekühlte Siegeleinrichtung",
-      "fleischgabel_kaliber": "Fleischgabel für Kaliberprodukte"
+      "fleischgabel_kaliber": "Fleischgabel für Kaliberprodukte",
+      "abmessung": "Abmessung",
+      "gewicht": "Gewicht",
+      "material": "Material",
+      "pumpe": "Pumpe",
+      "vakuumier_leistung": "Vakuumier-Leistung",
+      "umdrehung": "Umdrehung",
+      "trafo": "Trafo",
+      "pumpvolumen": "Pumpvolumen",
+      "steuerung": "Steuerung",
+      "motor": "Motor",
+      "zusatzliche_information": "Zusätzliche Information",
+      "artikelnummer": "Artikelnummer",
+      "inhalt": "Inhalt",
+      "lange": "Länge",
+      "breite": "Breite",
+      "hohe": "Höhe",
+      "kg_brutto": "Kg Brutto",
+      "kg_netto": "Kg Netto",
+      "max_kapazitat_des_kessels": "Max. Kapazität des Kessels",
+      "leistung_dampferzeuger": "Leistung Dampferzeuger",
+      "leistung_bugeltisch": "Leistung Bügeltisch",
+      "bugeltischoberflache": "Bügeltischoberfläche",
+      "motor_mit_doppelschaltung": "Motor mit Doppelschaltung",
+      "leistung_bugeleisen": "Leistung Bügeleisen",
+      "dampfdruck": "Dampfdruck",
+      "zubehor_in_der_verpackung": "Zubehör in der Verpackung",
+      "dicke": "Dicke",
+      "durchmesser": "Durchmesser",
+      "fullmenge": "Füllmenge"
     },
     "values": {
       "optional": "Optional"
