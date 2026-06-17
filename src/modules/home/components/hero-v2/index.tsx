@@ -75,7 +75,13 @@ export default function HeroV2() {
                   fill
                   sizes="100vw"
                   className="object-cover object-center opacity-80"
+                  // First slide is the hero / LCP — load it eagerly with high
+                  // priority. Remaining slides load in the background at low
+                  // priority so they're ready before autoplay rotates to them,
+                  // without competing with the initial paint.
                   priority={slide.id === 0}
+                  loading={slide.id === 0 ? undefined : "eager"}
+                  fetchPriority={slide.id === 0 ? "high" : "low"}
                 />
 
                 {/* Left-side gradient so text stays readable */}
