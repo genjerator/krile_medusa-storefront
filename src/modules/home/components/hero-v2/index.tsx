@@ -32,7 +32,6 @@ const AUTOPLAY_MS = 6000
 export default function HeroV2() {
   const t = useTranslations("heroV2")
   const [current, setCurrent] = useState(0)
-  const [quoteModal, setQuoteModal] = useState(false)
   const touchStartX = useRef<number | null>(null)
 
   useEffect(() => {
@@ -110,12 +109,12 @@ export default function HeroV2() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
                       </LocalizedClientLink>
-                      <button
-                        onClick={() => setQuoteModal(true)}
+                      <LocalizedClientLink
+                        href="/kontakt"
                         className="inline-flex items-center px-6 py-3 border border-white/50 text-white text-sm font-semibold rounded hover:bg-white/10 hover:border-white transition-colors"
                       >
                         {t(`${key}.secondaryCta`)}
-                      </button>
+                      </LocalizedClientLink>
                     </div>
 
                     <p className="text-xs text-white/40 tracking-wide">
@@ -178,36 +177,6 @@ export default function HeroV2() {
         </div>
 
       </div>
-
-      {/* Request Quote modal */}
-      {quoteModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => setQuoteModal(false)}
-        >
-          <div
-            className="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full mx-4 text-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-4xl mb-4">🚧</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{t("modal.title")}</h2>
-            <p className="text-gray-500 text-sm mb-6">{t("modal.description")}</p>
-            <LocalizedClientLink
-              href="/kontakt"
-              className="inline-flex items-center justify-center w-full px-6 py-3 bg-gray-900 text-white text-sm font-semibold rounded hover:bg-gray-700 transition-colors"
-              onClick={() => setQuoteModal(false)}
-            >
-              {t("modal.contactButton")}
-            </LocalizedClientLink>
-            <button
-              onClick={() => setQuoteModal(false)}
-              className="mt-3 w-full px-6 py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              {t("modal.close")}
-            </button>
-          </div>
-        </div>
-      )}
     </>
   )
 }
