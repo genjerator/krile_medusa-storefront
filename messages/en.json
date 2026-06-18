@@ -49,7 +49,8 @@
     "paypalConfirmed": "✓ PayPal confirmed",
     "paypalTaken": "✓ Taken from PayPal:",
     "buyNow": "Buy now",
-    "termsHint": "By clicking you confirm our terms and privacy policy."
+    "termsHint": "By clicking you confirm our terms and privacy policy.",
+    "selectShippingBeforePaypal": "Please select a shipping method before paying with PayPal."
   },
   "order": {
     "thankYou": "Thank you!",

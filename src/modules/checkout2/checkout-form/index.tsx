@@ -219,8 +219,18 @@ export default function Checkout2Client({
               ))}
           </div>
 
-          {/* PayPal button — shown when PayPal is selected */}
-          {isPayPal(selectedPayment) && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && !paypalApproved && (
+          {/* Require a shipping method BEFORE paying: PayPal captures funds on
+              approval, so paying first would leave the order unplaceable. */}
+          {isPayPal(selectedPayment) && !selectedShipping && !paypalApproved && (
+            <div className="mt-4">
+              <Text className="txt-small text-ui-fg-muted">
+                {t("selectShippingBeforePaypal")}
+              </Text>
+            </div>
+          )}
+
+          {/* PayPal button — shown once PayPal is selected AND shipping is chosen */}
+          {isPayPal(selectedPayment) && selectedShipping && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && !paypalApproved && (
             <div className="mt-4">
               <PayPalScriptProvider options={{
                 clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
