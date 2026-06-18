@@ -36,5 +36,10 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
+# Image optimization needs sharp at runtime. Standalone tracing can miss it on
+# Alpine/musl, so copy it (and its platform binaries) explicitly.
+COPY --from=builder /app/node_modules/sharp ./node_modules/sharp
+COPY --from=builder /app/node_modules/@img ./node_modules/@img
+
 EXPOSE 8000
 CMD ["node", "server.js"]

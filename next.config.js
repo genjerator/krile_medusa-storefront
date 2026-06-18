@@ -62,7 +62,10 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    // Serve modern formats; Next negotiates AVIF first, then WebP, per browser.
+    formats: ["image/avif", "image/webp"],
+    // Cache optimized images for 30 days to limit re-optimization CPU cost.
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: "http",
