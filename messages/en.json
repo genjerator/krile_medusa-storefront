@@ -50,7 +50,8 @@
     "paypalTaken": "✓ Taken from PayPal:",
     "buyNow": "Buy now",
     "termsHint": "By clicking you confirm our terms and privacy policy.",
-    "selectShippingBeforePaypal": "Please select a shipping method before paying with PayPal."
+    "selectShippingBeforePaypal": "Please select a shipping method before paying with PayPal.",
+    "loading": "Loading…"
   },
   "order": {
     "thankYou": "Thank you!",

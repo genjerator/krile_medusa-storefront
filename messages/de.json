@@ -50,7 +50,8 @@
     "paypalTaken": "✓ Von PayPal übernommen:",
     "buyNow": "Jetzt kaufen",
     "termsHint": "Mit Klick bestätigen Sie unsere AGB und Datenschutzerklärung.",
-    "selectShippingBeforePaypal": "Bitte wählen Sie zuerst eine Versandart, bevor Sie mit PayPal bezahlen."
+    "selectShippingBeforePaypal": "Bitte wählen Sie zuerst eine Versandart, bevor Sie mit PayPal bezahlen.",
+    "loading": "Wird geladen…"
   },
   "order": {
     "thankYou": "Vielen Dank!",

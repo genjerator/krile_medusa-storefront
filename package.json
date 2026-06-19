@@ -15,6 +15,7 @@
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
+    "@easypayment/medusa-paypal-ui": "^1.0.50",
     "@headlessui/react": "^2.2.0",
     "@medusajs/icons": "latest",
     "@medusajs/js-sdk": "latest",

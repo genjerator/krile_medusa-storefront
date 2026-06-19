@@ -6,13 +6,13 @@ import { isPayPal, isManual, paymentInfoMap } from "@lib/constants"
 import {
   initiatePaymentSession,
   placeOrder,
-  updateCart,
+  retrieveCart,
   setShippingMethod,
 } from "@lib/data/cart"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { Button, Heading, Text, Badge, clx } from "@medusajs/ui"
 import { useTranslations } from "next-intl"
-import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js"
+import { MedusaNextPayPalAdapter } from "@easypayment/medusa-paypal-ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import RadioUI from "@modules/common/components/radio"
 import CartTotals from "@modules/common/components/cart-totals"
@@ -22,7 +22,7 @@ import Addresses from "@modules/checkout/components/addresses"
 import { convertToLocale } from "@lib/util/money"
 
 export default function Checkout2Client({
-  cart,
+  cart: initialCart,
   customer,
   shippingMethods: initialShipping,
   paymentMethods,
@@ -33,6 +33,7 @@ export default function Checkout2Client({
   paymentMethods: { id: string; is_enabled: boolean }[]
 }) {
   const t = useTranslations("checkout")
+  const [cart, setCart] = useState(initialCart)
   const [selectedPayment, setSelectedPayment] = useState("")
   const [selectedShipping, setSelectedShipping] = useState(
     initialShipping.length === 1 ? initialShipping[0].id : ""
@@ -40,6 +41,7 @@ export default function Checkout2Client({
   const [shippingMethods, setShippingMethods] = useState(initialShipping)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [paypalLoading, setPaypalLoading] = useState(false)
   const [paypalApproved, setPaypalApproved] = useState(false)
   const [paypalAddress, setPaypalAddress] = useState<string | null>(null)
 
@@ -52,51 +54,44 @@ export default function Checkout2Client({
   const canPlaceOrder =
     selectedPayment &&
     selectedShipping &&
-    (isPayPal(selectedPayment) ? paypalApproved : cart.shipping_address?.address_1)
+    (!isPayPal(selectedPayment) || paypalApproved)
 
-  // ── PayPal flow ───────────────────────────────────────────────────────────
-  const createPayPalOrder = async () => {
-    const session = await initiatePaymentSession(cart, { provider_id: "pp_paypal_paypal" })
-    const ps = session?.payment_collection?.payment_sessions?.find(
-      (s: any) => s.provider_id === "pp_paypal_paypal"
-    )
-    return (ps?.data as any)?.id
+  // ── Payment selection ─────────────────────────────────────────────────────
+  // For PayPal we create the Medusa payment session up front so the adapter has
+  // a session to attach its order to.
+  const handlePaymentSelect = async (method: string) => {
+    setError(null)
+    setSelectedPayment(method)
+    setPaypalApproved(false)
+    setPaypalAddress(null)
+    if (!isPayPal(method)) return
+    setPaypalLoading(true)
+    try {
+      await initiatePaymentSession(cart, { provider_id: method })
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setPaypalLoading(false)
+    }
   }
 
-  const handlePayPalApprove = async (data: any, actions: any) => {
+  // ── PayPal approval (authorize / hold) ────────────────────────────────────
+  // The adapter authorizes the funds with PayPal and syncs the buyer's address
+  // to the cart on the backend. We DON'T place the order here — capture stays
+  // tied to the explicit "Jetzt kaufen" click (two-step flow).
+  const handlePayPalSuccess = async () => {
     setLoading(true)
     try {
-      const details = await actions.order.get()
-      const pu = details.purchase_units?.[0]?.shipping?.address
-      if (pu) {
-        await updateCart({
-          shipping_address: {
-            first_name: details.payer?.name?.given_name || "",
-            last_name: details.payer?.name?.surname || "",
-            address_1: pu.address_line_1 || "",
-            address_2: pu.address_line_2 || "",
-            city: pu.admin_area_2 || "",
-            province: pu.admin_area_1 || "",
-            postal_code: pu.postal_code || "",
-            country_code: pu.country_code?.toLowerCase() || "de",
-            phone: "",
-          },
-          billing_address: {
-            first_name: details.payer?.name?.given_name || "",
-            last_name: details.payer?.name?.surname || "",
-            address_1: pu.address_line_1 || "",
-            city: pu.admin_area_2 || "",
-            postal_code: pu.postal_code || "",
-            country_code: pu.country_code?.toLowerCase() || "de",
-            phone: "",
-          },
-          email: details.payer?.email_address || cart.email || "",
-        })
-        setPaypalAddress(
-          `${details.payer?.name?.given_name} ${details.payer?.name?.surname}, ${pu.address_line_1}, ${pu.postal_code} ${pu.admin_area_2}`
-        )
+      const refreshed = await retrieveCart(cart.id)
+      if (refreshed) {
+        setCart(refreshed)
+        const sa = refreshed.shipping_address
+        if (sa) {
+          setPaypalAddress(
+            `${sa.first_name ?? ""} ${sa.last_name ?? ""}, ${sa.address_1 ?? ""}, ${sa.postal_code ?? ""} ${sa.city ?? ""}`
+          )
+        }
       }
-      // Refresh shipping methods with new address country
       const updated = await listCartShippingMethods(cart.id)
       if (updated?.length) setShippingMethods(updated)
       setPaypalApproved(true)
@@ -203,7 +198,7 @@ export default function Checkout2Client({
               .map((m) => (
                 <div
                   key={m.id}
-                  onClick={() => setSelectedPayment(m.id)}
+                  onClick={() => handlePaymentSelect(m.id)}
                   className={clx(
                     "flex items-center gap-x-3 py-3 px-4 border rounded-lg cursor-pointer transition-colors",
                     selectedPayment === m.id
@@ -219,7 +214,7 @@ export default function Checkout2Client({
               ))}
           </div>
 
-          {/* Require a shipping method BEFORE paying: PayPal captures funds on
+          {/* Require a shipping method BEFORE paying: PayPal authorizes funds on
               approval, so paying first would leave the order unplaceable. */}
           {isPayPal(selectedPayment) && !selectedShipping && !paypalApproved && (
             <div className="mt-4">
@@ -229,21 +224,22 @@ export default function Checkout2Client({
             </div>
           )}
 
-          {/* PayPal button — shown once PayPal is selected AND shipping is chosen */}
-          {isPayPal(selectedPayment) && selectedShipping && process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID && !paypalApproved && (
+          {/* PayPal UI (Smart Buttons / Card) — shown once PayPal is selected
+              AND shipping is chosen, until the buyer has approved. */}
+          {isPayPal(selectedPayment) && selectedShipping && !paypalApproved && (
             <div className="mt-4">
-              <PayPalScriptProvider options={{
-                clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-                currency: cart.currency_code?.toUpperCase() || "EUR",
-                intent: "capture",
-              }}>
-                <PayPalButtons
-                  style={{ layout: "vertical", shape: "rect", label: "pay" }}
-                  createOrder={createPayPalOrder}
-                  onApprove={handlePayPalApprove}
-                  onError={(e) => setError(String(e))}
+              {paypalLoading ? (
+                <Text className="txt-small text-ui-fg-muted">{t("loading")}</Text>
+              ) : (
+                <MedusaNextPayPalAdapter
+                  cartId={cart.id}
+                  selectedProviderId={selectedPayment}
+                  baseUrl={process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL!}
+                  publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
+                  onSuccess={() => handlePayPalSuccess()}
+                  onError={(message) => setError(message)}
                 />
-              </PayPalScriptProvider>
+              )}
             </div>
           )}
 
