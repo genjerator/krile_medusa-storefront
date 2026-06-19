@@ -1,12 +1,20 @@
 import { getLocaleHeader } from "@lib/util/get-locale-header"
 import Medusa, { FetchArgs, FetchInput } from "@medusajs/js-sdk"
 
-// Defaults to standard port for Medusa server
+// Resolved Medusa backend URL, usable on both server and client.
+// - Server: MEDUSA_BACKEND_URL is available (e.g. http://localhost:9000 in dev).
+// - Client: only NEXT_PUBLIC_* vars are inlined into the browser bundle, so we
+//   fall back to NEXT_PUBLIC_MEDUSA_BACKEND_URL (set in dev), then to the known
+//   production backend. This is what client-side PayPal needs to reach the API.
 let MEDUSA_BACKEND_URL = "https://admin.planetaindustries.de"
 
 if (process.env.MEDUSA_BACKEND_URL) {
   MEDUSA_BACKEND_URL = process.env.MEDUSA_BACKEND_URL
+} else if (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {
+  MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 }
+
+export { MEDUSA_BACKEND_URL }
 
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,

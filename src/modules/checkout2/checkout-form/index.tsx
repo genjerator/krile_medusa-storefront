@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { isPayPal, isManual, paymentInfoMap } from "@lib/constants"
+import { MEDUSA_BACKEND_URL } from "@lib/config"
 import {
   initiatePaymentSession,
   placeOrder,
@@ -283,7 +284,7 @@ export default function Checkout2Client({
                 <PayPalButtonsTwoStep
                   cartId={cart.id}
                   selectedProviderId={selectedPayment}
-                  baseUrl={process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL!}
+                  baseUrl={MEDUSA_BACKEND_URL}
                   publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
                   onApproved={() => handlePayPalSuccess()}
                   onError={(message) => setError(message)}
