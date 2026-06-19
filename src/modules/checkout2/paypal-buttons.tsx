@@ -1,12 +1,12 @@
 "use client"
 
 import { useMemo } from "react"
-import { PayPalButtons } from "@paypal/react-paypal-js"
 import {
-  PayPalProvider,
-  usePayPalConfig,
-  createPayPalStoreApi,
-} from "@easypayment/medusa-paypal-ui"
+  PayPalScriptProvider,
+  PayPalButtons,
+  type ReactPayPalScriptOptions,
+} from "@paypal/react-paypal-js"
+import { usePayPalConfig, createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { Text } from "@medusajs/ui"
 import { setPayPalAddress } from "@lib/data/cart"
 
@@ -85,21 +85,33 @@ export default function PayPalButtonsTwoStep({
     enabled: true,
   })
 
+  // Load the PayPal SDK ourselves with a buttons-only, memoised options object.
+  // A new options reference on every render makes PayPalScriptProvider reload
+  // the script (and briefly leaves `window.paypal.Buttons` undefined), so this
+  // MUST be memoised. We deliberately request only `components: "buttons"` (no
+  // card-fields / client-token) — this is a Smart-Buttons-only flow.
+  const options = useMemo<ReactPayPalScriptOptions | null>(() => {
+    if (!config) return null
+    return {
+      clientId: config.client_id,
+      currency: config.currency,
+      intent: config.intent === "authorize" ? "authorize" : "capture",
+      components: "buttons",
+      "disable-funding": Array.isArray(config.disable_buttons)
+        ? config.disable_buttons.join(",")
+        : undefined,
+    }
+  }, [config])
+
   if (loading)
     return <Text className="txt-small text-ui-fg-muted">PayPal wird geladen…</Text>
   if (error) return <Text className="txt-small text-red-600">{error}</Text>
-  if (!config || config.currency_supported === false) return null
-
-  const intent = config.intent === "authorize" ? "authorize" : "capture"
-  const disableFunding = Array.isArray(config.disable_buttons)
-    ? config.disable_buttons.join(",")
-    : undefined
+  if (!config || config.currency_supported === false || !options) return null
 
   return (
-    <PayPalProvider
-      config={config}
-      intent={intent}
-      disableFunding={disableFunding}
+    <PayPalScriptProvider
+      key={`${options.clientId}-${options.currency}-${options.intent}`}
+      options={options}
     >
       <PayPalButtons
         style={{
@@ -131,6 +143,6 @@ export default function PayPalButtonsTwoStep({
           onError(e?.message || "PayPal-Fehler")
         }
       />
-    </PayPalProvider>
+    </PayPalScriptProvider>
   )
 }
