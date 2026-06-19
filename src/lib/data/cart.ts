@@ -387,9 +387,50 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     return e.message
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
-  )
+  // No redirect: updateCart() above revalidates the cart, so the current page
+  // (checkout2) re-renders in place with the saved address — without remounting
+  // and losing the shipping/payment selection. This lets "Jetzt kaufen" enable
+  // as soon as all required fields are saved.
+}
+
+/**
+ * Writes the buyer address extracted from a PayPal approval onto the cart
+ * (shipping + billing + email). Used by the two-step checkout2 PayPal flow so
+ * the address/name/email collected in the PayPal popup populate the cart
+ * WITHOUT placing the order — the order is only created when the buyer clicks
+ * "Jetzt kaufen". Country code is lower-cased to match Medusa's region format.
+ */
+export async function setPayPalAddress(address: {
+  first_name?: string
+  last_name?: string
+  address_1?: string
+  address_2?: string
+  city?: string
+  province?: string
+  postal_code?: string
+  country_code?: string
+  phone?: string
+  email?: string
+}) {
+  const shipping = {
+    first_name: address.first_name || "",
+    last_name: address.last_name || "",
+    address_1: address.address_1 || "",
+    address_2: address.address_2 || "",
+    city: address.city || "",
+    province: address.province || "",
+    postal_code: address.postal_code || "",
+    country_code: (address.country_code || "").toLowerCase(),
+    phone: address.phone || "",
+  }
+
+  const data: HttpTypes.StoreUpdateCart = {
+    shipping_address: shipping,
+    billing_address: shipping,
+  }
+  if (address.email) data.email = address.email
+
+  await updateCart(data)
 }
 
 /**

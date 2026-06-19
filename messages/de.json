@@ -51,7 +51,13 @@
     "buyNow": "Jetzt kaufen",
     "termsHint": "Mit Klick bestätigen Sie unsere AGB und Datenschutzerklärung.",
     "selectShippingBeforePaypal": "Bitte wählen Sie zuerst eine Versandart, bevor Sie mit PayPal bezahlen.",
-    "loading": "Wird geladen…"
+    "loading": "Wird geladen…",
+    "stillNeeded": "Noch erforderlich",
+    "missingAddress": "Adresse speichern",
+    "missingRequiredFields": "Alle Pflichtfelder ausfüllen",
+    "missingShipping": "Versandart wählen",
+    "missingPayment": "Zahlungsart wählen",
+    "missingPaypalApproval": "PayPal-Zahlung bestätigen"
   },
   "order": {
     "thankYou": "Vielen Dank!",

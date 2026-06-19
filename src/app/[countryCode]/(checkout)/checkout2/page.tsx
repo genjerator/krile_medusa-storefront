@@ -9,7 +9,12 @@ import { notFound } from "next/navigation"
 export const metadata: Metadata = { title: "Checkout" }
 
 export default async function Checkout2() {
-  const cart = await retrieveCart()
+  // Explicitly include address + email so the "Jetzt kaufen" gate can check
+  // that all required fields are submitted.
+  const cart = await retrieveCart(
+    undefined,
+    "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, *shipping_address, *billing_address, +email"
+  )
   if (!cart) return notFound()
 
   const customer = await retrieveCustomer()

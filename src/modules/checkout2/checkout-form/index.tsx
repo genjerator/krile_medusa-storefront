@@ -12,7 +12,7 @@ import {
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { Button, Heading, Text, Badge, clx } from "@medusajs/ui"
 import { useTranslations } from "next-intl"
-import { MedusaNextPayPalAdapter } from "@easypayment/medusa-paypal-ui"
+import PayPalButtonsTwoStep from "@modules/checkout2/paypal-buttons"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import RadioUI from "@modules/common/components/radio"
 import CartTotals from "@modules/common/components/cart-totals"
@@ -44,6 +44,10 @@ export default function Checkout2Client({
   const [paypalLoading, setPaypalLoading] = useState(false)
   const [paypalApproved, setPaypalApproved] = useState(false)
   const [paypalAddress, setPaypalAddress] = useState<string | null>(null)
+  // Live validity of the address form (reported by <Addresses>). Used so the
+  // place-order button disables the moment a required field is cleared, before
+  // the change is saved back to the cart.
+  const [addressFormValid, setAddressFormValid] = useState(false)
 
   useEffect(() => {
     if (initialShipping.length === 1) {
@@ -51,10 +55,45 @@ export default function Checkout2Client({
     }
   }, [])
 
+  // Keep local cart in sync with fresh server data (e.g. after the address
+  // form is saved and the page revalidates).
+  useEffect(() => {
+    setCart(initialCart)
+  }, [initialCart])
+
+  // All required contact/address fields must be submitted (saved to the cart)
+  // before the order can be placed. For PayPal these are filled from the
+  // PayPal account on approval; for manual payment the buyer saves the form.
+  const hasRequiredFields = !!(
+    cart.email &&
+    cart.shipping_address?.first_name &&
+    cart.shipping_address?.last_name &&
+    cart.shipping_address?.address_1 &&
+    cart.shipping_address?.city &&
+    cart.shipping_address?.postal_code &&
+    cart.shipping_address?.country_code
+  )
+
+  // The address counts as ready only when it's saved on the cart AND the live
+  // form is still valid. For PayPal the address comes from the PayPal account
+  // (the form stays empty), so we don't require the form to be valid there.
+  const addressReady =
+    hasRequiredFields && (isPayPal(selectedPayment) || addressFormValid)
+
   const canPlaceOrder =
     selectedPayment &&
     selectedShipping &&
+    addressReady &&
     (!isPayPal(selectedPayment) || paypalApproved)
+
+  // What's still missing — shown under the (disabled) place-order button so the
+  // buyer knows exactly why they can't continue yet.
+  const missingRequirements: string[] = []
+  if (!addressReady) missingRequirements.push(t("missingRequiredFields"))
+  if (!selectedShipping) missingRequirements.push(t("missingShipping"))
+  if (!selectedPayment) missingRequirements.push(t("missingPayment"))
+  else if (isPayPal(selectedPayment) && !paypalApproved)
+    missingRequirements.push(t("missingPaypalApproval"))
 
   // ── Payment selection ─────────────────────────────────────────────────────
   // For PayPal we create the Medusa payment session up front so the adapter has
@@ -76,13 +115,18 @@ export default function Checkout2Client({
   }
 
   // ── PayPal approval (authorize / hold) ────────────────────────────────────
-  // The adapter authorizes the funds with PayPal and syncs the buyer's address
-  // to the cart on the backend. We DON'T place the order here — capture stays
-  // tied to the explicit "Jetzt kaufen" click (two-step flow).
+  // Our PayPalButtonsTwoStep has already captured/authorized the PayPal order
+  // and synced the buyer's address onto the cart — WITHOUT placing the order.
+  // Here we just pull the fresh cart (now carrying the PayPal address) and flag
+  // it as approved. The order is created only on the explicit "Jetzt kaufen"
+  // click (two-step flow).
   const handlePayPalSuccess = async () => {
     setLoading(true)
     try {
-      const refreshed = await retrieveCart(cart.id)
+      const refreshed = await retrieveCart(
+        cart.id,
+        "*items, *region, +items.total, *promotions, +shipping_methods.name, *shipping_address, *billing_address, +email"
+      )
       if (refreshed) {
         setCart(refreshed)
         const sa = refreshed.shipping_address
@@ -138,7 +182,12 @@ export default function Checkout2Client({
 
       {/* ── Left: Address + Versandmethode ───────────────────────────────── */}
       <div className="flex flex-col gap-y-6">
-        <Addresses cart={cart} customer={customer} alwaysOpen />
+        <Addresses
+          cart={cart}
+          customer={customer}
+          alwaysOpen
+          onValidityChange={setAddressFormValid}
+        />
         {isPayPal(selectedPayment) && paypalApproved && paypalAddress && (
           <div className="p-4 border border-green-200 rounded-lg bg-green-50">
             <Text className="txt-small font-medium text-green-700 mb-1">{t("paypalTaken")}</Text>
@@ -231,12 +280,12 @@ export default function Checkout2Client({
               {paypalLoading ? (
                 <Text className="txt-small text-ui-fg-muted">{t("loading")}</Text>
               ) : (
-                <MedusaNextPayPalAdapter
+                <PayPalButtonsTwoStep
                   cartId={cart.id}
                   selectedProviderId={selectedPayment}
                   baseUrl={process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL!}
                   publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
-                  onSuccess={() => handlePayPalSuccess()}
+                  onApproved={() => handlePayPalSuccess()}
                   onError={(message) => setError(message)}
                 />
               )}
@@ -261,6 +310,11 @@ export default function Checkout2Client({
         >
           {t("buyNow")}
         </Button>
+        {!canPlaceOrder && missingRequirements.length > 0 && (
+          <Text className="txt-small text-amber-600 text-center">
+            {t("stillNeeded")}: {missingRequirements.join(" · ")}
+          </Text>
+        )}
         <Text className="txt-small text-ui-fg-muted text-center">
           {t("termsHint")}
         </Text>

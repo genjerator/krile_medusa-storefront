@@ -51,7 +51,13 @@
     "buyNow": "Buy now",
     "termsHint": "By clicking you confirm our terms and privacy policy.",
     "selectShippingBeforePaypal": "Please select a shipping method before paying with PayPal.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "stillNeeded": "Still needed",
+    "missingAddress": "Save address",
+    "missingRequiredFields": "Fill in all required fields",
+    "missingShipping": "Select shipping",
+    "missingPayment": "Select payment",
+    "missingPaypalApproval": "Confirm PayPal payment"
   },
   "order": {
     "thankYou": "Thank you!",

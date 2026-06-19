@@ -9,7 +9,7 @@ import Divider from "@modules/common/components/divider"
 import Spinner from "@modules/common/icons/spinner"
 import { useTranslations } from "next-intl"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useActionState } from "react"
+import { useActionState, useEffect, useRef } from "react"
 import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
@@ -19,10 +19,12 @@ const Addresses = ({
   cart,
   customer,
   alwaysOpen,
+  onValidityChange,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
   alwaysOpen?: boolean
+  onValidityChange?: (valid: boolean) => void
 }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -38,6 +40,37 @@ const Addresses = ({
   }
 
   const [message, formAction] = useActionState(setAddresses, null)
+
+  // In checkout2 (alwaysOpen) there is no manual "Speichern" button: the form
+  // auto-saves to the cart as soon as every required field is valid, which is
+  // what enables "Jetzt kaufen". We snapshot the last saved values to avoid
+  // re-submitting unchanged data on every blur.
+  const formRef = useRef<HTMLFormElement>(null)
+  const lastSavedRef = useRef<string>("")
+
+  // Report live form validity to the parent so "Jetzt kaufen" disables again as
+  // soon as a required field is cleared — even though the previously saved value
+  // still lingers on the cart.
+  const reportValidity = () => {
+    onValidityChange?.(!!formRef.current && formRef.current.checkValidity())
+  }
+
+  const handleAutoSave = () => {
+    reportValidity()
+    const form = formRef.current
+    if (!form || !form.checkValidity()) return
+    const snapshot = JSON.stringify(Array.from(new FormData(form).entries()))
+    if (snapshot === lastSavedRef.current) return
+    lastSavedRef.current = snapshot
+    form.requestSubmit()
+  }
+
+  // Initialise validity once the (pre-filled) form is mounted, e.g. for
+  // returning customers whose address is already on the cart.
+  useEffect(() => {
+    if (alwaysOpen) reportValidity()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="bg-white">
@@ -62,7 +95,12 @@ const Addresses = ({
         )}
       </div>
       {isOpen ? (
-        <form action={formAction}>
+        <form
+          ref={formRef}
+          action={formAction}
+          onChange={alwaysOpen ? reportValidity : undefined}
+          onBlur={alwaysOpen ? handleAutoSave : undefined}
+        >
           <div className="pb-8">
             <ShippingAddress
               customer={customer}
@@ -83,9 +121,11 @@ const Addresses = ({
                 <BillingAddress cart={cart} />
               </div>
             )}
-            <SubmitButton className="mt-6" data-testid="submit-address-button">
-              {t("save")}
-            </SubmitButton>
+            {!alwaysOpen && (
+              <SubmitButton className="mt-6" data-testid="submit-address-button">
+                {t("save")}
+              </SubmitButton>
+            )}
             <ErrorMessage error={message} data-testid="address-error-message" />
           </div>
         </form>
