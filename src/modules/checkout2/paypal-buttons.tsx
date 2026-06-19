@@ -92,15 +92,20 @@ export default function PayPalButtonsTwoStep({
   // card-fields / client-token) — this is a Smart-Buttons-only flow.
   const options = useMemo<ReactPayPalScriptOptions | null>(() => {
     if (!config) return null
-    return {
+    const opts: ReactPayPalScriptOptions = {
       clientId: config.client_id,
       currency: config.currency,
       intent: config.intent === "authorize" ? "authorize" : "capture",
       components: "buttons",
-      "disable-funding": Array.isArray(config.disable_buttons)
-        ? config.disable_buttons.join(",")
-        : undefined,
     }
+    // Only set disable-funding when there's an actual value — passing
+    // `undefined` serializes to `disable-funding=undefined` in the SDK URL,
+    // which makes PayPal load without the Buttons component.
+    const disabled = Array.isArray(config.disable_buttons)
+      ? config.disable_buttons.filter(Boolean)
+      : []
+    if (disabled.length) opts["disable-funding"] = disabled.join(",")
+    return opts
   }, [config])
 
   if (loading)
