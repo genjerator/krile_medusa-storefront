@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import Image from "next/image"
 import { getTranslations } from "next-intl/server"
+import { ShoppingCart } from "@medusajs/icons"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
@@ -62,11 +63,13 @@ export default async function Nav() {
             <Suspense
               fallback={
                 <LocalizedClientLink
-                  className="font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors flex gap-2"
+                  className="font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors flex items-center gap-x-1"
                   href="/cart"
                   data-testid="nav-cart-link"
+                  aria-label="Cart (0)"
                 >
-                  Cart (0)
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>(0)</span>
                 </LocalizedClientLink>
               }
             >
