@@ -19,18 +19,14 @@ export const getAuthHeaders = async (): Promise<
 }
 
 export const getCacheTag = async (tag: string): Promise<string> => {
-  try {
-    const cookies = await nextCookies()
-    const cacheId = cookies.get("_medusa_cache_id")?.value
-
-    if (!cacheId) {
-      return ""
-    }
-
-    return `${tag}-${cacheId}`
-  } catch (error) {
-    return ""
-  }
+  // Use a global, stable tag (no per-visitor cache id). This lets the backend
+  // revalidate `products`/`categories`/`collections` for ALL visitors via
+  // /api/revalidate. The old `${tag}-${cacheId}` form (cacheId = random per-
+  // visitor UUID) meant externally-triggered revalidateTag(tag) never matched,
+  // so admin changes weren't visible until each visitor's 24h cookie expired.
+  // Per-user fetches (cart/customer) stay isolated because they're keyed by
+  // their own auth token, so a global tag only triggers a harmless refetch.
+  return tag
 }
 
 export const getCacheOptions = async (
