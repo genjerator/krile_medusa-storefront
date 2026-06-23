@@ -15,6 +15,10 @@ export default function ProductDetailTabs({
   const t = useTranslations("technicalData")
   const metadata = (product as any).metadata ?? {}
 
+  // Rich-text technical data entered via the admin WYSIWYG editor. When set, it
+  // takes precedence over the auto-generated spec table below.
+  const technicalHtml = (metadata.technische_daten_html as string) || ""
+
   const formatValue = (v: unknown): string => {
     if (v === true) return "●"
     if (v === false) return "–"
@@ -63,7 +67,7 @@ export default function ProductDetailTabs({
           )}
           {active === 1 && (
             <div className="space-y-6">
-              {Object.keys(sections).length === 0 && (
+              {Object.keys(sections).length === 0 && technicalHtml.trim().length === 0 && (
                 <p className="text-sm text-ui-fg-muted">Keine technischen Daten verfügbar.</p>
               )}
               {Object.entries(sections).map(([section, rows]) => (
@@ -83,6 +87,12 @@ export default function ProductDetailTabs({
                   </table>
                 </div>
               ))}
+              {technicalHtml.trim().length > 0 && (
+                <div
+                  className="text-sm text-ui-fg-base leading-relaxed [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_a]:underline [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-semibold [&_table]:w-full [&_td]:py-2 [&_td]:pr-4"
+                  dangerouslySetInnerHTML={{ __html: technicalHtml }}
+                />
+              )}
             </div>
           )}
           {active === 2 && <p className="text-sm text-ui-fg-muted">Keine Downloads verfügbar.</p>}
