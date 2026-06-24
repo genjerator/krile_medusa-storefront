@@ -20,7 +20,7 @@ export default function InformationsPage() {
           <dd className="text-ui-fg-base">Planeta GmbH &amp; Co.KG</dd>
 
           <dt className="text-ui-fg-muted">Institute</dt>
-          <dd className="text-ui-fg-base">Sparkasse Schwaben Bodensee MM-LI-MN</dd>
+          <dd className="text-ui-fg-base">Sparkasse Schwaben Bodensee</dd>
 
           <dt className="text-ui-fg-muted">BIC / SWIFT</dt>
           <dd className="text-ui-fg-base font-sans">BYLADEM1MLM</dd>
