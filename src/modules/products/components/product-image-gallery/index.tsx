@@ -14,6 +14,7 @@ export default function ProductImageGallery({
   const [active, setActive] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const touchStartX = useRef<number | null>(null)
+  const thumbsRef = useRef<HTMLDivElement | null>(null)
   const validImages = images?.filter((i) => i.url) ?? []
 
   if (!validImages.length) {
@@ -28,6 +29,14 @@ export default function ProductImageGallery({
 
   const prev = () => setActive((i) => (i - 1 + validImages.length) % validImages.length)
   const next = () => setActive((i) => (i + 1) % validImages.length)
+
+  // Keep the active thumbnail visible when navigating via the main arrows
+  useEffect(() => {
+    const el = thumbsRef.current
+    if (!el) return
+    const thumb = el.children[active] as HTMLElement | undefined
+    thumb?.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" })
+  }, [active])
 
   // Lock body scroll + keyboard navigation while the lightbox is open
   useEffect(() => {
@@ -120,9 +129,9 @@ export default function ProductImageGallery({
         )}
       </div>
 
-      {/* Horizontal thumbnails */}
+      {/* Horizontal thumbnails — scrollable by touch / mouse */}
       {validImages.length > 1 && (
-        <div className="flex gap-2">
+        <div ref={thumbsRef} className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth">
           {validImages.map((img, i) => (
             <button
               key={img.id}
