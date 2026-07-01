@@ -44,6 +44,15 @@ export default async function ProductCard({
             </div>
           )}
         </div>
+
+        {/* Subtitle overlay — revealed on hover */}
+        {product.subtitle?.trim() && (
+          <div className="absolute inset-0 z-10 flex items-end p-4 bg-black/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <p className="text-white text-xs leading-snug line-clamp-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+              {product.subtitle}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Content */}

@@ -3,7 +3,7 @@ import { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 import { Inter, Montserrat } from "next/font/google"
-import Script from "next/script"
+import CookieConsent from "@modules/common/components/cookie-consent"
 import "styles/globals.css"
 
 const inter = Inter({
@@ -70,25 +70,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang={locale} data-mode="light" className={`${inter.variable} ${montserrat.variable}`}>
       <body className={inter.className}>
-        <Script
-          id="Cookiebot"
-          src="https://consent.cookiebot.com/uc.js"
-          data-cbid="2686c025-1e16-4fd7-8bdc-b6badb011f71"
-          data-blockingmode="auto"
-          strategy="beforeInteractive"
-        />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-CN1PX0WWDT"
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-CN1PX0WWDT');
-          `}
-        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -110,6 +91,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         />
         <NextIntlClientProvider messages={messages}>
           <main className="relative">{props.children}</main>
+          <CookieConsent />
         </NextIntlClientProvider>
       </body>
     </html>

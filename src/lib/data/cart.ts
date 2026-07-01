@@ -412,23 +412,49 @@ export async function setPayPalAddress(address: {
   phone?: string
   email?: string
 }) {
-  const shipping = {
-    first_name: address.first_name || "",
-    last_name: address.last_name || "",
-    address_1: address.address_1 || "",
-    address_2: address.address_2 || "",
-    city: address.city || "",
-    province: address.province || "",
-    postal_code: address.postal_code || "",
-    country_code: (address.country_code || "").toLowerCase(),
-    phone: address.phone || "",
+  // Only fill what the buyer hasn't already entered — never overwrite existing
+  // cart data with the PayPal payer details.
+  const cart = await retrieveCart(
+    undefined,
+    "id,email,*shipping_address,*billing_address"
+  )
+
+  const existing = cart?.shipping_address
+  const addressFilled = !!(
+    existing &&
+    (existing.first_name ||
+      existing.last_name ||
+      existing.address_1 ||
+      existing.city ||
+      existing.postal_code ||
+      existing.country_code)
+  )
+  const emailFilled = !!cart?.email
+
+  const data: HttpTypes.StoreUpdateCart = {}
+
+  if (!addressFilled) {
+    const shipping = {
+      first_name: address.first_name || "",
+      last_name: address.last_name || "",
+      address_1: address.address_1 || "",
+      address_2: address.address_2 || "",
+      city: address.city || "",
+      province: address.province || "",
+      postal_code: address.postal_code || "",
+      country_code: (address.country_code || "").toLowerCase(),
+      phone: address.phone || "",
+    }
+    data.shipping_address = shipping
+    data.billing_address = shipping
   }
 
-  const data: HttpTypes.StoreUpdateCart = {
-    shipping_address: shipping,
-    billing_address: shipping,
+  if (!emailFilled && address.email) {
+    data.email = address.email
   }
-  if (address.email) data.email = address.email
+
+  // Nothing to fill — the buyer already provided everything.
+  if (!data.shipping_address && !data.email) return
 
   await updateCart(data)
 }

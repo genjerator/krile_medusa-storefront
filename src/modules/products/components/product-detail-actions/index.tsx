@@ -92,8 +92,8 @@ export default function ProductDetailActions({
 
 
       <div className="border-t border-ui-border-base pt-5 space-y-4">
-        {/* Variant options */}
-        {product.options?.map((opt) => (
+        {/* Variant options — hidden when there's only one variant */}
+        {(product.variants?.length ?? 0) > 1 && product.options?.map((opt) => (
           <div key={opt.id} className="flex items-center gap-4">
             <span className="text-sm text-ui-fg-subtle w-28 shrink-0">{opt.title}</span>
             <select

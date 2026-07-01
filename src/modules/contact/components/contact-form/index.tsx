@@ -29,6 +29,8 @@ export default function ContactForm() {
           email,
           message,
           ...(phone && { phone }),
+          locale: window.location.pathname.split("/")[1] || undefined,
+          source_url: window.location.href,
         },
       })
       setSuccess(true)

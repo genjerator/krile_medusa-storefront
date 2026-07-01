@@ -27,12 +27,22 @@ export default async function ProductPreview({
         >
           {product.title}
         </h3>
-        <Thumbnail
-          thumbnail={product.thumbnail}
-          images={product.images}
-          size="full"
-          isFeatured={isFeatured}
-        />
+        <div className="relative rounded-large overflow-hidden">
+          <Thumbnail
+            thumbnail={product.thumbnail}
+            images={product.images}
+            size="full"
+            isFeatured={isFeatured}
+          />
+          {/* Subtitle overlay — revealed on hover */}
+          {product.subtitle?.trim() && (
+            <div className="absolute inset-0 z-10 flex items-end p-4 bg-black/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <p className="text-white text-xs leading-snug line-clamp-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                {product.subtitle}
+              </p>
+            </div>
+          )}
+        </div>
         <div className="flex flex-col items-center mt-3 gap-y-1">
           {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
           {product.collection && (

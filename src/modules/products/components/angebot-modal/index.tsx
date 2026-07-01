@@ -1,7 +1,7 @@
 "use client"
 
 import { sdk } from "@lib/config"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { useState } from "react"
 
 const MESSAGE_MAX_LENGTH = 256
@@ -18,6 +18,7 @@ export default function AngebotModal({
   onClose,
 }: AngebotModalProps) {
   const t = useTranslations("angebotModal")
+  const locale = useLocale()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
@@ -39,7 +40,7 @@ export default function AngebotModal({
 
       await sdk.client.fetch("/store/inquiries", {
         method: "POST",
-        body: { product_id: productId, name, email, phone: phone || undefined, message: fullMessage },
+        body: { product_id: productId, name, email, phone: phone || undefined, message: fullMessage, locale, source_url: window.location.href },
       })
       setSuccess(true)
     } catch {

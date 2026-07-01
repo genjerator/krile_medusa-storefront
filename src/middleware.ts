@@ -6,6 +6,10 @@ import {
   getRegionMap,
 } from "@lib/util/regions"
 
+// Maintenance mode: while true, every route serves the /maintenance page.
+// Set to false to restore the normal site (region routing below runs again).
+const MAINTENANCE_MODE = true
+
 /**
  * Middleware to handle region selection and onboarding status.
  */
@@ -13,6 +17,14 @@ export async function middleware(request: NextRequest) {
   // check if the url is a static asset
   if (request.nextUrl.pathname.includes(".")) {
     return NextResponse.next()
+  }
+
+  // Under-construction mode — rewrite all pages to /maintenance.
+  if (MAINTENANCE_MODE) {
+    if (request.nextUrl.pathname === "/maintenance") {
+      return NextResponse.next()
+    }
+    return NextResponse.rewrite(new URL("/maintenance", request.url))
   }
 
   let cacheIdCookie = request.cookies.get("_medusa_cache_id")
