@@ -20,11 +20,32 @@ export async function middleware(request: NextRequest) {
   }
 
   // Under-construction mode — rewrite all pages to /maintenance.
+  // Bypass: visiting any URL with `?krile=true` sets a cookie that lets that
+  // browser see the real site (persists across navigation).
   if (MAINTENANCE_MODE) {
-    if (request.nextUrl.pathname === "/maintenance") {
-      return NextResponse.next()
+    // `?krile=true` — store the bypass and redirect to the clean URL.
+    if (request.nextUrl.searchParams.get("krile") === "true") {
+      const url = request.nextUrl.clone()
+      url.searchParams.delete("krile")
+      const res = NextResponse.redirect(url)
+      res.cookies.set("krile_bypass", "true", {
+        maxAge: 60 * 60 * 24 * 7,
+        sameSite: "lax",
+        path: "/",
+      })
+      return res
     }
-    return NextResponse.rewrite(new URL("/maintenance", request.url))
+
+    const bypass = request.cookies.get("krile_bypass")?.value === "true"
+
+    // No bypass → everyone sees the maintenance page.
+    if (!bypass) {
+      if (request.nextUrl.pathname === "/maintenance") {
+        return NextResponse.next()
+      }
+      return NextResponse.rewrite(new URL("/maintenance", request.url))
+    }
+    // Bypass active → fall through to normal region routing below.
   }
 
   let cacheIdCookie = request.cookies.get("_medusa_cache_id")
