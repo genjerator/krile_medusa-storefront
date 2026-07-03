@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { HttpTypes } from "@medusajs/types"
+import { createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { isPayPal, isManual, paymentInfoMap } from "@lib/constants"
 import { MEDUSA_BACKEND_URL } from "@lib/config"
 import {
@@ -45,10 +46,24 @@ export default function Checkout2Client({
   const [paypalLoading, setPaypalLoading] = useState(false)
   const [paypalApproved, setPaypalApproved] = useState(false)
   const [paypalAddress, setPaypalAddress] = useState<string | null>(null)
+  // The approved PayPal order id, kept so we can capture (charge) it only when
+  // the buyer clicks "Jetzt kaufen" — not inside the PayPal popup.
+  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
   // Live validity of the address form (reported by <Addresses>). Used so the
   // place-order button disables the moment a required field is cleared, before
   // the change is saved back to the cart.
   const [addressFormValid, setAddressFormValid] = useState(false)
+
+  // Store API client for PayPal — used to capture the approved order on
+  // "Jetzt kaufen" (the popup no longer captures).
+  const paypalApi = useMemo(
+    () =>
+      createPayPalStoreApi({
+        baseUrl: MEDUSA_BACKEND_URL,
+        publishableApiKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+      }),
+    []
+  )
 
   useEffect(() => {
     if (initialShipping.length === 1) {
@@ -104,6 +119,7 @@ export default function Checkout2Client({
     setSelectedPayment(method)
     setPaypalApproved(false)
     setPaypalAddress(null)
+    setPaypalOrderId(null)
     if (!isPayPal(method)) return
     setPaypalLoading(true)
     try {
@@ -115,13 +131,14 @@ export default function Checkout2Client({
     }
   }
 
-  // ── PayPal approval (authorize / hold) ────────────────────────────────────
-  // Our PayPalButtonsTwoStep has already captured/authorized the PayPal order
-  // and synced the buyer's address onto the cart — WITHOUT placing the order.
-  // Here we just pull the fresh cart (now carrying the PayPal address) and flag
-  // it as approved. The order is created only on the explicit "Jetzt kaufen"
-  // click (two-step flow).
-  const handlePayPalSuccess = async () => {
+  // ── PayPal approval (review — no charge yet) ──────────────────────────────
+  // Our PayPalButtonsTwoStep has synced the buyer's PayPal address onto the
+  // cart WITHOUT charging and WITHOUT placing the order. Here we remember the
+  // approved PayPal order id, pull the fresh cart (now carrying the PayPal
+  // address) and flag it as approved. The money is captured and the order
+  // placed only on the explicit "Jetzt kaufen" click.
+  const handlePayPalSuccess = async (orderId: string) => {
+    setPaypalOrderId(orderId || null)
     setLoading(true)
     try {
       const refreshed = await retrieveCart(
@@ -168,6 +185,15 @@ export default function Checkout2Client({
     try {
       if (isManual(selectedPayment)) {
         await initiatePaymentSession(cart, { provider_id: selectedPayment })
+      } else if (isPayPal(selectedPayment)) {
+        // Charge the buyer NOW (the popup only approved). Capturing before
+        // placeOrder attaches the capture to the cart's payment session, so
+        // completeCart finalizes the order as paid. If the capture fails, we
+        // stop here and never place an unpaid order.
+        if (!paypalOrderId) {
+          throw new Error("PayPal-Zahlung wurde nicht bestätigt.")
+        }
+        await paypalApi.captureOrder(cart.id, paypalOrderId)
       }
       await placeOrder()
     } catch (e: any) {
@@ -286,7 +312,7 @@ export default function Checkout2Client({
                   selectedProviderId={selectedPayment}
                   baseUrl={MEDUSA_BACKEND_URL}
                   publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
-                  onApproved={() => handlePayPalSuccess()}
+                  onApproved={(orderId) => handlePayPalSuccess(orderId)}
                   onError={(message) => setError(message)}
                 />
               )}

@@ -11,18 +11,18 @@ import { Text } from "@medusajs/ui"
 import { setPayPalAddress } from "@lib/data/cart"
 
 /**
- * Two-step PayPal buttons for checkout2.
+ * Two-step PayPal buttons for checkout2 — "review payment" flow.
  *
- * Unlike the plugin's `MedusaNextPayPalAdapter`, this does NOT call
- * `markPaymentComplete` (`/store/paypal-complete` → completeCartWorkflow), so
- * approving in the PayPal popup does NOT place the order. Instead, on approval
- * we:
- *   1. capture/authorize the PayPal order (attaches it to the cart's payment
- *      session via the plugin's `/store/paypal/capture-order` route), and
- *   2. sync the PayPal payer address/name/email onto the cart.
+ * The SDK is loaded with `commit: false`, so the popup's final button reads
+ * "Weiter"/"Continue" (not "Pay Now") and approving does NOT charge the buyer.
+ * On approval we ONLY:
+ *   1. read the payer/shipping address from the *approved* PayPal order (via
+ *      the SDK's `actions.order.get()`, a read — no capture), and
+ *   2. sync that address/name/email onto the cart, then hand the PayPal
+ *      order id back to the checkout form.
  *
- * The order is only created later, when the buyer clicks "Jetzt kaufen"
- * (→ `placeOrder()` → cart completion).
+ * The money is captured — and the order placed — later, when the buyer clicks
+ * "Jetzt kaufen" (→ checkout form calls `captureOrder` then `placeOrder()`).
  */
 
 type Props = {
@@ -30,7 +30,7 @@ type Props = {
   selectedProviderId: string
   baseUrl: string
   publishableApiKey?: string
-  onApproved: () => void | Promise<void>
+  onApproved: (paypalOrderId: string) => void | Promise<void>
   onError: (message: string) => void
 }
 
@@ -97,6 +97,11 @@ export default function PayPalButtonsTwoStep({
       currency: config.currency,
       intent: config.intent === "authorize" ? "authorize" : "capture",
       components: "buttons",
+      // "Review payment" flow: `commit: false` makes the popup's final button
+      // read "Weiter"/"Continue" (a review step follows) instead of "Pay Now",
+      // and — together with not calling capture on approval — means the buyer
+      // is not charged inside the popup.
+      commit: false,
     }
     // Only set disable-funding when there's an actual value — passing
     // `undefined` serializes to `disable-funding=undefined` in the SDK URL,
@@ -130,16 +135,23 @@ export default function PayPalButtonsTwoStep({
           const r = await api.createOrder(cartId)
           return r.id
         }}
-        onApprove={async (data: { orderID?: string }) => {
+        onApprove={async (data: { orderID?: string }, actions: any) => {
           try {
-            const res: any = await api.captureOrder(
-              cartId,
-              String(data?.orderID || "")
-            )
-            // capture-order returns { capture } or { authorization }
-            const payload = res?.capture || res?.authorization || res
-            await setPayPalAddress(extractPayPalAddress(payload))
-            await onApproved()
+            const orderId = String(data?.orderID || "")
+            // Do NOT capture here — with `commit: false` the buyer has only
+            // *approved*, not paid. Read the approved order (no charge) to pull
+            // the payer/shipping address and sync it onto the cart. The capture
+            // happens later, on the explicit "Jetzt kaufen" click.
+            let payload: any = null
+            try {
+              payload = await actions?.order?.get?.()
+            } catch {
+              payload = null
+            }
+            if (payload) {
+              await setPayPalAddress(extractPayPalAddress(payload))
+            }
+            await onApproved(orderId)
           } catch (e: any) {
             onError(e?.message || "PayPal-Zahlung fehlgeschlagen")
           }
