@@ -1,8 +1,7 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
-import { createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { isPayPal, isManual, paymentInfoMap } from "@lib/constants"
 import { MEDUSA_BACKEND_URL } from "@lib/config"
 import {
@@ -46,24 +45,10 @@ export default function Checkout2Client({
   const [paypalLoading, setPaypalLoading] = useState(false)
   const [paypalApproved, setPaypalApproved] = useState(false)
   const [paypalAddress, setPaypalAddress] = useState<string | null>(null)
-  // The approved PayPal order id, kept so we can capture (charge) it only when
-  // the buyer clicks "Jetzt kaufen" — not inside the PayPal popup.
-  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
   // Live validity of the address form (reported by <Addresses>). Used so the
   // place-order button disables the moment a required field is cleared, before
   // the change is saved back to the cart.
   const [addressFormValid, setAddressFormValid] = useState(false)
-
-  // Store API client for PayPal — used to capture the approved order on
-  // "Jetzt kaufen" (the popup no longer captures).
-  const paypalApi = useMemo(
-    () =>
-      createPayPalStoreApi({
-        baseUrl: MEDUSA_BACKEND_URL,
-        publishableApiKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
-      }),
-    []
-  )
 
   useEffect(() => {
     if (initialShipping.length === 1) {
@@ -91,10 +76,12 @@ export default function Checkout2Client({
   )
 
   // The address counts as ready only when it's saved on the cart AND the live
-  // form is still valid. The buyer must enter the address on-site before paying
-  // — for PayPal too (we no longer pull the address from PayPal), so the form
-  // must be valid regardless of payment method.
-  const addressReady = hasRequiredFields && addressFormValid
+  // form is still valid. For PayPal the buyer MAY skip the form and let PayPal
+  // fill the address on approval, so we don't require the form to be valid there
+  // — only that the cart ends up with the required fields (from the form or from
+  // PayPal).
+  const addressReady =
+    hasRequiredFields && (isPayPal(selectedPayment) || addressFormValid)
 
   const canPlaceOrder =
     selectedPayment &&
@@ -119,7 +106,6 @@ export default function Checkout2Client({
     setSelectedPayment(method)
     setPaypalApproved(false)
     setPaypalAddress(null)
-    setPaypalOrderId(null)
     if (!isPayPal(method)) return
     setPaypalLoading(true)
     try {
@@ -131,14 +117,11 @@ export default function Checkout2Client({
     }
   }
 
-  // ── PayPal approval (review — no charge yet) ──────────────────────────────
-  // Our PayPalButtonsTwoStep has synced the buyer's PayPal address onto the
-  // cart WITHOUT charging and WITHOUT placing the order. Here we remember the
-  // approved PayPal order id, pull the fresh cart (now carrying the PayPal
-  // address) and flag it as approved. The money is captured and the order
-  // placed only on the explicit "Jetzt kaufen" click.
-  const handlePayPalSuccess = async (orderId: string) => {
-    setPaypalOrderId(orderId || null)
+  // ── PayPal approval (already captured in the popup) ───────────────────────
+  // PayPalButtonsTwoStep has captured (charged) the order in the popup. Here we
+  // just pull the fresh cart and flag it as approved so "Jetzt kaufen" enables;
+  // that button then only places the order (the money is already captured).
+  const handlePayPalSuccess = async () => {
     setLoading(true)
     try {
       const refreshed = await retrieveCart(
@@ -185,16 +168,9 @@ export default function Checkout2Client({
     try {
       if (isManual(selectedPayment)) {
         await initiatePaymentSession(cart, { provider_id: selectedPayment })
-      } else if (isPayPal(selectedPayment)) {
-        // Charge the buyer NOW (the popup only approved). Capturing before
-        // placeOrder attaches the capture to the cart's payment session, so
-        // completeCart finalizes the order as paid. If the capture fails, we
-        // stop here and never place an unpaid order.
-        if (!paypalOrderId) {
-          throw new Error("PayPal-Zahlung wurde nicht bestätigt.")
-        }
-        await paypalApi.captureOrder(cart.id, paypalOrderId)
       }
+      // For PayPal the payment was already captured in the popup (commit:true),
+      // so "Jetzt kaufen" only needs to place the order.
       await placeOrder()
     } catch (e: any) {
       if (e?.digest?.startsWith("NEXT_REDIRECT")) throw e
@@ -290,21 +266,21 @@ export default function Checkout2Client({
               ))}
           </div>
 
-          {/* Require the address AND a shipping method BEFORE paying: the
-              address must be entered on-site (we don't take it from PayPal), and
-              PayPal authorizes funds on approval, so paying first would leave the
-              order unplaceable. */}
-          {isPayPal(selectedPayment) && !paypalApproved && (!addressReady || !selectedShipping) && (
+          {/* Require a shipping method BEFORE paying: PayPal captures on
+              approval, so paying first would leave the order unplaceable. The
+              address may be left empty here — PayPal fills it on approval if the
+              buyer didn't enter one on-site. */}
+          {isPayPal(selectedPayment) && !selectedShipping && !paypalApproved && (
             <div className="mt-4">
               <Text className="txt-small text-ui-fg-muted">
-                {!addressReady ? t("missingRequiredFields") : t("selectShippingBeforePaypal")}
+                {t("selectShippingBeforePaypal")}
               </Text>
             </div>
           )}
 
           {/* PayPal UI (Smart Buttons / Card) — shown once PayPal is selected
-              AND the address + shipping are set, until the buyer has approved. */}
-          {isPayPal(selectedPayment) && addressReady && selectedShipping && !paypalApproved && (
+              AND shipping is chosen, until the buyer has approved. */}
+          {isPayPal(selectedPayment) && selectedShipping && !paypalApproved && (
             <div className="mt-4">
               {paypalLoading ? (
                 <Text className="txt-small text-ui-fg-muted">{t("loading")}</Text>
@@ -314,7 +290,7 @@ export default function Checkout2Client({
                   selectedProviderId={selectedPayment}
                   baseUrl={MEDUSA_BACKEND_URL}
                   publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
-                  onApproved={(orderId) => handlePayPalSuccess(orderId)}
+                  onApproved={() => handlePayPalSuccess()}
                   onError={(message) => setError(message)}
                 />
               )}

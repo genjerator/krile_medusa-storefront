@@ -8,18 +8,20 @@ import {
 } from "@paypal/react-paypal-js"
 import { usePayPalConfig, createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { Text } from "@medusajs/ui"
+import { setPayPalAddress } from "@lib/data/cart"
 
 /**
- * Two-step PayPal buttons for checkout2 — "review payment" flow.
+ * PayPal buttons for checkout2 — "pay in popup" flow.
  *
- * The SDK is loaded with `commit: false`, so the popup's final button reads
- * "Weiter"/"Continue" (not "Pay Now") and approving does NOT charge the buyer.
- * The buyer enters their address on-site BEFORE paying, so on approval we do
- * NOT read or sync any address from PayPal — we just hand the approved PayPal
- * order id back to the checkout form.
+ * The SDK is loaded with `commit: true`, so the popup's final button reads
+ * "Jetzt bezahlen" / "Complete Purchase" and shows the FINAL amount (no
+ * "up to X / additional fees / final amount when you return" disclaimer).
  *
- * The money is captured — and the order placed — later, when the buyer clicks
- * "Jetzt kaufen" (→ checkout form calls `captureOrder` then `placeOrder()`).
+ * On approval we CAPTURE (charge) the order in the popup, then fill the buyer's
+ * address onto the cart FROM PayPal — but only the fields they didn't already
+ * enter on-site (`setPayPalAddress` never overwrites existing cart data). Then
+ * we hand the order id back; "Jetzt kaufen" afterwards only places the order
+ * (`placeOrder()`) — the money is already captured.
  */
 
 type Props = {
@@ -29,6 +31,38 @@ type Props = {
   publishableApiKey?: string
   onApproved: (paypalOrderId: string) => void | Promise<void>
   onError: (message: string) => void
+}
+
+/** PayPal capture payloads put the buyer details in a few different places
+ * depending on funding source — read them all with fallbacks. */
+function extractPayPalAddress(payload: any) {
+  const pu = payload?.purchase_units?.[0] ?? {}
+  const shipping = pu?.shipping ?? {}
+  const shipAddr = shipping?.address ?? {}
+  const payer = payload?.payer ?? {}
+  const ppSource = payload?.payment_source?.paypal ?? {}
+
+  let first = payer?.name?.given_name || ppSource?.name?.given_name || ""
+  let last = payer?.name?.surname || ppSource?.name?.surname || ""
+  if (!first && !last && shipping?.name?.full_name) {
+    const parts = String(shipping.name.full_name).trim().split(/\s+/)
+    first = parts.shift() || ""
+    last = parts.join(" ")
+  }
+
+  return {
+    first_name: first,
+    last_name: last,
+    address_1: shipAddr?.address_line_1 || "",
+    address_2: shipAddr?.address_line_2 || "",
+    city: shipAddr?.admin_area_2 || "",
+    province: shipAddr?.admin_area_1 || "",
+    postal_code: shipAddr?.postal_code || "",
+    country_code: String(
+      shipAddr?.country_code || payer?.address?.country_code || ""
+    ).toLowerCase(),
+    email: payer?.email_address || ppSource?.email_address || "",
+  }
 }
 
 export default function PayPalButtonsTwoStep({
@@ -62,11 +96,11 @@ export default function PayPalButtonsTwoStep({
       currency: config.currency,
       intent: config.intent === "authorize" ? "authorize" : "capture",
       components: "buttons",
-      // "Review payment" flow: `commit: false` makes the popup's final button
-      // read "Weiter"/"Continue" (a review step follows) instead of "Pay Now",
-      // and — together with not calling capture on approval — means the buyer
-      // is not charged inside the popup.
-      commit: false,
+      // `commit: true` → the popup's final button reads "Jetzt bezahlen" /
+      // "Complete Purchase" and shows the FINAL amount (no "up to X / additional
+      // fees / final amount when you return" disclaimer). We capture the payment
+      // in `onApprove` (in the popup); "Jetzt kaufen" then only places the order.
+      commit: true,
     }
     // Only set disable-funding when there's an actual value — passing
     // `undefined` serializes to `disable-funding=undefined` in the SDK URL,
@@ -102,10 +136,14 @@ export default function PayPalButtonsTwoStep({
         }}
         onApprove={async (data: { orderID?: string }) => {
           try {
-            // Do NOT capture here — with `commit: false` the buyer has only
-            // *approved*, not paid. The address was entered on-site before
-            // paying, so we read/sync nothing from PayPal; just hand the
-            // approved order id back. Capture happens later, on "Jetzt kaufen".
+            // `commit: true` → capture (charge) the payment now, in the popup.
+            // This attaches the capture to the cart's payment session so the
+            // later "Jetzt kaufen" only needs to place the order.
+            const res: any = await api.captureOrder(cartId, String(data?.orderID || ""))
+            // Fill the address from PayPal ONLY where the buyer left it empty
+            // on-site — setPayPalAddress never overwrites existing cart data.
+            const payload = res?.capture || res?.authorization || res
+            await setPayPalAddress(extractPayPalAddress(payload))
             await onApproved(String(data?.orderID || ""))
           } catch (e: any) {
             onError(e?.message || "PayPal-Zahlung fehlgeschlagen")
