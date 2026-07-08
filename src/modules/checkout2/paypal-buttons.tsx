@@ -8,18 +8,15 @@ import {
 } from "@paypal/react-paypal-js"
 import { usePayPalConfig, createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { Text } from "@medusajs/ui"
-import { setPayPalAddress } from "@lib/data/cart"
 
 /**
  * Two-step PayPal buttons for checkout2 — "review payment" flow.
  *
  * The SDK is loaded with `commit: false`, so the popup's final button reads
  * "Weiter"/"Continue" (not "Pay Now") and approving does NOT charge the buyer.
- * On approval we ONLY:
- *   1. read the payer/shipping address from the *approved* PayPal order (via
- *      the SDK's `actions.order.get()`, a read — no capture), and
- *   2. sync that address/name/email onto the cart, then hand the PayPal
- *      order id back to the checkout form.
+ * The buyer enters their address on-site BEFORE paying, so on approval we do
+ * NOT read or sync any address from PayPal — we just hand the approved PayPal
+ * order id back to the checkout form.
  *
  * The money is captured — and the order placed — later, when the buyer clicks
  * "Jetzt kaufen" (→ checkout form calls `captureOrder` then `placeOrder()`).
@@ -32,38 +29,6 @@ type Props = {
   publishableApiKey?: string
   onApproved: (paypalOrderId: string) => void | Promise<void>
   onError: (message: string) => void
-}
-
-/** PayPal capture/authorize payloads put the buyer details in a few different
- * places depending on funding source — read them all with fallbacks. */
-function extractPayPalAddress(payload: any) {
-  const pu = payload?.purchase_units?.[0] ?? {}
-  const shipping = pu?.shipping ?? {}
-  const shipAddr = shipping?.address ?? {}
-  const payer = payload?.payer ?? {}
-  const ppSource = payload?.payment_source?.paypal ?? {}
-
-  let first = payer?.name?.given_name || ppSource?.name?.given_name || ""
-  let last = payer?.name?.surname || ppSource?.name?.surname || ""
-  if (!first && !last && shipping?.name?.full_name) {
-    const parts = String(shipping.name.full_name).trim().split(/\s+/)
-    first = parts.shift() || ""
-    last = parts.join(" ")
-  }
-
-  return {
-    first_name: first,
-    last_name: last,
-    address_1: shipAddr?.address_line_1 || "",
-    address_2: shipAddr?.address_line_2 || "",
-    city: shipAddr?.admin_area_2 || "",
-    province: shipAddr?.admin_area_1 || "",
-    postal_code: shipAddr?.postal_code || "",
-    country_code: String(
-      shipAddr?.country_code || payer?.address?.country_code || ""
-    ).toLowerCase(),
-    email: payer?.email_address || ppSource?.email_address || "",
-  }
 }
 
 export default function PayPalButtonsTwoStep({
@@ -135,23 +100,13 @@ export default function PayPalButtonsTwoStep({
           const r = await api.createOrder(cartId)
           return r.id
         }}
-        onApprove={async (data: { orderID?: string }, actions: any) => {
+        onApprove={async (data: { orderID?: string }) => {
           try {
-            const orderId = String(data?.orderID || "")
             // Do NOT capture here — with `commit: false` the buyer has only
-            // *approved*, not paid. Read the approved order (no charge) to pull
-            // the payer/shipping address and sync it onto the cart. The capture
-            // happens later, on the explicit "Jetzt kaufen" click.
-            let payload: any = null
-            try {
-              payload = await actions?.order?.get?.()
-            } catch {
-              payload = null
-            }
-            if (payload) {
-              await setPayPalAddress(extractPayPalAddress(payload))
-            }
-            await onApproved(orderId)
+            // *approved*, not paid. The address was entered on-site before
+            // paying, so we read/sync nothing from PayPal; just hand the
+            // approved order id back. Capture happens later, on "Jetzt kaufen".
+            await onApproved(String(data?.orderID || ""))
           } catch (e: any) {
             onError(e?.message || "PayPal-Zahlung fehlgeschlagen")
           }

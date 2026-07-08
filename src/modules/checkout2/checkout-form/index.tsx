@@ -91,10 +91,10 @@ export default function Checkout2Client({
   )
 
   // The address counts as ready only when it's saved on the cart AND the live
-  // form is still valid. For PayPal the address comes from the PayPal account
-  // (the form stays empty), so we don't require the form to be valid there.
-  const addressReady =
-    hasRequiredFields && (isPayPal(selectedPayment) || addressFormValid)
+  // form is still valid. The buyer must enter the address on-site before paying
+  // — for PayPal too (we no longer pull the address from PayPal), so the form
+  // must be valid regardless of payment method.
+  const addressReady = hasRequiredFields && addressFormValid
 
   const canPlaceOrder =
     selectedPayment &&
@@ -290,19 +290,21 @@ export default function Checkout2Client({
               ))}
           </div>
 
-          {/* Require a shipping method BEFORE paying: PayPal authorizes funds on
-              approval, so paying first would leave the order unplaceable. */}
-          {isPayPal(selectedPayment) && !selectedShipping && !paypalApproved && (
+          {/* Require the address AND a shipping method BEFORE paying: the
+              address must be entered on-site (we don't take it from PayPal), and
+              PayPal authorizes funds on approval, so paying first would leave the
+              order unplaceable. */}
+          {isPayPal(selectedPayment) && !paypalApproved && (!addressReady || !selectedShipping) && (
             <div className="mt-4">
               <Text className="txt-small text-ui-fg-muted">
-                {t("selectShippingBeforePaypal")}
+                {!addressReady ? t("missingRequiredFields") : t("selectShippingBeforePaypal")}
               </Text>
             </div>
           )}
 
           {/* PayPal UI (Smart Buttons / Card) — shown once PayPal is selected
-              AND shipping is chosen, until the buyer has approved. */}
-          {isPayPal(selectedPayment) && selectedShipping && !paypalApproved && (
+              AND the address + shipping are set, until the buyer has approved. */}
+          {isPayPal(selectedPayment) && addressReady && selectedShipping && !paypalApproved && (
             <div className="mt-4">
               {paypalLoading ? (
                 <Text className="txt-small text-ui-fg-muted">{t("loading")}</Text>
