@@ -8,20 +8,22 @@ import {
 } from "@paypal/react-paypal-js"
 import { usePayPalConfig, createPayPalStoreApi } from "@easypayment/medusa-paypal-ui"
 import { Text } from "@medusajs/ui"
-import { setPayPalAddress } from "@lib/data/cart"
 
 /**
- * PayPal buttons for checkout2 — "pay in popup" flow.
+ * Two-step PayPal buttons for checkout2 — "confirm on Jetzt kaufen" flow.
  *
- * The SDK is loaded with `commit: true`, so the popup's final button reads
- * "Jetzt bezahlen" / "Complete Purchase" and shows the FINAL amount (no
- * "up to X / additional fees / final amount when you return" disclaimer).
+ * The SDK is loaded with `commit: true` so PayPal shows the FINAL amount (no
+ * "up to X / additional fees / final amount when you return" disclaimer). NOTE:
+ * `commit` only sets the popup button WORDING ("Jetzt bezahlen") — it does NOT
+ * charge. Approving does NOT capture. On approval we ONLY hand the PayPal
+ * order id back to the checkout form.
  *
- * On approval we CAPTURE (charge) the order in the popup, then fill the buyer's
- * address onto the cart FROM PayPal — but only the fields they didn't already
- * enter on-site (`setPayPalAddress` never overwrites existing cart data). Then
- * we hand the order id back; "Jetzt kaufen" afterwards only places the order
- * (`placeOrder()`) — the money is already captured.
+ * The buttons are gated on a fully filled address form (see `disabled`), and
+ * the typed address is the one that ships: the payer/shipping address from the
+ * PayPal account is deliberately NOT written back to the cart.
+ *
+ * The money is captured — and the order placed — later, when the buyer clicks
+ * "Jetzt kaufen" (→ checkout form calls `captureOrder` then `placeOrder()`).
  */
 
 type Props = {
@@ -29,40 +31,11 @@ type Props = {
   selectedProviderId: string
   baseUrl: string
   publishableApiKey?: string
+  /** Grey out the buttons and block the popup (e.g. while the address form is
+   * incomplete). */
+  disabled?: boolean
   onApproved: (paypalOrderId: string) => void | Promise<void>
   onError: (message: string) => void
-}
-
-/** PayPal capture payloads put the buyer details in a few different places
- * depending on funding source — read them all with fallbacks. */
-function extractPayPalAddress(payload: any) {
-  const pu = payload?.purchase_units?.[0] ?? {}
-  const shipping = pu?.shipping ?? {}
-  const shipAddr = shipping?.address ?? {}
-  const payer = payload?.payer ?? {}
-  const ppSource = payload?.payment_source?.paypal ?? {}
-
-  let first = payer?.name?.given_name || ppSource?.name?.given_name || ""
-  let last = payer?.name?.surname || ppSource?.name?.surname || ""
-  if (!first && !last && shipping?.name?.full_name) {
-    const parts = String(shipping.name.full_name).trim().split(/\s+/)
-    first = parts.shift() || ""
-    last = parts.join(" ")
-  }
-
-  return {
-    first_name: first,
-    last_name: last,
-    address_1: shipAddr?.address_line_1 || "",
-    address_2: shipAddr?.address_line_2 || "",
-    city: shipAddr?.admin_area_2 || "",
-    province: shipAddr?.admin_area_1 || "",
-    postal_code: shipAddr?.postal_code || "",
-    country_code: String(
-      shipAddr?.country_code || payer?.address?.country_code || ""
-    ).toLowerCase(),
-    email: payer?.email_address || ppSource?.email_address || "",
-  }
 }
 
 export default function PayPalButtonsTwoStep({
@@ -70,6 +43,7 @@ export default function PayPalButtonsTwoStep({
   selectedProviderId,
   baseUrl,
   publishableApiKey,
+  disabled = false,
   onApproved,
   onError,
 }: Props) {
@@ -105,10 +79,10 @@ export default function PayPalButtonsTwoStep({
     // Only set disable-funding when there's an actual value — passing
     // `undefined` serializes to `disable-funding=undefined` in the SDK URL,
     // which makes PayPal load without the Buttons component.
-    const disabled = Array.isArray(config.disable_buttons)
+    const disabledFunding = Array.isArray(config.disable_buttons)
       ? config.disable_buttons.filter(Boolean)
       : []
-    if (disabled.length) opts["disable-funding"] = disabled.join(",")
+    if (disabledFunding.length) opts["disable-funding"] = disabledFunding.join(",")
     return opts
   }, [config])
 
@@ -130,21 +104,26 @@ export default function PayPalButtonsTwoStep({
           label: config.button_label,
           height: config.button_height,
         }}
+        disabled={disabled}
+        // Safety net alongside `disabled`: even if a click gets through (e.g.
+        // a stale render), refuse to open the popup while blocked.
+        onClick={(_data: unknown, actions: { resolve: () => void; reject: () => void }) =>
+          disabled ? actions.reject() : actions.resolve()
+        }
         createOrder={async () => {
           const r = await api.createOrder(cartId)
           return r.id
         }}
         onApprove={async (data: { orderID?: string }) => {
           try {
-            // `commit: true` → capture (charge) the payment now, in the popup.
-            // This attaches the capture to the cart's payment session so the
-            // later "Jetzt kaufen" only needs to place the order.
-            const res: any = await api.captureOrder(cartId, String(data?.orderID || ""))
-            // Fill the address from PayPal ONLY where the buyer left it empty
-            // on-site — setPayPalAddress never overwrites existing cart data.
-            const payload = res?.capture || res?.authorization || res
-            await setPayPalAddress(extractPayPalAddress(payload))
-            await onApproved(String(data?.orderID || ""))
+            const orderId = String(data?.orderID || "")
+            // Do NOT capture here — `commit: true` only changes the popup button
+            // wording; it does NOT charge. The buyer has only *approved*, not
+            // paid. The cart keeps the address the buyer typed into the form
+            // (required before the buttons unlock) — the PayPal account address
+            // is NOT written back. The capture happens later, on the explicit
+            // "Jetzt kaufen" click.
+            await onApproved(orderId)
           } catch (e: any) {
             onError(e?.message || "PayPal-Zahlung fehlgeschlagen")
           }
