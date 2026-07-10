@@ -13,6 +13,7 @@ export default function MobileMenu() {
     { label: t("training"), href: "/service" },
     { label: t("contact"), href: "/kontakt" },
     { label: t("informations"), href: "/informations" },
+    { label: t("reparatur"), href: "/reparatur" },
   ]
 
   return (
@@ -47,13 +48,6 @@ export default function MobileMenu() {
                 {link.label}
               </LocalizedClientLink>
             ))}
-            <LocalizedClientLink
-              href="/account"
-              className="text-white text-sm hover:text-white/70 transition-colors"
-              onClick={() => setMenuOpen(false)}
-            >
-              {t("account")}
-            </LocalizedClientLink>
           </div>
         </div>
       )}

@@ -43,9 +43,6 @@ export default function Checkout2Client({
   const [loading, setLoading] = useState(false)
   const [paypalLoading, setPaypalLoading] = useState(false)
   const [paypalApproved, setPaypalApproved] = useState(false)
-  // The approved PayPal order id, kept so we can capture (charge) it only when
-  // the buyer clicks "Jetzt kaufen" — not inside the PayPal popup.
-  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
   // Live validity of the address form (reported by <Addresses>). Used so the
   // place-order button disables the moment a required field is cleared, before
   // the change is saved back to the cart.
@@ -114,7 +111,6 @@ export default function Checkout2Client({
     setError(null)
     setSelectedPayment(method)
     setPaypalApproved(false)
-    setPaypalOrderId(null)
     if (!isPayPal(method)) return
     setPaypalLoading(true)
     try {
@@ -126,15 +122,27 @@ export default function Checkout2Client({
     }
   }
 
-  // ── PayPal approval (review — no charge yet) ──────────────────────────────
-  // The buyer has approved in the popup: nothing was charged, no order was
-  // placed, and the cart address (typed into the form) stays untouched — the
-  // PayPal account address is never written back. We only remember the approved
-  // PayPal order id; the money is captured and the order placed on the explicit
-  // "Jetzt kaufen" click.
-  const handlePayPalSuccess = (orderId: string) => {
-    setPaypalOrderId(orderId || null)
+  // ── PayPal approval → complete the order immediately ──────────────────────
+  // The buyer approved in the PayPal popup. There is no "Jetzt kaufen" step for
+  // PayPal: we capture (charge) the approved order right away and then place the
+  // order, which redirects to the confirmation page. If capture/placement fails
+  // we surface the error and let the buyer retry (nothing was finalized).
+  const handlePayPalApproved = async (orderId: string) => {
     setPaypalApproved(true)
+    setLoading(true)
+    setError(null)
+    try {
+      if (!orderId) throw new Error("PayPal-Zahlung wurde nicht bestätigt.")
+      await paypalApi.captureOrder(cart.id, orderId)
+      await placeOrder() // redirects to the confirmation page on success
+    } catch (e: any) {
+      if (e?.digest?.startsWith("NEXT_REDIRECT")) throw e
+      console.error("[PayPal] auto-complete error:", e?.message, e?.digest, e)
+      setError(e.message)
+      setLoading(false)
+      // Let the buyer try the PayPal payment again.
+      setPaypalApproved(false)
+    }
   }
 
   // ── Shipping selection ────────────────────────────────────────────────────
@@ -151,23 +159,15 @@ export default function Checkout2Client({
     }
   }
 
-  // ── Place order ───────────────────────────────────────────────────────────
+  // ── Place order (Vorkasse only) ───────────────────────────────────────────
+  // Only used for manual/prepayment ("Vorkasse"); PayPal completes itself on
+  // approval (see handlePayPalApproved), so the "Jetzt kaufen" button is only
+  // shown for manual payment.
   const handlePlaceOrder = async () => {
     setLoading(true)
     setError(null)
     try {
-      if (isManual(selectedPayment)) {
-        await initiatePaymentSession(cart, { provider_id: selectedPayment })
-      } else if (isPayPal(selectedPayment)) {
-        // Charge the buyer NOW (the popup only approved). Capturing before
-        // placeOrder attaches the capture to the cart's payment session, so
-        // completeCart finalizes the order as paid. If the capture fails, we
-        // stop here and never place an unpaid order.
-        if (!paypalOrderId) {
-          throw new Error("PayPal-Zahlung wurde nicht bestätigt.")
-        }
-        await paypalApi.captureOrder(cart.id, paypalOrderId)
-      }
+      await initiatePaymentSession(cart, { provider_id: selectedPayment })
       await placeOrder()
     } catch (e: any) {
       if (e?.digest?.startsWith("NEXT_REDIRECT")) throw e
@@ -288,7 +288,7 @@ export default function Checkout2Client({
                     baseUrl={MEDUSA_BACKEND_URL}
                     publishableApiKey={process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY}
                     disabled={!addressFormValid}
-                    onApproved={(orderId) => handlePayPalSuccess(orderId)}
+                    onApproved={(orderId) => handlePayPalApproved(orderId)}
                     onError={(message) => setError(message)}
                   />
                 </>
@@ -299,25 +299,32 @@ export default function Checkout2Client({
           {paypalApproved && (
             <div className="mt-3 flex items-center gap-2">
               <Badge color="green" size="2xsmall">{t("paypalConfirmed")}</Badge>
+              {loading && (
+                <Text className="txt-small text-ui-fg-muted">{t("processingPayment")}</Text>
+              )}
             </div>
           )}
         </div>
 
-        {/* Place order */}
+        {/* Place order — Vorkasse only. PayPal completes on approval (no button). */}
         <ErrorMessage error={error} data-testid="checkout2-error" />
-        <Button
-          size="large"
-          className="w-full"
-          onClick={handlePlaceOrder}
-          isLoading={loading}
-          disabled={!canPlaceOrder || loading}
-        >
-          {t("buyNow")}
-        </Button>
-        {!canPlaceOrder && missingRequirements.length > 0 && (
-          <Text className="txt-small text-amber-600 text-center">
-            {t("stillNeeded")}: {missingRequirements.join(" · ")}
-          </Text>
+        {isManual(selectedPayment) && (
+          <>
+            <Button
+              size="large"
+              className="w-full"
+              onClick={handlePlaceOrder}
+              isLoading={loading}
+              disabled={!canPlaceOrder || loading}
+            >
+              {t("buyNow")}
+            </Button>
+            {!canPlaceOrder && missingRequirements.length > 0 && (
+              <Text className="txt-small text-amber-600 text-center">
+                {t("stillNeeded")}: {missingRequirements.join(" · ")}
+              </Text>
+            )}
+          </>
         )}
         <Text className="txt-small text-ui-fg-muted text-center">
           {t("termsHint")}

@@ -4,6 +4,7 @@
     "training": "Service",
     "contact": "Kontakt",
     "informations": "Informationen",
+    "reparatur": "Reparatur",
     "account": "Konto",
     "cart": "Warenkorb"
   },
@@ -47,6 +48,7 @@
     "paymentMethod": "Zahlungsmethode",
     "prepayment": "Vorkasse",
     "paypalConfirmed": "✓ PayPal bestätigt",
+    "processingPayment": "Zahlung wird abgeschlossen, bitte warten…",
     "buyNow": "Jetzt kaufen",
     "termsHint": "Mit Klick bestätigen Sie unsere AGB und Datenschutzerklärung.",
     "selectShippingBeforePaypal": "Bitte wählen Sie zuerst eine Versandart, bevor Sie mit PayPal bezahlen.",

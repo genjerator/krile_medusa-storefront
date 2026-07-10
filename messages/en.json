@@ -4,6 +4,7 @@
     "training": "Service",
     "contact": "Contact",
     "informations": "Informations",
+    "reparatur": "Repair",
     "account": "Account",
     "cart": "Cart"
   },
@@ -47,6 +48,7 @@
     "paymentMethod": "Payment method",
     "prepayment": "Prepayment",
     "paypalConfirmed": "✓ PayPal confirmed",
+    "processingPayment": "Completing payment, please wait…",
     "buyNow": "Buy now",
     "termsHint": "By clicking you confirm our terms and privacy policy.",
     "selectShippingBeforePaypal": "Please select a shipping method before paying with PayPal.",

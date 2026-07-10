@@ -16,6 +16,7 @@ export default async function Nav() {
     { label: t("training"), href: "/service" },
     { label: t("contact"), href: "/kontakt" },
     { label: t("informations"), href: "/informations" },
+    { label: t("reparatur"), href: "/reparatur" },
   ]
   return (
     <div className="sticky top-0 inset-x-0 z-50">
@@ -50,16 +51,9 @@ export default async function Nav() {
             ))}
           </div>
 
-          {/* Right: language + account + cart + hamburger */}
+          {/* Right: language + cart + hamburger */}
           <div className="flex items-center gap-x-4">
             <LanguageSwitcher />
-            <LocalizedClientLink
-              className="hidden small:block font-heading font-semibold uppercase tracking-widest text-xs text-white hover:text-white/70 transition-colors"
-              href="/account"
-              data-testid="nav-account-link"
-            >
-              {t("account")}
-            </LocalizedClientLink>
             <Suspense
               fallback={
                 <LocalizedClientLink
