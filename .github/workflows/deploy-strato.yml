@@ -1,0 +1,86 @@
+name: Deploy Storefront (Industries) to Strato VPS
+
+# Builds the Planeta Industries storefront and deploys it to the Strato VPS in
+# one click: build (linux/amd64) -> push to GHCR -> SSH to the VPS -> pull +
+# recreate ONLY the `storefront-planeta-industries` service.
+#
+# Manual for now (workflow_dispatch) so it doesn't collide with the AWS deploy;
+# switch to `push: { branches: [main] }` once AWS is retired.
+#
+# NOTE: NEXT_PUBLIC_* are baked in at BUILD time, so the *_STRATO_* secrets must
+# point at the Strato domains (e.g. https://industries.alcoccodrillo.de and
+# https://admin.alcoccodrillo.de). This supersedes build-ghcr.yml (which only
+# builds) — that file can be removed.
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/krile-storefront
+  # docker-compose service name on the VPS (see krile_medusa/docker-compose.strato.yml)
+  SERVICE: storefront-planeta-industries
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # lets GITHUB_TOKEN push to GHCR
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64   # Strato VPS is x86_64
+          push: true
+          build-args: |
+            NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY }}
+            NEXT_PUBLIC_BASE_URL=${{ secrets.STRATO_NEXT_PUBLIC_BASE_URL }}
+            NEXT_PUBLIC_DEFAULT_REGION=${{ secrets.NEXT_PUBLIC_DEFAULT_REGION }}
+            MEDUSA_BACKEND_URL=${{ secrets.STRATO_MEDUSA_BACKEND_URL }}
+            NEXT_PUBLIC_PAYPAL_CLIENT_ID=${{ secrets.NEXT_PUBLIC_PAYPAL_CLIENT_ID }}
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=registry,ref=${{ env.IMAGE }}:cache
+          cache-to: type=registry,ref=${{ env.IMAGE }}:cache,mode=max
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STRATO_HOST }}
+          username: ${{ secrets.STRATO_USER }}
+          key: ${{ secrets.STRATO_SSH_KEY }}
+          script: |
+            # Fail loudly on any error (a silent failure would falsely report a
+            # successful deploy while nothing changed).
+            set -euo pipefail
+            cd ~/app
+
+            # Log in to GHCR to pull the private storefront image.
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+            # Pull the freshly built image and recreate ONLY this storefront.
+            # The compose file + .env.strato on the VPS are owned by the backend
+            # deploy; this workflow just swaps in the new storefront image.
+            docker compose -f docker-compose.strato.yml pull storefront-planeta-industries
+            docker compose -f docker-compose.strato.yml up -d --no-deps --force-recreate storefront-planeta-industries
+
+            # Prove which image is now running, then clean up dangling images.
+            docker compose -f docker-compose.strato.yml ps storefront-planeta-industries
+            docker compose -f docker-compose.strato.yml images storefront-planeta-industries
+            docker image prune -f
