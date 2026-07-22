@@ -8,7 +8,7 @@ import {
 
 // Maintenance mode: while true, every route serves the /maintenance page.
 // Set to false to restore the normal site (region routing below runs again).
-const MAINTENANCE_MODE = true
+const MAINTENANCE_MODE = false
 
 /**
  * Middleware to handle region selection and onboarding status.

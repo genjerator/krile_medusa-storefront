@@ -54,24 +54,6 @@ const SERVICE_ITEMS: ServiceItem[] = [
     ),
   },
   {
-    label: "Reparaturformular",
-    content: (
-      <div className="pb-4 pl-4 border-l-2 border-brand-navy ml-1">
-        <a
-          href="/Reparaturformular_fi.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-sm text-brand-navy hover:underline"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 shrink-0">
-            <path fillRule="evenodd" d="M4.5 2A1.5 1.5 0 0 0 3 3.5v13A1.5 1.5 0 0 0 4.5 18h11a1.5 1.5 0 0 0 1.5-1.5V7.621a1.5 1.5 0 0 0-.44-1.06l-4.12-4.122A1.5 1.5 0 0 0 11.378 2H4.5Zm2.25 8.5a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Zm0 3a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5Z" clipRule="evenodd" />
-          </svg>
-          Reparaturformular.pdf
-        </a>
-      </div>
-    ),
-  },
-  {
     label: "Beratungsleistungen",
     children: [
       { label: "Ganzheitliche Verpackungsberatung", href: "#" },

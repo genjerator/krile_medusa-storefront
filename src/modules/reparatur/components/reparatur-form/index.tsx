@@ -9,7 +9,6 @@ type FormState = {
   kd_nr: string
   name: string
   vorname: string
-  kontakt: string
   strasse_nr: string
   plz: string
   ort: string
@@ -18,7 +17,6 @@ type FormState = {
   email: string
   kunden_nummer: string
   geraete_nummer: string
-  anderer_empfaenger: boolean
   datum: string
   beschreibung: string
   unterschrift_ort: string
@@ -30,7 +28,6 @@ const INITIAL: FormState = {
   kd_nr: "",
   name: "",
   vorname: "",
-  kontakt: "",
   strasse_nr: "",
   plz: "",
   ort: "",
@@ -39,7 +36,6 @@ const INITIAL: FormState = {
   email: "",
   kunden_nummer: "",
   geraete_nummer: "",
-  anderer_empfaenger: false,
   datum: "",
   beschreibung: "",
   unterschrift_ort: "",
@@ -136,13 +132,11 @@ export default function ReparaturForm() {
       {/* Auftraggeber */}
       <fieldset className="flex flex-col gap-6">
         <legend className="text-lg font-semibold text-ui-fg-base mb-2">Auftraggeber</legend>
+        <Field label="Kd. Nr." htmlFor="kd_nr">
+          <input id="kd_nr" type="text" value={form.kd_nr} onChange={set("kd_nr")} className={inputClass} />
+        </Field>
+
         <div className="grid sm:grid-cols-2 gap-6">
-          <Field label="Kd. Nr." htmlFor="kd_nr">
-            <input id="kd_nr" type="text" value={form.kd_nr} onChange={set("kd_nr")} className={inputClass} />
-          </Field>
-          <Field label="Kontakt" htmlFor="kontakt">
-            <input id="kontakt" type="text" value={form.kontakt} onChange={set("kontakt")} className={inputClass} />
-          </Field>
           <Field label="Name" htmlFor="name" required>
             <input id="name" type="text" required value={form.name} onChange={set("name")} className={inputClass} />
           </Field>
@@ -176,10 +170,6 @@ export default function ReparaturForm() {
           </Field>
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-ui-fg-base">
-          <input type="checkbox" checked={form.anderer_empfaenger} onChange={set("anderer_empfaenger")} />
-          Anderer Empfänger
-        </label>
       </fieldset>
 
       {/* Gerät */}

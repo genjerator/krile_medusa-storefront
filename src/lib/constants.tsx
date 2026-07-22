@@ -30,9 +30,9 @@ export const paymentInfoMap: Record<
     title: "Bancontact",
     icon: <Bancontact />,
   },
-  pp_paypal_paypal: {
-    title: "PayPal",
-    icon: <PayPal />,
+  pp_manual_manual: {
+    title: "Vorkasse",
+    icon: <CreditCard />,
   },
   pp_system_default: {
     title: "Manual Payment",
