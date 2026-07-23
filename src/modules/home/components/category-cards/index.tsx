@@ -84,7 +84,7 @@ function CardContent({ cat, found }: { cat: HttpTypes.StoreProductCategory | { h
 export default async function CategoryCards() {
   const [packagingMachines, folien, vakuumBehaelter, gewurze, gebrauchtMaschinen, haushalts] = await Promise.all([
     getCategoryByHandle(["vakuum-maschienen"]).catch(() => null),
-    getCategoryByHandle(["vakuumspeicherung"]).catch(() => null),
+    getCategoryByHandle(["vakuumiertuten-rollen"]).catch(() => null),
     getCategoryByHandle(["vakuum-behaelter"]).catch(() => null),
     getCategoryByHandle(["gewurze"]).catch(() => null),
     getCategoryByHandle(["gebraucht_maschienen"]).catch(() => null),
@@ -93,7 +93,7 @@ export default async function CategoryCards() {
 
   const slots: { data: HttpTypes.StoreProductCategory | null | undefined; handle: string; name?: string }[] = [
     { data: packagingMachines, handle: "vakuum-maschienen", name: "Verpackungsmaschinen" },
-    { data: folien, handle: "vakuumspeicherung", name: "Vakuumspeicherung" },
+    { data: folien, handle: "vakuumiertuten-rollen", name: "Vakuumiertüten & Rollen" },
     { data: vakuumBehaelter, handle: "vakuum-behaelter" },
     { data: gewurze, handle: "gewurze" },
     { data: gebrauchtMaschinen, handle: "gebraucht_maschienen" },
