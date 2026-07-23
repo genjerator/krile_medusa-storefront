@@ -3,21 +3,15 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { HttpTypes } from "@medusajs/types"
-
-const tabs = ["Beschreibung", "Technische Daten"]
+import { descriptionToHtml } from "@lib/util/description-html"
 
 export default function ProductDetailTabs({
   product,
 }: {
   product: HttpTypes.StoreProduct
 }) {
-  const [active, setActive] = useState(0)
   const t = useTranslations("technicalData")
   const metadata = (product as any).metadata ?? {}
-
-  // Rich-text technical data entered via the admin WYSIWYG editor. When set, it
-  // takes precedence over the auto-generated spec table below.
-  const technicalHtml = (metadata.technische_daten_html as string) || ""
 
   const formatValue = (v: unknown): string => {
     if (v === true) return "●"
@@ -36,6 +30,15 @@ export default function ProductDetailTabs({
     try { label = t(`fields.${field}`) } catch { label = field }
     sections[section].push({ field, label, value: formatValue(value) })
   }
+
+  // Rich-text technical data entered via the admin WYSIWYG editor. When set, it
+  // takes precedence over the auto-generated spec table below.
+  const technicalHtml = (metadata.technische_daten_html as string) || ""
+
+  const hasTechnicalData = technicalHtml.trim().length > 0 || Object.keys(sections).length > 0
+  const tabs = ["Beschreibung", ...(hasTechnicalData ? ["Technische Daten"] : [])]
+
+  const [active, setActive] = useState(0)
 
   return (
     <div className="border border-ui-border-base rounded-lg overflow-hidden">
@@ -60,10 +63,14 @@ export default function ProductDetailTabs({
       <div className="p-6 bg-white">
         <div>
           {active === 0 && (
-            <p className="text-sm text-ui-fg-base leading-relaxed">
-              {product.description ||
-                `Die ${product.title} ist eine kompakte und leistungsstarke Vakuumverpackungsmaschine, die sich ideal für das Vakuumverpacken von Lebensmitteln und Non-Food-Produkten eignet. Dank ihrer benutzerfreundlichen Bedienung, der hochwertigen Verarbeitung aus Edelstahl und der präzisen Vakuumtechnologie garantiert sie optimale Verpackungsergebnisse und eine lange Lebensdauer.`}
-            </p>
+            <div
+              className="text-sm text-ui-fg-base leading-relaxed [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_a]:underline [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-semibold [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-ui-border-base [&_th]:bg-ui-bg-subtle [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-ui-border-base [&_td]:px-3 [&_td]:py-2 [&_td]:align-top [&_th_p]:mb-0 [&_td_p]:mb-0"
+              dangerouslySetInnerHTML={{
+                __html: product.description
+                  ? descriptionToHtml(product.description)
+                  : `<p>Die ${product.title} ist eine kompakte und leistungsstarke Vakuumverpackungsmaschine, die sich ideal für das Vakuumverpacken von Lebensmitteln und Non-Food-Produkten eignet. Dank ihrer benutzerfreundlichen Bedienung, der hochwertigen Verarbeitung aus Edelstahl und der präzisen Vakuumtechnologie garantiert sie optimale Verpackungsergebnisse und eine lange Lebensdauer.</p>`
+              }}
+            />
           )}
           {active === 1 && (
             <div className="space-y-6">
