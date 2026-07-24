@@ -8,6 +8,8 @@ import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { getContentBlock } from "@lib/data/content-blocks"
+import { isSectionValue } from "@modules/categories/templates/sections"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -78,12 +80,25 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
+  // Optional content pinned to the top of this category, bound via the
+  // category's `content_block_top` metadata key (set in admin). Locale follows
+  // the URL's countryCode (de/en/it). A `section-*` value selects a code-driven
+  // section template (resolved in CategoryTemplate); any other value is a DB
+  // content block fetched here.
+  const topBlockKey = (productCategory.metadata?.content_block_top as string) || null
+  const topBlock =
+    topBlockKey && !isSectionValue(topBlockKey)
+      ? await getContentBlock(topBlockKey, params.countryCode.slice(0, 2).toLowerCase())
+      : null
+
   return (
     <CategoryTemplate
       category={productCategory}
       sortBy={sortBy}
       page={page}
       countryCode={params.countryCode}
+      topBlockHtml={topBlock?.body || null}
+      topBlockKey={topBlockKey}
     />
   )
 }

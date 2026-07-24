@@ -8,17 +8,25 @@ import ProductsGrid from "@modules/products/templates/products-grid"
 import ProductCount from "@modules/products/templates/product-count"
 import SortSelect from "@modules/products/components/sort-select"
 import StoreSidebar from "@modules/store/components/store-sidebar"
+import { descriptionToHtml } from "@lib/util/description-html"
+import { getSectionComponent } from "@modules/categories/templates/sections"
 
 export default function CategoryTemplate({
   category,
   sortBy,
   page,
   countryCode,
+  topBlockHtml,
+  topBlockKey,
 }: {
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
   page?: string
   countryCode: string
+  /** Optional CMS content block rendered above the category header. */
+  topBlockHtml?: string | null
+  /** Key of the top block, used to pick its render mode. */
+  topBlockKey?: string | null
 }) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
@@ -43,6 +51,11 @@ export default function CategoryTemplate({
     return ids
   }
   const categoryIds = getAllCategoryIds(category)
+
+  // A `section-*` metadata value resolves to a code-driven section template;
+  // otherwise the DB content block's HTML (topBlockHtml) is rendered plain.
+  const TopSection = getSectionComponent(topBlockKey)
+  const topLocale = countryCode.slice(0, 2).toLowerCase()
 
   return (
     <div>
@@ -109,6 +122,22 @@ export default function CategoryTemplate({
           {/* Products grid — top on mobile */}
           <div className="flex-1 min-w-0 order-1 medium:order-2">
             <Suspense fallback={<SkeletonProductGrid numberOfProducts={category.products?.length ?? 8} />}>
+              {/* Optional content pinned above the products (admin-managed via the
+          category's `content_block_top` metadata key). A `section-*` value
+          renders a code-driven section template; any other value renders the
+          DB content block's HTML. */}
+              {TopSection ? (
+                <div className="py-8">
+                  <TopSection locale={topLocale} />
+                </div>
+              ) : topBlockHtml ? (
+                <div className="py-8">
+                  <div
+                    className="max-w-3xl text-ui-fg-base [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:underline [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:font-semibold [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-ui-border-base [&_th]:bg-ui-bg-subtle [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-ui-border-base [&_td]:px-3 [&_td]:py-2 [&_td]:align-top"
+                    dangerouslySetInnerHTML={{ __html: descriptionToHtml(topBlockHtml) }}
+                  />
+                </div>
+              ) : null}
               <ProductsGrid
                 sortBy={sort}
                 page={pageNumber}
