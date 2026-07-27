@@ -59,35 +59,12 @@ export default async function Footer() {
                 </ul>
               </div>
             )}
-
-            <div className="flex flex-col gap-2">
-              <span className="txt-compact-small font-semibold text-ui-fg-base uppercase tracking-wider">
-                Rechtliches
-              </span>
-              <ul className="flex flex-col gap-1">
-                {[
-                  { label: "Impressum", href: "/impressum" },
-                  { label: "Datenschutz", href: "/datenschutz" },
-                  { label: "AGB", href: "/agb" },
-                  { label: "Widerrufsbelehrung", href: "/widerruf" },
-                ].map((link) => (
-                  <li key={link.href}>
-                    <LocalizedClientLink
-                      className="txt-compact-small text-ui-fg-subtle hover:text-ui-fg-base"
-                      href={link.href}
-                    >
-                      {link.label}
-                    </LocalizedClientLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
 
         <div className="">
           <Text className="txt-compact-small text-ui-fg-muted">
-            © {new Date().getFullYear()} Planeta. All rights reserved.
+            © {new Date().getFullYear()} Planeta. Alle Rechte vorbehalten.
           </Text>
         </div>
       </div>
