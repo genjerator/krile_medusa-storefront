@@ -31,12 +31,25 @@ export default function ProductDetailActions({
   const [isAdding, setIsAdding] = useState(false)
   const [angebotOpen, setAngebotOpen] = useState(false)
 
-  // Preselect if only 1 variant
+  // Preselect the whole variant when there's only one, and otherwise
+  // preselect any option that has a single value (e.g. a lone Gebinde) so it
+  // resolves a variant without the shopper touching a dropdown.
   useEffect(() => {
     if (product.variants?.length === 1) {
       setOptions(optionsAsKeymap(product.variants[0].options) ?? {})
+      return
     }
-  }, [product.variants])
+    const singles = (product.options ?? []).reduce(
+      (acc: Record<string, string>, opt) => {
+        if ((opt.values?.length ?? 0) === 1) acc[opt.id] = opt.values![0].value
+        return acc
+      },
+      {}
+    )
+    if (Object.keys(singles).length) {
+      setOptions((prev) => ({ ...singles, ...prev }))
+    }
+  }, [product.variants, product.options])
 
   const selectedVariant = useMemo(() =>
     product.variants?.find((v) => isEqual(optionsAsKeymap(v.options), options)),
@@ -92,22 +105,35 @@ export default function ProductDetailActions({
 
 
       <div className="border-t border-ui-border-base pt-5 space-y-4">
-        {/* Variant options — hidden when there's only one variant */}
-        {(product.variants?.length ?? 0) > 1 && product.options?.map((opt) => (
-          <div key={opt.id} className="flex items-center gap-4">
-            <span className="text-sm text-ui-fg-subtle w-28 shrink-0">{opt.title}</span>
-            <select
-              className="flex-1 border border-ui-border-base rounded px-3 py-2 text-sm bg-white text-ui-fg-base focus:outline-none focus:ring-1 focus:ring-blue-600"
-              value={options[opt.id] ?? ""}
-              onChange={(e) => setOptions((prev) => ({ ...prev, [opt.id]: e.target.value }))}
-            >
-              <option value="">Bitte auswählen</option>
-              {opt.values?.map((v) => (
-                <option key={v.id} value={v.value}>{v.value}</option>
-              ))}
-            </select>
-          </div>
-        ))}
+        {/* Variant options — a single value (e.g. one Gebinde) is shown as
+            plain text; only genuine choices render a dropdown. Medusa's
+            synthetic "Default option" is skipped. */}
+        {product.options
+          ?.filter((opt) => opt.title?.toLowerCase() !== "default option")
+          .map((opt) => {
+            const values = opt.values ?? []
+            return (
+              <div key={opt.id} className="flex items-center gap-4">
+                <span className="text-sm text-ui-fg-subtle w-28 shrink-0">{opt.title}</span>
+                {values.length <= 1 ? (
+                  <span className="text-sm text-ui-fg-base font-medium">
+                    {values[0]?.value}
+                  </span>
+                ) : (
+                  <select
+                    className="flex-1 border border-ui-border-base rounded px-3 py-2 text-sm bg-white text-ui-fg-base focus:outline-none focus:ring-1 focus:ring-blue-600"
+                    value={options[opt.id] ?? ""}
+                    onChange={(e) => setOptions((prev) => ({ ...prev, [opt.id]: e.target.value }))}
+                  >
+                    <option value="">Bitte auswählen</option>
+                    {values.map((v) => (
+                      <option key={v.id} value={v.value}>{v.value}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )
+          })}
 
         {/* Quantity + delivery */}
         <div className="flex items-center gap-4">

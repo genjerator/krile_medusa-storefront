@@ -128,8 +128,8 @@ export default function CategoryTemplate({
 
         {/* Main layout */}
         <div className="flex flex-col medium:flex-row gap-6 medium:gap-8">
-          {/* Products grid — top on mobile */}
-          <div className="flex-1 min-w-0 order-1 medium:order-2">
+          {/* Products grid — below categories on mobile */}
+          <div className="flex-1 min-w-0 order-2">
             <Suspense fallback={<SkeletonProductGrid numberOfProducts={category.products?.length ?? 8} />}>
               {/* Optional content pinned above the products (admin-managed via the
           category's `content_block_top` metadata key). A `section-*` value
@@ -157,10 +157,10 @@ export default function CategoryTemplate({
             </Suspense>
           </div>
 
-          {/* Sidebar — bottom on mobile */}
-          <div className="order-2 medium:order-1 medium:w-56 medium:shrink-0">
+          {/* Sidebar — between blue bar and grid on mobile, left on desktop */}
+          <div className="order-1 medium:w-56 medium:shrink-0">
             <Suspense fallback={null}>
-              <StoreSidebar />
+              <StoreSidebar activeHandle={category.handle} />
             </Suspense>
           </div>
         </div>

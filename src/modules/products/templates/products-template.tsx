@@ -63,8 +63,8 @@ export default function ProductsTemplate({
         {/* Main layout: grid first, sidebar below on mobile / left on desktop */}
         <div className="flex flex-col medium:flex-row gap-6 medium:gap-8">
 
-          {/* Products grid — order-1 on mobile (top), natural order on desktop */}
-          <div className="flex-1 min-w-0 order-1 medium:order-2">
+          {/* Products grid — below categories on mobile, right on desktop */}
+          <div className="flex-1 min-w-0 order-2">
             <Suspense fallback={<SkeletonProductGrid />}>
               <ProductsGrid
                 sortBy={sort}
@@ -75,8 +75,8 @@ export default function ProductsTemplate({
             </Suspense>
           </div>
 
-          {/* Sidebar (Kategorien) — order-2 on mobile (bottom), left on desktop */}
-          <div className="order-2 medium:order-1 medium:w-56 medium:shrink-0">
+          {/* Sidebar (Kategorien) — between blue bar and grid on mobile, left on desktop */}
+          <div className="order-1 medium:w-56 medium:shrink-0">
             <Suspense fallback={null}>
               <StoreSidebar />
             </Suspense>
