@@ -7,11 +7,13 @@ export default async function ProductCount({
   page,
   countryCode,
   categoryId,
+  q,
 }: {
   sortBy?: SortOptions
   page: number
   countryCode: string
   categoryId?: string | string[]
+  q?: string
 }) {
   const region = await getRegion(countryCode)
   if (!region) return null
@@ -23,7 +25,7 @@ export default async function ProductCount({
 
   const {
     response: { count },
-  } = await listProductsWithSort({ page, queryParams, sortBy, countryCode })
+  } = await listProductsWithSort({ page, queryParams, sortBy, countryCode, q })
 
   return <span className="text-sm text-ui-fg-muted">{count} Produkte gefunden</span>
 }

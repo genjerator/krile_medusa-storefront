@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { sortProducts } from "@lib/util/sort-products"
+import { productMatchesSearch } from "@lib/util/search"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
@@ -94,11 +95,13 @@ export const listProductsWithSort = async ({
   queryParams,
   sortBy = "created_at",
   countryCode,
+  q,
 }: {
   page?: number
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
   sortBy?: SortOptions
   countryCode: string
+  q?: string
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -112,23 +115,32 @@ export const listProductsWithSort = async ({
     pageParam: 0,
     queryParams: {
       ...queryParams,
-      limit: 100,
+      limit: 200,
     },
     countryCode,
   })
 
-  const sortedProducts = sortProducts(products, sortBy)
+  // Search is filtered here instead of via the backend `q` param so that
+  // "bugel"/"buegel" also match "Bügel" (Postgres ILIKE is accent-sensitive).
+  // Like the sorting, it only sees the products fetched above.
+  const filteredProducts = q
+    ? products.filter((p) => productMatchesSearch(p, q))
+    : products
+
+  const effectiveCount = q ? filteredProducts.length : count
+
+  const sortedProducts = sortProducts(filteredProducts, sortBy)
 
   const pageParam = (page - 1) * limit
 
-  const nextPage = count > pageParam + limit ? pageParam + limit : null
+  const nextPage = effectiveCount > pageParam + limit ? pageParam + limit : null
 
   const paginatedProducts = sortedProducts.slice(pageParam, pageParam + limit)
 
   return {
     response: {
       products: paginatedProducts,
-      count,
+      count: effectiveCount,
     },
     nextPage,
     queryParams,

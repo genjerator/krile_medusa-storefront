@@ -8,6 +8,7 @@ import ProductsGrid from "@modules/products/templates/products-grid"
 import ProductCount from "@modules/products/templates/product-count"
 import SortSelect from "@modules/products/components/sort-select"
 import StoreSidebar from "@modules/store/components/store-sidebar"
+import SearchBox from "@modules/store/components/search-box"
 import { descriptionToHtml } from "@lib/util/description-html"
 import { getSectionComponent } from "@modules/categories/templates/sections"
 
@@ -15,6 +16,7 @@ export default function CategoryTemplate({
   category,
   sortBy,
   page,
+  q,
   countryCode,
   topBlockHtml,
   topBlockKey,
@@ -22,6 +24,7 @@ export default function CategoryTemplate({
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
   page?: string
+  q?: string
   countryCode: string
   /** Optional CMS content block rendered above the category header. */
   topBlockHtml?: string | null
@@ -103,13 +106,19 @@ export default function CategoryTemplate({
                     page={pageNumber}
                     countryCode={countryCode}
                     categoryId={categoryIds}
+                    q={q}
                   />
                 </span>
               </Suspense>
             </div>
-            <Suspense fallback={null}>
-              <SortSelect sortBy={sort} />
-            </Suspense>
+            <div className="flex items-center gap-4 flex-wrap">
+              <Suspense fallback={null}>
+                <SearchBox />
+              </Suspense>
+              <Suspense fallback={null}>
+                <SortSelect sortBy={sort} />
+              </Suspense>
+            </div>
           </div>
         </div>
       </div>
@@ -143,6 +152,7 @@ export default function CategoryTemplate({
                 page={pageNumber}
                 countryCode={countryCode}
                 categoryId={categoryIds}
+                q={q}
               />
             </Suspense>
           </div>

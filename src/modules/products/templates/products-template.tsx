@@ -7,14 +7,17 @@ import ProductsGrid from "./products-grid"
 import ProductCount from "./product-count"
 import SortSelect from "@modules/products/components/sort-select"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import SearchBox from "@modules/store/components/search-box"
 
 export default function ProductsTemplate({
   sortBy,
   page,
+  q,
   countryCode,
 }: {
   sortBy?: SortOptions
   page?: string
+  q?: string
   countryCode: string
 }) {
   const pageNumber = page ? parseInt(page) : 1
@@ -39,13 +42,19 @@ export default function ProductsTemplate({
                   sortBy={sort}
                   page={pageNumber}
                   countryCode={countryCode}
+                  q={q}
                 />
               </span>
             </Suspense>
           </div>
-          <Suspense fallback={null}>
-            <SortSelect sortBy={sort} />
-          </Suspense>
+          <div className="flex items-center gap-4 flex-wrap">
+            <Suspense fallback={null}>
+              <SearchBox />
+            </Suspense>
+            <Suspense fallback={null}>
+              <SortSelect sortBy={sort} />
+            </Suspense>
+          </div>
         </div>
       </StoreHero>
 
@@ -61,6 +70,7 @@ export default function ProductsTemplate({
                 sortBy={sort}
                 page={pageNumber}
                 countryCode={countryCode}
+                q={q}
               />
             </Suspense>
           </div>

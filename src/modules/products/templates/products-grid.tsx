@@ -11,11 +11,13 @@ export default async function ProductsGrid({
   page,
   countryCode,
   categoryId,
+  q,
 }: {
   sortBy?: SortOptions
   page: number
   countryCode: string
   categoryId?: string | string[]
+  q?: string
 }) {
   const region = await getRegion(countryCode)
 
@@ -38,6 +40,7 @@ export default async function ProductsGrid({
     queryParams,
     sortBy,
     countryCode,
+    q,
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
