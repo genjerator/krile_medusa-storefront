@@ -32,7 +32,7 @@ export default function CategoryTemplate({
   topBlockKey?: string | null
 }) {
   const pageNumber = page ? parseInt(page) : 1
-  const sort = sortBy || "created_at"
+  const sort = sortBy || "price_asc"
 
   if (!category || !countryCode) notFound()
 
