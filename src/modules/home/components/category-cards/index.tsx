@@ -92,7 +92,7 @@ export default async function CategoryCards() {
   ])
 
   const slots: { data: HttpTypes.StoreProductCategory | null | undefined; handle: string; name?: string }[] = [
-    { data: packagingMachines, handle: "vakuum-maschienen", name: "Verpackungsmaschinen" },
+    { data: packagingMachines, handle: "vakuum-maschienen", name: "Vakuum Maschienen" },
     { data: folien, handle: "vakuumiertuten-rollen", name: "Vakuumiertüten & Rollen" },
     { data: vakuumBehaelter, handle: "vakuum-behaelter" },
     { data: gewurze, handle: "gewurze" },
