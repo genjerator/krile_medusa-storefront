@@ -11,7 +11,7 @@ const PINNED = [
   { handle: "gebraucht_maschinen" },
 ]
 
-const cardClass = "group relative rounded-xl overflow-hidden bg-gradient-to-br from-white to-slate-100 border border-blue-100 min-h-[160px] flex flex-col justify-between p-4 shadow-[0_6px_24px_rgba(15,30,70,0.10)] hover:border-blue-300 hover:shadow-[0_10px_36px_rgba(15,30,70,0.22)] hover:from-slate-50 hover:to-slate-200 transition-all duration-300"
+export const cardClass = "group relative rounded-xl overflow-hidden bg-gradient-to-br from-white to-slate-100 border border-blue-100 min-h-[160px] flex flex-col justify-between p-4 shadow-[0_6px_24px_rgba(15,30,70,0.10)] hover:border-blue-300 hover:shadow-[0_10px_36px_rgba(15,30,70,0.22)] hover:from-slate-50 hover:to-slate-200 transition-all duration-300"
 
 function CardContent({ cat }: { cat: HttpTypes.StoreProductCategory | { handle: string; name: string } }) {
   const image = cat.handle ? `/pictogram-${cat.handle}.svg` : null

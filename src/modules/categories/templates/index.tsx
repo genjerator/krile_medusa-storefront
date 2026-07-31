@@ -11,6 +11,13 @@ import StoreSidebar from "@modules/store/components/store-sidebar"
 import SearchBox from "@modules/store/components/search-box"
 import { descriptionToHtml } from "@lib/util/description-html"
 import { getSectionComponent } from "@modules/categories/templates/sections"
+import SubcategoryCards from "@modules/categories/components/subcategory-cards"
+
+// On this parent category, show a curated set of subcategory cards (in the
+// given order) above the products.
+const CURATED_SUBCATEGORIES: Record<string, string[]> = {
+  "vakuum-maschinen": ["p-serie", "c-serie"],
+}
 
 export default function CategoryTemplate({
   category,
@@ -54,6 +61,12 @@ export default function CategoryTemplate({
     return ids
   }
   const categoryIds = getAllCategoryIds(category)
+
+  // Curated subcategory cards for this category (ordered by CURATED_SUBCATEGORIES).
+  const curatedHandles = CURATED_SUBCATEGORIES[category.handle] ?? []
+  const curatedSubcategories = curatedHandles
+    .map((h) => category.category_children?.find((c) => c.handle === h))
+    .filter((c): c is HttpTypes.StoreProductCategory => Boolean(c))
 
   // A `section-*` metadata value resolves to a code-driven section template;
   // otherwise the DB content block's HTML (topBlockHtml) is rendered plain.
@@ -122,6 +135,9 @@ export default function CategoryTemplate({
           </div>
         </div>
       </div>
+
+      {/* Curated subcategory cards above the products (e.g. P-Serie / C-Serie) */}
+      <SubcategoryCards subcategories={curatedSubcategories} />
 
       <div className="content-container py-4 medium:py-6">
 
