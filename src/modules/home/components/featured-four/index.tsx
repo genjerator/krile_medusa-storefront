@@ -76,16 +76,6 @@ export default function FeaturedFour() {
   return (
     <div className="content-container py-6">
 
-      {/* Text section */}
-      <div className="flex flex-col items-center text-center mb-8 gap-4">
-        <p className="text-xl font-semibold text-ui-fg-base">VAKUUMVERPACKT KONSERVIEREN</p>
-        <p className="text-ui-fg-subtle text-sm leading-relaxed max-w-2xl">
-          Technik, die Ihre Küche radikal verändert.<br />
-          Technologie, die die Haltbarkeit der Produkte verlängert.<br />
-          Sicherheit, die Geschmack und Qualität garantiert.
-        </p>
-      </div>
-
       {/* Outer box */}
       <div className="rounded-xl border border-ui-border-base bg-white shadow-sm p-4 small:p-6">
 
@@ -95,11 +85,12 @@ export default function FeaturedFour() {
         {/* Video grid */}
         <div className="grid grid-cols-1 small:grid-cols-3 gap-4">
           {VIDEOS.slice(0, visibleCount).map((video) => (
-            <ContentBox key={video.id} title={video.title} aspectRatio="video">
+            <ContentBox key={video.id} aspectRatio="video">
               <video
                 src={video.src}
                 poster={video.poster}
                 controls
+                aria-label={video.title}
                 preload={preloadVideos ? "auto" : "none"}
                 className="w-full h-full object-cover"
               />

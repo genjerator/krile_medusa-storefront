@@ -62,10 +62,18 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="">
+        <div className="flex items-center justify-between pt-2">
           <Text className="txt-compact-small text-ui-fg-muted">
             © {new Date().getFullYear()} Planeta. Alle Rechte vorbehalten.
           </Text>
+          <a
+            href="https://planeta.de"
+            target="_blank"
+            rel="noreferrer"
+            className="txt-compact-small text-ui-fg-subtle hover:text-ui-fg-base"
+          >
+            planeta.de
+          </a>
         </div>
       </div>
     </footer>

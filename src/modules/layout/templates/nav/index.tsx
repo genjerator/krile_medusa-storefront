@@ -32,8 +32,8 @@ export default async function Nav() {
             <Image
               src="/planeta_logo_blue.webp"
               alt="Planeta"
-              width={160}
-              height={53}
+              width={120}
+              height={40}
               priority
             />
           </LocalizedClientLink>

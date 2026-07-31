@@ -8,6 +8,7 @@ import ProductCount from "./product-count"
 import SortSelect from "@modules/products/components/sort-select"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import SearchBox from "@modules/store/components/search-box"
+import CategoryCards from "@modules/home/components/category-cards"
 
 export default function ProductsTemplate({
   sortBy,
@@ -57,6 +58,11 @@ export default function ProductsTemplate({
           </div>
         </div>
       </StoreHero>
+
+      {/* Category section — above the product grid */}
+      <div className="pt-4 medium:pt-6">
+        <CategoryCards />
+      </div>
 
       <div className="content-container py-4 medium:py-6">
 

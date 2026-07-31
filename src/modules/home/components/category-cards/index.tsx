@@ -11,9 +11,9 @@ const PINNED = [
   { handle: "gebraucht_maschinen" },
 ]
 
-const cardClass = "group relative rounded-xl overflow-hidden bg-gradient-to-br from-white to-slate-100 border border-blue-100 min-h-[380px] flex flex-col justify-between p-6 shadow-[0_6px_24px_rgba(15,30,70,0.10)] hover:border-blue-300 hover:shadow-[0_10px_36px_rgba(15,30,70,0.22)] hover:from-slate-50 hover:to-slate-200 transition-all duration-300"
+const cardClass = "group relative rounded-xl overflow-hidden bg-gradient-to-br from-white to-slate-100 border border-blue-100 min-h-[160px] flex flex-col justify-between p-4 shadow-[0_6px_24px_rgba(15,30,70,0.10)] hover:border-blue-300 hover:shadow-[0_10px_36px_rgba(15,30,70,0.22)] hover:from-slate-50 hover:to-slate-200 transition-all duration-300"
 
-function CardContent({ cat, found }: { cat: HttpTypes.StoreProductCategory | { handle: string; name: string }; found: boolean }) {
+function CardContent({ cat }: { cat: HttpTypes.StoreProductCategory | { handle: string; name: string } }) {
   const image = cat.handle ? `/pictogram-${cat.handle}.svg` : null
   const isPackaging = cat.handle === "vakuum-maschinen"
   const subcategories = (cat as any).category_children ?? []
@@ -21,13 +21,6 @@ function CardContent({ cat, found }: { cat: HttpTypes.StoreProductCategory | { h
   return (
     <>
       <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="w-5 h-px bg-slate-400" />
-          <span className="text-xs font-medium tracking-[0.2em] uppercase text-slate-400">
-            Kategorie
-          </span>
-        </div>
-
         <h3 className="text-xl font-bold leading-tight tracking-tight mb-3" style={{ color: "#0F1E46" }}>
           {(cat as any).name ?? cat.handle}
         </h3>
@@ -51,30 +44,18 @@ function CardContent({ cat, found }: { cat: HttpTypes.StoreProductCategory | { h
           )
         )}
 
-        {image && (
-          <div className="flex justify-center mt-6">
-            <Image
-              src={image}
-              alt={(cat as any).name ?? cat.handle}
-              width={200}
-              height={200}
-              className="object-contain opacity-30 group-hover:opacity-80 transition-opacity duration-300"
-            />
-          </div>
-        )}
       </div>
 
-      {found && (
-        <div className="relative z-10 flex items-center gap-2 mt-6">
-          <span className="text-xs font-medium text-slate-400 group-hover:text-slate-900 transition-colors tracking-wide uppercase">
-            Entdecken
-          </span>
-          <svg
-            className="w-4 h-4 text-slate-400 group-hover:text-slate-900 group-hover:translate-x-1 transition-all duration-200"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
+      {image && (
+        <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+          <Image
+            src={image}
+            alt=""
+            aria-hidden
+            width={130}
+            height={130}
+            className="object-contain opacity-10 group-hover:opacity-25 transition-opacity duration-300"
+          />
         </div>
       )}
     </>
@@ -102,7 +83,7 @@ export default async function CategoryCards() {
 
   return (
     <div className="content-container pt-6">
-      <div className="grid grid-cols-1 small:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 small:grid-cols-3 auto-rows-fr gap-4">
         {slots.map(({ data, handle, name }) => {
           const found = !!data
           const cat = { ...(data ?? {}), handle, name: name ?? data?.name ?? handle }
@@ -113,11 +94,11 @@ export default async function CategoryCards() {
               href={`/categories/${handle}`}
               className={cardClass}
             >
-              <CardContent cat={cat as HttpTypes.StoreProductCategory} found={true} />
+              <CardContent cat={cat as HttpTypes.StoreProductCategory} />
             </LocalizedClientLink>
           ) : (
             <div key={handle} className={cardClass}>
-              <CardContent cat={cat as HttpTypes.StoreProductCategory} found={false} />
+              <CardContent cat={cat as HttpTypes.StoreProductCategory} />
             </div>
           )
         })}

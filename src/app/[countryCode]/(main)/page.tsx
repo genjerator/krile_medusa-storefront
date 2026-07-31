@@ -1,10 +1,15 @@
 import { Metadata } from "next"
 import HeroV2 from "@modules/home/components/hero-v2"
 import CategoryCards from "@modules/home/components/category-cards"
+import Benefits from "@modules/home/components/benefits"
 import FeaturedFour from "@modules/home/components/featured-four"
 import FeaturedProducts from "@modules/home/components/featured-products"
+import KemptenFestNotice from "@modules/home/components/kempten-fest-notice"
+import HolidayNotice from "@modules/home/components/holiday-notice"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
+import { isKemptenFestActive } from "@lib/util/kempten-fest"
+import { isCollectiveHolidayActive } from "@lib/util/holiday"
 
 export const metadata: Metadata = {
   title: "planeta industries",
@@ -38,10 +43,19 @@ export default async function Home(props: {
 
   if (!collections || !region) return null
 
+  const isKemptenFest = isKemptenFestActive()
+  const isHoliday = isCollectiveHolidayActive()
+
   return (
     <>
-      <HeroV2 />
+      <HeroV2
+        showKemptenFestBanner={isKemptenFest}
+        showHolidayBanner={isHoliday}
+      />
       <CategoryCards />
+      <Benefits />
+      {isKemptenFest && <KemptenFestNotice />}
+      {isHoliday && <HolidayNotice />}
       <FeaturedFour />
       {collections.length > 0 && (
         <div className="py-12">

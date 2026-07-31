@@ -5,6 +5,7 @@ import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
+import CategoryCards from "@modules/home/components/category-cards"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
@@ -64,6 +65,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         <Suspense fallback={<SkeletonRelatedProducts />}>
           <RelatedProducts product={product} countryCode={countryCode} />
         </Suspense>
+      </div>
+      <div className="my-16 small:my-32">
+        <CategoryCards />
       </div>
     </>
   )

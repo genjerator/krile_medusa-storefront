@@ -29,10 +29,21 @@ const SLIDE_CONFIGS: SlideConfig[] = [
 
 const AUTOPLAY_MS = 6000
 
-export default function HeroV2() {
+export default function HeroV2({
+  showKemptenFestBanner = false,
+  showHolidayBanner = false,
+}: {
+  showKemptenFestBanner?: boolean
+  showHolidayBanner?: boolean
+} = {}) {
   const t = useTranslations("heroV2")
   const [current, setCurrent] = useState(0)
   const touchStartX = useRef<number | null>(null)
+
+  const onBannerLinkClick = (e: React.MouseEvent, href: string) => {
+    e.preventDefault()
+    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" })
+  }
 
   useEffect(() => {
     const timer = setInterval(() => setCurrent((p) => (p + 1) % SLIDE_CONFIGS.length), AUTOPLAY_MS)
@@ -58,6 +69,40 @@ export default function HeroV2() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
+        {/* Announcement banners — overlaid on top of the slider */}
+        {(showKemptenFestBanner || showHolidayBanner) && (
+          <div className="absolute top-0 inset-x-0 z-30 flex flex-col">
+            {showKemptenFestBanner && (
+              <div className="bg-[#dc2626]/95 backdrop-blur-sm text-white text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+                <span className="text-xs small:text-sm font-medium">
+                  Wir sind auf der Kempten Festwoche — 31.07. bis 18.08.2026.
+                </span>
+                <a
+                  href="#kempten-fest"
+                  onClick={(e) => onBannerLinkClick(e, "#kempten-fest")}
+                  className="text-xs small:text-sm font-bold underline underline-offset-2 hover:no-underline whitespace-nowrap"
+                >
+                  Mehr erfahren →
+                </a>
+              </div>
+            )}
+            {showHolidayBanner && (
+              <div className="bg-[#0F1E46]/90 backdrop-blur-sm text-white text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+                <span className="text-xs small:text-sm font-medium">
+                  Wir machen Sommerurlaub — geschlossen vom 18.08. bis einschließlich 10.09.2026.
+                </span>
+                <a
+                  href="#holiday-notice"
+                  onClick={(e) => onBannerLinkClick(e, "#holiday-notice")}
+                  className="text-xs small:text-sm font-bold underline underline-offset-2 hover:no-underline whitespace-nowrap"
+                >
+                  Mehr erfahren →
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Slide track */}
         <div
           className="flex h-full transition-transform duration-700 ease-in-out"
