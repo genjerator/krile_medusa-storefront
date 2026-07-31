@@ -97,9 +97,17 @@ export default function HeroV2() {
                       </span>
                     </div>
 
-                    <h1 className="text-2xl small:text-4xl large:text-5xl font-bold text-white leading-[1.15] tracking-tight mb-5">
-                      {t(`${key}.heading`)}
-                    </h1>
+                    {/* Only the first slide carries the page's single <h1>;
+                        the rest are <h2> so the page has exactly one H1 (SEO). */}
+                    {slide.id === 0 ? (
+                      <h1 className="text-2xl small:text-4xl large:text-5xl font-bold text-white leading-[1.15] tracking-tight mb-5">
+                        {t(`${key}.heading`)}
+                      </h1>
+                    ) : (
+                      <h2 className="text-2xl small:text-4xl large:text-5xl font-bold text-white leading-[1.15] tracking-tight mb-5">
+                        {t(`${key}.heading`)}
+                      </h2>
+                    )}
 
                     <p className="text-sm small:text-base text-white/70 leading-relaxed mb-8 max-w-lg">
                       {t(`${key}.subheading`)}
