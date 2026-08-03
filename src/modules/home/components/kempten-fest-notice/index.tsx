@@ -37,6 +37,9 @@ export default function KemptenFestNotice() {
           <p className="text-sm leading-relaxed text-white/80 text-center">
             Besuchen Sie uns auf der Kemptener Festwoche — wir freuen uns auf
             Ihren Besuch!
+            <br />
+            Wir sind auf der Allgäuer Festwoche in Kempten dieses Jahr auf dem
+            Freigelände Standnummer F. G. Nord 17.
           </p>
         </div>
       </div>
