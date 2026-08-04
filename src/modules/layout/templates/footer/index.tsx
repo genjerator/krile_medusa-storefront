@@ -1,13 +1,9 @@
 import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
-import { Text, clx } from "@medusajs/ui"
+import { Text } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default async function Footer() {
-  const { collections } = await listCollections({
-    fields: "*products",
-  })
   const productCategories = await listCategories()
 
   const topLevelCategories = productCategories?.filter(
@@ -39,26 +35,6 @@ export default async function Footer() {
                 </ul>
               </div>
             ) */}
-
-            {collections && collections.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <span className="txt-compact-small font-semibold text-ui-fg-base uppercase tracking-wider">
-                  Collections
-                </span>
-                <ul className="flex flex-col gap-1">
-                  {collections.slice(0, 6).map((c) => (
-                    <li key={c.id}>
-                      <LocalizedClientLink
-                        className="txt-compact-small text-ui-fg-subtle hover:text-ui-fg-base"
-                        href={`/collections/${c.handle}`}
-                      >
-                        {c.title}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         </div>
 
