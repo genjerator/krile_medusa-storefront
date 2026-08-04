@@ -18,6 +18,19 @@ const nextConfig = {
   output: "standalone",
   compress: true,
   reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        // Canonical product URL is /product/<handle>. Old /products/<handle>
+        // detail URLs (still in Google's index and old links) 301 here so
+        // ranking signals consolidate. The /products listing page (no handle)
+        // is unaffected — this only matches when a handle segment follows.
+        source: "/:countryCode/products/:handle",
+        destination: "/:countryCode/product/:handle",
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

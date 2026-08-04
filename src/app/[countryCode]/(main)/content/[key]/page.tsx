@@ -17,7 +17,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const { countryCode, key } = await props.params
   const block = await getContentBlock(key, localeFromCountry(countryCode))
   if (!block) return {}
-  return { title: block.title ? `${block.title} | Planeta` : "Planeta" }
+  return { title: block.title || "Planeta Industries" }
 }
 
 /**

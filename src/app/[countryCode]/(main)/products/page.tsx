@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Produkte",
   description: "Entdecken Sie unsere hochwertigen Vakuumverpackungsmaschinen für professionelle Anwendungen.",
   openGraph: {
-    title: "Produkte | planeta industries",
+    title: "Produkte | Planeta Industries",
     description: "Entdecken Sie unsere hochwertigen Vakuumverpackungsmaschinen für professionelle Anwendungen.",
     url: "/products",
     images: [
@@ -16,12 +16,12 @@ export const metadata: Metadata = {
         url: "/planeta-og.jpg",
         width: 1200,
         height: 630,
-        alt: "planeta industries – Produktübersicht",
+        alt: "Planeta Industries – Produktübersicht",
       },
     ],
   },
   twitter: {
-    title: "Produkte | planeta industries",
+    title: "Produkte | Planeta Industries",
     description: "Entdecken Sie unsere hochwertigen Vakuumverpackungsmaschinen.",
     images: ["/planeta-og.jpg"],
   },

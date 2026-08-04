@@ -9,6 +9,7 @@ import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getContentBlock } from "@lib/data/content-blocks"
+import { toMetaDescription } from "@lib/util/description-html"
 import { isSectionValue } from "@modules/categories/templates/sections"
 
 type Props = {
@@ -54,12 +55,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Planeta"
-
-    const description = productCategory.description ?? `${title} category.`
+    const description =
+      toMetaDescription(productCategory.description) ||
+      `${productCategory.name} von Planeta Industries – jetzt im Shop entdecken.`
 
     return {
-      title: `${title} | Planeta`,
+      title: productCategory.name,
       description,
       alternates: {
         canonical: `${params.category.join("/")}`,

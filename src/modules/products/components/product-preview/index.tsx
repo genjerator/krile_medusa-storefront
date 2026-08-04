@@ -19,7 +19,7 @@ export default async function ProductPreview({
   })
 
   return (
-    <LocalizedClientLink href={`/products/${product.handle}`} className="group">
+    <LocalizedClientLink href={`/product/${product.handle}`} className="group">
       <div data-testid="product-wrapper" className="flex flex-col">
         <h3
           className="text-center font-semibold text-base text-ui-fg-base mb-3 leading-tight line-clamp-2 tracking-tight"

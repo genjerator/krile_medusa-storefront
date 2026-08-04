@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import LegalTabs from "./legal-tabs"
 
 export const metadata: Metadata = {
-  title: "Informations",
-  description: "Allgemeine Information",
+  title: "Informationen",
+  description: "Allgemeine Informationen, Zahlungsmethoden und Bankverbindung von Planeta Industries.",
 }
 
 export default function InformationsPage() {
@@ -12,14 +12,14 @@ export default function InformationsPage() {
       <h1 className="heading-product text-ui-fg-base mb-10">Allgemeine Information</h1>
 
       <section>
-        <h2 className="heading-section text-ui-fg-base mb-4">Payment Methods</h2>
+        <h2 className="heading-section text-ui-fg-base mb-4">Zahlungsmethoden</h2>
 
-        <h3 className="font-heading font-semibold uppercase tracking-widest text-xs text-ui-fg-base mb-3">Bank details</h3>
+        <h3 className="font-heading font-semibold uppercase tracking-widest text-xs text-ui-fg-base mb-3">Bankverbindung</h3>
         <dl className="grid grid-cols-[max-content_1fr] gap-x-8 gap-y-2 text-sm">
-          <dt className="text-ui-fg-muted">Owner</dt>
+          <dt className="text-ui-fg-muted">Kontoinhaber</dt>
           <dd className="text-ui-fg-base">Planeta GmbH &amp; Co.KG</dd>
 
-          <dt className="text-ui-fg-muted">Institute</dt>
+          <dt className="text-ui-fg-muted">Kreditinstitut</dt>
           <dd className="text-ui-fg-base">Sparkasse Schwaben Bodensee</dd>
 
           <dt className="text-ui-fg-muted">BIC / SWIFT</dt>

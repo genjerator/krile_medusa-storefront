@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
     .then(({ products }) =>
       products.map((p) => ({
-        url: `${BASE_URL}/${LOCALE}/products/${p.handle}`,
+        url: `${BASE_URL}/${LOCALE}/product/${p.handle}`,
         lastModified: new Date(p.updated_at),
         changeFrequency: "weekly" as const,
         priority: 0.8,

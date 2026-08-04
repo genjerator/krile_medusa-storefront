@@ -12,10 +12,10 @@ import { isKemptenFestActive } from "@lib/util/kempten-fest"
 import { isCollectiveHolidayActive } from "@lib/util/holiday"
 
 export const metadata: Metadata = {
-  title: "planeta industries",
+  title: "Vakuumverpackungsmaschinen für die Industrie",
   description: "Hochleistungs-Vakuumverpackungsmaschinen für Lebensmittel-, Pharma- und Industrieumgebungen. Modular, effizient, langlebig.",
   openGraph: {
-    title: "planeta industries – Vakuumverpackungsmaschinen",
+    title: "Planeta Industries – Vakuumverpackungsmaschinen",
     description: "Hochleistungs-Vakuumverpackungsmaschinen für Lebensmittel-, Pharma- und Industrieumgebungen. Modular, effizient, langlebig.",
     url: "/",
     images: [
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
         url: "/planeta-og.jpg",
         width: 1200,
         height: 630,
-        alt: "planeta industries – Vakuumverpackungsmaschinen",
+        alt: "Planeta Industries – Vakuumverpackungsmaschinen",
       },
     ],
   },
   twitter: {
-    title: "planeta industries – Vakuumverpackungsmaschinen",
+    title: "Planeta Industries – Vakuumverpackungsmaschinen",
     description: "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion.",
     images: ["/planeta-og.jpg"],
   },

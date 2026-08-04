@@ -6,6 +6,7 @@ import { listProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import ProductDetailTemplate from "@modules/products/templates/product-detail-template"
 import { HttpTypes } from "@medusajs/types"
+import { toMetaDescription } from "@lib/util/description-html"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -29,10 +30,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   if (!product) notFound()
 
   return {
-    title: `${product.title} | Planeta`,
-    description: product.description ?? product.title,
+    title: product.title,
+    description: toMetaDescription(product.description) || product.title,
     openGraph: {
-      title: `${product.title} | Planeta`,
+      title: `${product.title} | Planeta Industries`,
+      description: toMetaDescription(product.description) || product.title,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }
