@@ -75,7 +75,7 @@ export default function HeroV2({
             {showKemptenFestBanner && (
               <div className="bg-[#dc2626]/95 backdrop-blur-sm text-white text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
                 <span className="text-xs small:text-sm font-medium">
-                  Wir sind auf der Kempten Festwoche — 31.07. bis 18.08.2026.
+                  Wir sind auf der Festwoche Kempten — 31.07. bis 18.08.2026.
                 </span>
                 <a
                   href="#kempten-fest"
