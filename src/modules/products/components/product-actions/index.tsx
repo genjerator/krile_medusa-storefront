@@ -1,6 +1,7 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
+import { getProductPrice } from "@lib/util/get-product-price"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -119,6 +120,14 @@ export default function ProductActions({
 
   const [angebotOpen, setAngebotOpen] = useState(false)
 
+  // Pricing gates the CTA: with no price we hide the (unbuyable) price + cart
+  // and surface the "Angebot anfragen" quote button. A price ≥ 1000 keeps the
+  // buy flow but also offers the quote button.
+  const { cheapestPrice } = getProductPrice({ product })
+  const hasPrice = !!cheapestPrice
+  const showAngebot =
+    !hasPrice || (cheapestPrice?.calculated_price_number ?? 0) >= 1000
+
   const actionsRef = useRef<HTMLDivElement>(null)
 
   const inView = useIntersection(actionsRef, "0px")
@@ -163,37 +172,43 @@ export default function ProductActions({
           )}
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
+        {hasPrice && (
+          <ProductPrice product={product} variant={selectedVariant} />
+        )}
 
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          variant="primary"
-          className="w-full h-10"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !options
-            ? "Select variant"
-            : !inStock || !isValidVariant
-            ? "Out of stock"
-            : "Add to cart"}
-        </Button>
+        {hasPrice && (
+          <Button
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              !isValidVariant
+            }
+            variant="primary"
+            className="w-full h-10"
+            isLoading={isAdding}
+            data-testid="add-product-button"
+          >
+            {!selectedVariant && !options
+              ? "Select variant"
+              : !inStock || !isValidVariant
+              ? "Out of stock"
+              : "Add to cart"}
+          </Button>
+        )}
 
-        <Button
-          onClick={() => setAngebotOpen(true)}
-          variant="secondary"
-          className="w-full h-10"
-          data-testid="angebot-button"
-        >
-          Angebot anfragen
-        </Button>
+        {showAngebot && (
+          <Button
+            onClick={() => setAngebotOpen(true)}
+            variant="secondary"
+            className="w-full h-10"
+            data-testid="angebot-button"
+          >
+            Angebot anfragen
+          </Button>
+        )}
 
         {angebotOpen && (
           <AngebotModal
@@ -203,17 +218,19 @@ export default function ProductActions({
           />
         )}
 
-        <MobileActions
-          product={product}
-          variant={selectedVariant}
-          options={options}
-          updateOptions={setOptionValue}
-          inStock={inStock}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
-          show={!inView}
-          optionsDisabled={!!disabled || isAdding}
-        />
+        {hasPrice && (
+          <MobileActions
+            product={product}
+            variant={selectedVariant}
+            options={options}
+            updateOptions={setOptionValue}
+            inStock={inStock}
+            handleAddToCart={handleAddToCart}
+            isAdding={isAdding}
+            show={!inView}
+            optionsDisabled={!!disabled || isAdding}
+          />
+        )}
       </div>
     </>
   )
