@@ -82,6 +82,12 @@ export default function ProductDetailActions({
     ? getProductPrice({ product, variantId: selectedVariant.id }).variantPrice
     : cheapestPrice
 
+  // Surface the quote button when there's no price at all, or when the price is
+  // high enough (≥ 1000) that customers typically request an offer instead.
+  const hasPrice = !!cheapestPrice
+  const showAngebot =
+    !hasPrice || (cheapestPrice?.calculated_price_number ?? 0) >= 1000
+
   const sku = selectedVariant?.sku ?? product.variants?.[0]?.sku ?? `${(product.handle ?? "").toUpperCase().slice(0, 8)}-001`
 
   const handleAddToCart = async () => {
@@ -162,7 +168,7 @@ export default function ProductDetailActions({
           </svg>
           {isAdding ? "Wird hinzugefügt..." : !selectedVariant ? "Variante auswählen" : !inStock ? "Nicht verfügbar" : "In den Warenkorb"}
         </button>
-        {(cheapestPrice?.calculated_price_number ?? 0) >= 1000 && (
+        {showAngebot && (
           <button
             type="button"
             onClick={() => setAngebotOpen(true)}

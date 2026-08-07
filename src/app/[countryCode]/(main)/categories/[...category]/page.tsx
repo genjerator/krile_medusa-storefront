@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import { getCategoryByHandle, listCategories } from "@lib/data/categories"
+import { getCategoryByHandle, listCategories, listCategoryIdsWithProducts } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
@@ -82,6 +82,10 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
+  // Category IDs that actually have products (in this sales channel) — used to
+  // hide subcategory cards for empty subcategories.
+  const categoryIdsWithProducts = await listCategoryIdsWithProducts()
+
   // Optional content pinned to the top of this category, bound via the
   // category's `content_block_top` metadata key (set in admin). Locale follows
   // the URL's countryCode (de/en/it). A `section-*` value selects a code-driven
@@ -102,6 +106,7 @@ export default async function CategoryPage(props: Props) {
       countryCode={params.countryCode}
       topBlockHtml={topBlock?.body || null}
       topBlockKey={topBlockKey}
+      categoryIdsWithProducts={categoryIdsWithProducts}
     />
   )
 }

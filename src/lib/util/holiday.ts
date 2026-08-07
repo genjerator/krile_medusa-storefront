@@ -2,7 +2,7 @@
 // 2026-09-10 inclusive. During this window the homepage shows a holiday
 // notice instead of the weekly-action section. Update these dates for future
 // years, or remove the check once no longer needed.
-const HOLIDAY_START = new Date("2026-08-17T00:00:00+02:00")
+const HOLIDAY_START = new Date("2026-08-07T00:00:00+02:00")
 const HOLIDAY_END_EXCLUSIVE = new Date("2026-09-11T00:00:00+02:00")
 
 export const isCollectiveHolidayActive = (): boolean => {

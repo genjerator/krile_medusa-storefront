@@ -13,8 +13,9 @@ import { descriptionToHtml } from "@lib/util/description-html"
 import { getSectionComponent } from "@modules/categories/templates/sections"
 import SubcategoryCards from "@modules/categories/components/subcategory-cards"
 
-// On this parent category, show a curated set of subcategory cards (in the
-// given order) above the products.
+// Optional override: on these parent categories, show only this curated set
+// of subcategory cards (in the given order) instead of all children. Any
+// category not listed here shows all of its (visible) subcategories.
 const CURATED_SUBCATEGORIES: Record<string, string[]> = {
   "vakuum-maschinen": ["p-serie", "c-serie"],
 }
@@ -27,6 +28,7 @@ export default function CategoryTemplate({
   countryCode,
   topBlockHtml,
   topBlockKey,
+  categoryIdsWithProducts,
 }: {
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
@@ -37,6 +39,8 @@ export default function CategoryTemplate({
   topBlockHtml?: string | null
   /** Key of the top block, used to pick its render mode. */
   topBlockKey?: string | null
+  /** Category IDs that have products — subcategories with none are hidden. */
+  categoryIdsWithProducts?: Set<string>
 }) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "price_asc"
@@ -62,11 +66,31 @@ export default function CategoryTemplate({
   }
   const categoryIds = getAllCategoryIds(category)
 
-  // Curated subcategory cards for this category (ordered by CURATED_SUBCATEGORIES).
-  const curatedHandles = CURATED_SUBCATEGORIES[category.handle] ?? []
-  const curatedSubcategories = curatedHandles
-    .map((h) => category.category_children?.find((c) => c.handle === h))
-    .filter((c): c is HttpTypes.StoreProductCategory => Boolean(c))
+  // Subcategory cards shown above the products. By default show every visible
+  // child (skip inactive/internal), ordered by the Admin ranking. A category
+  // listed in CURATED_SUBCATEGORIES instead shows only that curated set, in
+  // the given order.
+  // A subcategory counts as "has products" if it — or any category in its
+  // subtree — has at least one product. Hide the card otherwise.
+  const childHasProducts = (child: HttpTypes.StoreProductCategory): boolean =>
+    !categoryIdsWithProducts ||
+    getAllCategoryIds(child).some((id) => categoryIdsWithProducts.has(id))
+
+  const visibleChildren = [...(category.category_children ?? [])]
+    .filter(
+      (child) =>
+        (child as any).is_active !== false &&
+        (child as any).is_internal !== true &&
+        childHasProducts(child)
+    )
+    .sort((a, b) => ((a as any).rank ?? 0) - ((b as any).rank ?? 0))
+
+  const curatedHandles = CURATED_SUBCATEGORIES[category.handle]
+  const subcategoryCards = curatedHandles
+    ? curatedHandles
+        .map((h) => visibleChildren.find((c) => c.handle === h))
+        .filter((c): c is HttpTypes.StoreProductCategory => Boolean(c))
+    : visibleChildren
 
   // A `section-*` metadata value resolves to a code-driven section template;
   // otherwise the DB content block's HTML (topBlockHtml) is rendered plain.
@@ -136,8 +160,8 @@ export default function CategoryTemplate({
         </div>
       </div>
 
-      {/* Curated subcategory cards above the products (e.g. P-Serie / C-Serie) */}
-      <SubcategoryCards subcategories={curatedSubcategories} />
+      {/* Subcategory cards above the products (all children, or a curated set) */}
+      <SubcategoryCards subcategories={subcategoryCards} />
 
       <div className="content-container py-4 medium:py-6">
 
