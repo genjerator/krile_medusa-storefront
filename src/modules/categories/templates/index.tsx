@@ -100,11 +100,23 @@ export default function CategoryTemplate({
   return (
     <div>
       {/* Header banner */}
-      <div className="sticky top-16 z-40 bg-brand-navy text-white py-6 medium:py-10 pt-0">
+      <div className="bg-brand-navy text-white py-6 medium:py-10 pt-0">
         <div className="content-container">
-          <h1 className="text-2xl medium:text-4xl font-bold mb-1 medium:mb-2">
-            {category.name}
-          </h1>
+          <div className="flex items-baseline gap-x-3 gap-y-1 flex-wrap mb-1 medium:mb-2">
+            <h1 className="text-2xl medium:text-4xl font-bold">
+              {category.name}
+            </h1>
+            <Suspense fallback={null}>
+              <ProductCount
+                sortBy={sort}
+                page={pageNumber}
+                countryCode={countryCode}
+                categoryId={categoryIds}
+                q={q}
+                className="text-white/70 text-base font-normal"
+              />
+            </Suspense>
+          </div>
           {category.description && (
             <p className="text-white/70 text-sm leading-relaxed mb-4">
               {category.description}
@@ -136,17 +148,6 @@ export default function CategoryTemplate({
                 <span>›</span>
                 <span className="text-white/90 font-medium">{category.name}</span>
               </nav>
-              <Suspense fallback={null}>
-                <span className="text-white/60">
-                  <ProductCount
-                    sortBy={sort}
-                    page={pageNumber}
-                    countryCode={countryCode}
-                    categoryId={categoryIds}
-                    q={q}
-                  />
-                </span>
-              </Suspense>
             </div>
             <div className="flex items-center gap-4 flex-wrap">
               <Suspense fallback={null}>

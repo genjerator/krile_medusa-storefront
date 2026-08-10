@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -n \"/export const getCollectionByHandle/,/^}/p\" src/lib/data/collections.ts)",
+      "Bash(sed -n \"/export const listProductsWithSort/,/^}/p\" src/lib/data/products.ts)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); cs=d.get\\('collections',[]\\); print\\('found:',len\\(cs\\)\\); [print\\('  id=',c['id'],'handle=',c.get\\('handle'\\),'title=',c.get\\('title'\\),'products\\(embedded\\)=',len\\(c.get\\('products',[]\\)\\)\\) for c in cs]\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s -H 'x-publishable-api-key: pk_dd63d4f99e8a38a51713d95dd71835a04bd4fc983d3382e97be959caa572ae8b' http://18.196.77.51:9000/store/regions -w '\\\\nHTTP %{http_code}\\\\n')",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count field:',d.get\\('count'\\)\\)\")",
+      "Bash(curl -s \"https://www.planeta.de/de/buegelsystem\" -o /tmp/live.html -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s \"http://localhost:9002/de/buegelsystem\" -o /tmp/base.html -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:9002/de/b%C3%BCgelsystem\" -o /tmp/enc.html -w \"HTTP %{http_code}\\\\n\")",
+      "Bash(curl -s -o /tmp/a.html -w '%{http_code}' http://localhost:9002/de/buegelsystem)",
+      "Bash(echo \"baseline /de/buegelsystem:        $\\(curl -s -o /tmp/a.html -w '%{http_code}' http://localhost:9002/de/buegelsystem\\)  article=$\\(grep -c 'Was ist ein Bügelsystem' /tmp/a.html\\)\")",
+      "Bash(curl -s -o /tmp/b.html -w '%{http_code}' http://localhost:9002/de/b%C3%BCgelsystem)",
+      "Bash(echo \"/de/bügelsystem \\(enc, singular\\):  $\\(curl -s -o /tmp/b.html -w '%{http_code}' http://localhost:9002/de/b%C3%BCgelsystem\\)  article=$\\(grep -c 'Was ist ein Bügelsystem' /tmp/b.html\\)\")",
+      "Bash(curl -s -o /tmp/c.html -w '%{http_code}' http://localhost:9002/de/b%C3%BCgelsysteme)"
+    ],
+    "additionalDirectories": [
+      "/Users/genjerator/Projects/planetagmbh_medusa-storefront/src/app/[countryCode]/(main)/buegelsystem",
+      "/Users/genjerator/Projects/planetagmbh_medusa-storefront"
+    ]
+  }
+}
