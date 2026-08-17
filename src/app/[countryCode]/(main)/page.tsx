@@ -3,10 +3,8 @@ import HeroV2 from "@modules/home/components/hero-v2"
 import CategoryCards from "@modules/home/components/category-cards"
 import Benefits from "@modules/home/components/benefits"
 import FeaturedFour from "@modules/home/components/featured-four"
-import KemptenFestNotice from "@modules/home/components/kempten-fest-notice"
 import HolidayNotice from "@modules/home/components/holiday-notice"
 import { getRegion } from "@lib/data/regions"
-import { isKemptenFestActive } from "@lib/util/kempten-fest"
 import { isCollectiveHolidayActive } from "@lib/util/holiday"
 
 export const metadata: Metadata = {
@@ -40,18 +38,13 @@ export default async function Home(props: {
 
   if (!region) return null
 
-  const isKemptenFest = isKemptenFestActive()
   const isHoliday = isCollectiveHolidayActive()
 
   return (
     <>
-      <HeroV2
-        showKemptenFestBanner={isKemptenFest}
-        showHolidayBanner={isHoliday}
-      />
+      <HeroV2 showHolidayBanner={isHoliday} />
       <CategoryCards />
       <Benefits />
-      {isKemptenFest && <KemptenFestNotice />}
       {isHoliday && <HolidayNotice />}
       <FeaturedFour />
     </>
