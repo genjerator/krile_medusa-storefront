@@ -26,7 +26,7 @@ const ROWS: Row[] = [
     text: (
       <>
         Bitte beachten Sie, dass unser Unternehmen in der Zeit vom{" "}
-        <strong className="text-white">18.08.2026 bis einschließlich 10.09.2026</strong>{" "}
+        <strong className="text-white">24.08.2026 bis einschließlich 10.09.2026</strong>{" "}
         aufgrund unseres Sommerurlaubs geschlossen ist.
       </>
     ),
@@ -86,7 +86,7 @@ export default function HolidayNotice() {
           <h2 className="font-heading font-extrabold uppercase tracking-tight text-3xl small:text-5xl leading-[0.95]">
             Wir machen Sommerurlaub
           </h2>
-          <p className="text-white/60 text-sm">18.08. – 10.09.2026</p>
+          <p className="text-white/60 text-sm">24.08. – 10.09.2026</p>
         </div>
 
         <div className="max-w-xl mx-auto flex flex-col gap-6">

@@ -89,7 +89,7 @@ export default function HeroV2({
             {showHolidayBanner && (
               <div className="bg-[#0F1E46]/90 backdrop-blur-sm text-white text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
                 <span className="text-xs small:text-sm font-medium">
-                  Wir machen Sommerurlaub — geschlossen vom 18.08. bis einschließlich 10.09.2026.
+                  Wir machen Sommerurlaub — geschlossen vom 24.08. bis einschließlich 10.09.2026.
                 </span>
                 <a
                   href="#holiday-notice"
