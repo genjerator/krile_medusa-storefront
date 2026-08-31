@@ -73,12 +73,25 @@ export const listProducts = async ({
       }
     )
     .then(({ products, count }) => {
-      const nextPage = count > offset + limit ? pageParam + 1 : null
+      // Hide the vacuum-bag configurator product (metadata.hidden) from all
+      // listing surfaces (store, search, related, home, sitemap). Skip this when
+      // the caller asked for a specific product by handle or id — those are
+      // direct fetches (e.g. the configurator page loading its own product).
+      const isDirectFetch = Boolean(
+        (queryParams as any)?.handle || (queryParams as any)?.id
+      )
+      let visible = products
+      if (!isDirectFetch) {
+        visible = products.filter((p) => !(p.metadata as any)?.hidden)
+      }
+      const removed = products.length - visible.length
+      const adjustedCount = Math.max(0, count - removed)
+      const nextPage = adjustedCount > offset + limit ? pageParam + 1 : null
 
       return {
         response: {
-          products,
-          count,
+          products: visible,
+          count: adjustedCount,
         },
         nextPage: nextPage,
         queryParams,

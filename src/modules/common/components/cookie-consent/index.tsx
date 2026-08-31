@@ -3,11 +3,21 @@
 import { useEffect, useState } from "react"
 import Script from "next/script"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { sdk } from "@lib/config"
 
 const GA_ID = "G-CN1PX0WWDT"
 const STORAGE_KEY = "cookie-consent"
+// Ensures the "shown" event is counted once per visitor, not on every re-mount.
+const SHOWN_KEY = "cookie-consent-shown"
 
 type Consent = "accepted" | "declined"
+
+/** Best-effort banner-interaction tracking (shown / accept / decline). */
+const trackConsent = (event: "shown" | "accept" | "decline") => {
+  sdk.client
+    .fetch("/store/cookie-consent", { method: "POST", body: { event } })
+    .catch(() => {})
+}
 
 export default function CookieConsent() {
   const [consent, setConsent] = useState<Consent | null>(null)
@@ -20,6 +30,11 @@ export default function CookieConsent() {
       setConsent(stored)
     } else {
       setShowBanner(true)
+      // Count the banner impression once per visitor (until they decide).
+      if (!localStorage.getItem(SHOWN_KEY)) {
+        localStorage.setItem(SHOWN_KEY, "1")
+        trackConsent("shown")
+      }
     }
   }, [])
 
@@ -27,6 +42,7 @@ export default function CookieConsent() {
     localStorage.setItem(STORAGE_KEY, value)
     setConsent(value)
     setShowBanner(false)
+    trackConsent(value === "accepted" ? "accept" : "decline")
   }
 
   return (

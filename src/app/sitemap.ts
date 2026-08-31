@@ -17,12 +17,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const productPages = await sdk.client
-    .fetch<{ products: { handle: string; updated_at: string }[] }>("/store/products", {
-      query: { fields: "handle,updated_at", limit: 500 },
+    .fetch<{ products: { handle: string; updated_at: string; metadata?: Record<string, unknown> }[] }>("/store/products", {
+      query: { fields: "handle,updated_at,+metadata", limit: 500 },
       cache: "no-store",
     })
     .then(({ products }) =>
-      products.map((p) => ({
+      products
+        // Exclude the vacuum-bag configurator product (metadata.hidden).
+        .filter((p) => !(p.metadata as any)?.hidden)
+        .map((p) => ({
         url: `${BASE_URL}/${LOCALE}/product/${p.handle}`,
         lastModified: new Date(p.updated_at),
         changeFrequency: "weekly" as const,

@@ -24,7 +24,17 @@ export default function ProductDetailTemplate({
 
       {/* Title — always visible, above the two-column layout */}
       <div className="mb-4 medium:mb-6">
-        <p className="text-xs font-bold text-blue-600 tracking-widest uppercase mb-1">{categoryName}</p>
+        <nav className="flex items-center gap-1.5 text-xs font-bold text-blue-600 tracking-widest uppercase mb-1 flex-wrap">
+          <LocalizedClientLink href="/products" className="hover:text-blue-800">Produkte</LocalizedClientLink>
+          {category && (
+            <>
+              <span className="text-ui-fg-muted">/</span>
+              <LocalizedClientLink href={`/categories/${category.handle}`} className="hover:text-blue-800">
+                {categoryName}
+              </LocalizedClientLink>
+            </>
+          )}
+        </nav>
         <h1 className="text-2xl medium:text-3xl font-bold text-ui-fg-base leading-tight">{product.title}</h1>
         {product.subtitle && (
           <p className="text-sm text-ui-fg-muted mt-1 leading-relaxed">{product.subtitle}</p>
