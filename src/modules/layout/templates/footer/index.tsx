@@ -2,6 +2,7 @@ import { listCategories } from "@lib/data/categories"
 import { Text } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import SourceMarker from "@modules/common/components/source-marker"
 
 export default async function Footer() {
   const productCategories = await listCategories()
@@ -42,14 +43,17 @@ export default async function Footer() {
           <Text className="txt-compact-small text-ui-fg-muted">
             © {new Date().getFullYear()} Planeta. Alle Rechte vorbehalten.
           </Text>
-          <a
-            href="https://planeta.de"
-            target="_blank"
-            rel="noreferrer"
-            className="txt-compact-small text-ui-fg-subtle hover:text-ui-fg-base"
-          >
-            planeta.de
-          </a>
+          <div className="flex items-center gap-x-3">
+            <a
+              href="https://planeta.de"
+              target="_blank"
+              rel="noreferrer"
+              className="txt-compact-small text-ui-fg-subtle hover:text-ui-fg-base"
+            >
+              planeta.de
+            </a>
+            <SourceMarker />
+          </div>
         </div>
       </div>
     </footer>

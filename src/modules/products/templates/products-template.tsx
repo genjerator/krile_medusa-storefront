@@ -15,11 +15,15 @@ export default function ProductsTemplate({
   page,
   q,
   countryCode,
+  tagId,
+  tagLabel,
 }: {
   sortBy?: SortOptions
   page?: string
   q?: string
   countryCode: string
+  tagId?: string
+  tagLabel?: string
 }) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "price_asc"
@@ -35,7 +39,17 @@ export default function ProductsTemplate({
                 Startseite
               </LocalizedClientLink>
               <span>›</span>
-              <span className="text-white/90 font-medium">Produkte</span>
+              {tagId ? (
+                <>
+                  <LocalizedClientLink href="/products" className="hover:text-white transition-colors">
+                    Produkte
+                  </LocalizedClientLink>
+                  <span>›</span>
+                  <span className="text-white/90 font-medium">{tagLabel || "Tag"}</span>
+                </>
+              ) : (
+                <span className="text-white/90 font-medium">Produkte</span>
+              )}
             </nav>
             <Suspense fallback={null}>
               <span className="text-white/60">
@@ -44,6 +58,7 @@ export default function ProductsTemplate({
                   page={pageNumber}
                   countryCode={countryCode}
                   q={q}
+                  tagId={tagId}
                 />
               </span>
             </Suspense>
@@ -77,6 +92,7 @@ export default function ProductsTemplate({
                 page={pageNumber}
                 countryCode={countryCode}
                 q={q}
+                tagId={tagId}
               />
             </Suspense>
           </div>

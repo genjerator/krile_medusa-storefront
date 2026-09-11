@@ -159,3 +159,29 @@ export const listProductsWithSort = async ({
     queryParams,
   }
 }
+
+/**
+ * Resolve a product tag by its exact `value` (e.g. "Wurst & Charcuterie") to its
+ * id, so pretty tag URLs (/products/tag/<value>) can filter by tag_id. Returns
+ * null when no tag matches.
+ */
+export const getProductTagByValue = async (
+  value: string
+): Promise<HttpTypes.StoreProductTag | null> => {
+  const headers = { ...(await getAuthHeaders()) }
+  const next = { ...(await getCacheOptions("product-tags")) }
+
+  return sdk.client
+    .fetch<{ product_tags: HttpTypes.StoreProductTag[] }>(
+      `/store/product-tags`,
+      {
+        method: "GET",
+        query: { value, limit: 1 },
+        headers,
+        next,
+        cache: "force-cache",
+      }
+    )
+    .then(({ product_tags }) => product_tags?.[0] ?? null)
+    .catch(() => null)
+}

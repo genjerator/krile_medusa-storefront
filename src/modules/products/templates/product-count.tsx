@@ -9,6 +9,7 @@ export default async function ProductCount({
   categoryId,
   q,
   className,
+  tagId,
 }: {
   sortBy?: SortOptions
   page: number
@@ -16,6 +17,7 @@ export default async function ProductCount({
   categoryId?: string | string[]
   q?: string
   className?: string
+  tagId?: string
 }) {
   const region = await getRegion(countryCode)
   if (!region) return null
@@ -23,6 +25,9 @@ export default async function ProductCount({
   const queryParams: Record<string, unknown> = { limit: 1 }
   if (categoryId) {
     queryParams["category_id"] = Array.isArray(categoryId) ? categoryId : [categoryId]
+  }
+  if (tagId) {
+    queryParams["tag_id"] = [tagId]
   }
 
   const {

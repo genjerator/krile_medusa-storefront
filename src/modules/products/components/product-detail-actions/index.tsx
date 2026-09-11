@@ -7,6 +7,7 @@ import { isEqual } from "lodash"
 import { addToCart } from "@lib/data/cart"
 import { getProductPrice } from "@lib/util/get-product-price"
 import AngebotModal from "@modules/products/components/angebot-modal"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["options"]) =>
   variantOptions?.reduce((acc: Record<string, string>, varopt: any) => {
@@ -194,6 +195,21 @@ export default function ProductDetailActions({
       <p className="text-sm text-ui-fg-muted">
         SKU: <span className="text-ui-fg-base font-medium">{sku}</span>
       </p>
+
+      {/* Meal / dish tags */}
+      {(product.tags?.length ?? 0) > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {product.tags!.map((tag) => (
+            <LocalizedClientLink
+              key={tag.id}
+              href={`/products/tag/${encodeURIComponent(tag.value ?? "")}`}
+              className="inline-flex items-center rounded-full border border-ui-border-base bg-ui-bg-subtle px-2.5 py-0.5 text-xs text-ui-fg-subtle transition-colors hover:border-ui-border-interactive hover:text-ui-fg-base"
+            >
+              {tag.value}
+            </LocalizedClientLink>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
