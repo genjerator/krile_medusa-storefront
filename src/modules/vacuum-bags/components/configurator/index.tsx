@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
+import { useTranslations, useLocale } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import {
@@ -19,8 +20,14 @@ type Selection = {
 const selectClass =
   "border border-ui-border-base rounded-base px-4 py-2.5 text-sm text-ui-fg-base bg-ui-bg-field focus:outline-none focus:border-ui-border-interactive w-full appearance-none"
 
-const money = (amount: number, currency_code: string) =>
-  convertToLocale({ amount, currency_code, locale: "de-DE" })
+// Map the site language to a BCP-47 tag for currency/number formatting.
+const LOCALE_TAG: Record<string, string> = {
+  de: "de-DE",
+  en: "en-US",
+  it: "it-IT",
+  fr: "fr-FR",
+  ru: "ru-RU",
+}
 
 export default function VacuumBagConfigurator({
   options,
@@ -32,6 +39,11 @@ export default function VacuumBagConfigurator({
   baseImage?: string | null
 }) {
   const { combinations, colors, pack_size } = options
+
+  const t = useTranslations("vacuumConfigurator")
+  const locale = useLocale()
+  const money = (amount: number, currency_code: string) =>
+    convertToLocale({ amount, currency_code, locale: LOCALE_TAG[locale] ?? "de-DE" })
 
   // ─── Cascading value helpers (color → thickness → width → height) ──────────
   const uniqSorted = (arr: number[]) => [...new Set(arr)].sort((a, b) => a - b)
@@ -129,7 +141,7 @@ export default function VacuumBagConfigurator({
     if (res.success) {
       setAdded(true)
     } else {
-      setError(res.message ?? "Fehler beim Hinzufügen zum Warenkorb.")
+      setError(res.message ?? t("addError"))
     }
   }
 
@@ -144,7 +156,7 @@ export default function VacuumBagConfigurator({
         {mainImage ? (
           <Image
             src={mainImage}
-            alt={`Vakuumiertüte ${previewColor?.name ?? ""}`}
+            alt={t("imageAlt", { color: previewColor?.name ?? "" })}
             fill
             sizes="(min-width: 768px) 40vw, 90vw"
             className="object-contain p-6 transition-opacity duration-200"
@@ -163,7 +175,7 @@ export default function VacuumBagConfigurator({
         {/* Farbe — swatches with hover preview */}
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-ui-fg-base">
-            Farbe: <span className="text-ui-fg-subtle">{selectedColor?.name}</span>
+            {t("color")}: <span className="text-ui-fg-subtle">{selectedColor?.name}</span>
           </span>
           <div className="flex flex-wrap gap-2">
             {colors.map((c) => {
@@ -193,7 +205,7 @@ export default function VacuumBagConfigurator({
         {/* Stärke / Breite / Höhe */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-ui-fg-base">Stärke</span>
+            <span className="text-sm font-medium text-ui-fg-base">{t("thickness")}</span>
             <select
               className={selectClass}
               value={sel.thickness_um}
@@ -208,7 +220,7 @@ export default function VacuumBagConfigurator({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-ui-fg-base">Breite</span>
+            <span className="text-sm font-medium text-ui-fg-base">{t("width")}</span>
             <select
               className={selectClass}
               value={sel.width_mm}
@@ -223,7 +235,7 @@ export default function VacuumBagConfigurator({
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-ui-fg-base">Höhe</span>
+            <span className="text-sm font-medium text-ui-fg-base">{t("height")}</span>
             <select
               className={selectClass}
               value={sel.height_mm}
@@ -241,7 +253,7 @@ export default function VacuumBagConfigurator({
         {/* Menge (packs) */}
         <label className="flex flex-col gap-1 max-w-[10rem]">
           <span className="text-sm font-medium text-ui-fg-base">
-            Menge (Pack à {pack_size} Stk.)
+            {t("quantityLabel", { packSize: pack_size })}
           </span>
           <input
             type="number"
@@ -264,13 +276,13 @@ export default function VacuumBagConfigurator({
                 {money(totalPrice, currency)}
               </span>
               <span className="text-sm text-ui-fg-subtle">
-                {money(unitPrice, currency)} pro Pack ({pack_size} Stk.)
-                {quantity > 1 ? ` · ${quantity} Packs` : ""}
+                {money(unitPrice, currency)} {t("perPack", { packSize: pack_size })}
+                {quantity > 1 ? ` ${t("packsSuffix", { quantity })}` : ""}
               </span>
             </>
           ) : (
             <span className="text-sm text-ui-fg-subtle">
-              Diese Kombination ist auf Anfrage verfügbar.
+              {t("onRequest")}
             </span>
           )}
         </div>
@@ -282,19 +294,19 @@ export default function VacuumBagConfigurator({
           disabled={!priceRow || adding}
           className="bg-brand-navy text-white rounded-base px-6 py-3 text-sm font-medium hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {adding ? "Wird hinzugefügt…" : "In den Warenkorb"}
+          {adding ? t("adding") : t("addToCart")}
         </button>
 
         {added && (
           <div className="flex flex-col gap-1 text-sm">
             <span className="text-ui-fg-base font-medium">
-              Zum Warenkorb hinzugefügt.
+              {t("added")}
             </span>
             <LocalizedClientLink
               href="/cart"
               className="text-brand-navy font-medium hover:underline"
             >
-              Zum Warenkorb →
+              {t("goToCart")}
             </LocalizedClientLink>
           </div>
         )}

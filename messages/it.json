@@ -13,5 +13,26 @@
   },
   "footer": {
     "rights": "Tutti i diritti riservati"
+  },
+  "vacuumConfigurator": {
+    "metaTitle": "Configura i sacchetti sottovuoto",
+    "metaDescription": "Sacchetti sottovuoto su misura: scegli colore, spessore, larghezza e altezza e ordina direttamente.",
+    "heading": "Sacchetti sottovuoto su misura",
+    "intro": "Componi i tuoi sacchetti sottovuoto in modo personalizzato: scegli colore, spessore, larghezza e altezza. Il prezzo viene mostrato subito per la combinazione selezionata. Vendita in confezioni.",
+    "unavailable": "Il configuratore non è al momento disponibile. Contattaci per un preventivo.",
+    "color": "Colore",
+    "thickness": "Spessore",
+    "width": "Larghezza",
+    "height": "Altezza",
+    "quantityLabel": "Quantità (confezione da {packSize} pz.)",
+    "perPack": "per confezione ({packSize} pz.)",
+    "packsSuffix": "· {quantity} confezioni",
+    "onRequest": "Questa combinazione è disponibile su richiesta.",
+    "addToCart": "Aggiungi al carrello",
+    "adding": "Aggiunta in corso…",
+    "added": "Aggiunto al carrello.",
+    "goToCart": "Vai al carrello →",
+    "addError": "Errore durante l'aggiunta al carrello.",
+    "imageAlt": "Sacchetto sottovuoto {color}"
   }
 }

@@ -206,5 +206,26 @@
   "featuredFour": {
     "moreVideos": "More videos",
     "hide": "Hide"
+  },
+  "vacuumConfigurator": {
+    "metaTitle": "Configure vacuum bags",
+    "metaDescription": "Custom vacuum bags: choose colour, thickness, width and height and order directly.",
+    "heading": "Custom vacuum bags",
+    "intro": "Put together your vacuum bags individually: choose colour, thickness, width and height. The price is shown instantly for the selected combination. Sold in packs.",
+    "unavailable": "The configurator is currently unavailable. Please contact us for a quote.",
+    "color": "Colour",
+    "thickness": "Thickness",
+    "width": "Width",
+    "height": "Height",
+    "quantityLabel": "Quantity (pack of {packSize} pcs.)",
+    "perPack": "per pack ({packSize} pcs.)",
+    "packsSuffix": "· {quantity} packs",
+    "onRequest": "This combination is available on request.",
+    "addToCart": "Add to cart",
+    "adding": "Adding…",
+    "added": "Added to cart.",
+    "goToCart": "Go to cart →",
+    "addError": "Error adding to cart.",
+    "imageAlt": "Vacuum bag {color}"
   }
 }

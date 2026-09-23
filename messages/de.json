@@ -206,5 +206,26 @@
   "featuredFour": {
     "moreVideos": "Mehr Videos",
     "hide": "Ausblenden"
+  },
+  "vacuumConfigurator": {
+    "metaTitle": "Vakuumiertüten konfigurieren",
+    "metaDescription": "Vakuumiertüten nach Maß: Farbe, Stärke, Breite und Höhe wählen und direkt bestellen.",
+    "heading": "Vakuumiertüten nach Maß",
+    "intro": "Stellen Sie Ihre Vakuumiertüten individuell zusammen: Wählen Sie Farbe, Stärke sowie Breite und Höhe. Der Preis wird sofort für die gewählte Kombination angezeigt. Verkauf erfolgt in Packungen.",
+    "unavailable": "Der Konfigurator ist derzeit nicht verfügbar. Bitte kontaktieren Sie uns für ein Angebot.",
+    "color": "Farbe",
+    "thickness": "Stärke",
+    "width": "Breite",
+    "height": "Höhe",
+    "quantityLabel": "Menge (Pack à {packSize} Stk.)",
+    "perPack": "pro Pack ({packSize} Stk.)",
+    "packsSuffix": "· {quantity} Packs",
+    "onRequest": "Diese Kombination ist auf Anfrage verfügbar.",
+    "addToCart": "In den Warenkorb",
+    "adding": "Wird hinzugefügt…",
+    "added": "Zum Warenkorb hinzugefügt.",
+    "goToCart": "Zum Warenkorb →",
+    "addError": "Fehler beim Hinzufügen zum Warenkorb.",
+    "imageAlt": "Vakuumiertüte {color}"
   }
 }

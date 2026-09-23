@@ -13,5 +13,26 @@
   },
   "footer": {
     "rights": "Tous droits réservés"
+  },
+  "vacuumConfigurator": {
+    "metaTitle": "Configurer les sachets sous vide",
+    "metaDescription": "Sachets sous vide sur mesure : choisissez la couleur, l'épaisseur, la largeur et la hauteur et commandez directement.",
+    "heading": "Sachets sous vide sur mesure",
+    "intro": "Composez vos sachets sous vide de façon individuelle : choisissez la couleur, l'épaisseur, la largeur et la hauteur. Le prix s'affiche immédiatement pour la combinaison choisie. Vente par paquets.",
+    "unavailable": "Le configurateur n'est actuellement pas disponible. Veuillez nous contacter pour un devis.",
+    "color": "Couleur",
+    "thickness": "Épaisseur",
+    "width": "Largeur",
+    "height": "Hauteur",
+    "quantityLabel": "Quantité (paquet de {packSize} pcs)",
+    "perPack": "par paquet ({packSize} pcs)",
+    "packsSuffix": "· {quantity} paquets",
+    "onRequest": "Cette combinaison est disponible sur demande.",
+    "addToCart": "Ajouter au panier",
+    "adding": "Ajout en cours…",
+    "added": "Ajouté au panier.",
+    "goToCart": "Aller au panier →",
+    "addError": "Erreur lors de l'ajout au panier.",
+    "imageAlt": "Sachet sous vide {color}"
   }
 }
