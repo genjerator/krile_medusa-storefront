@@ -13,6 +13,9 @@ name: Deploy Storefront (Industries) to Strato VPS
 # builds) — that file can be removed.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   REGISTRY: ghcr.io
