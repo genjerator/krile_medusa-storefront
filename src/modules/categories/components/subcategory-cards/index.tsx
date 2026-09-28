@@ -7,7 +7,7 @@ import { cardClass } from "@modules/home/components/category-cards"
  * Subcategory cards shown above the product grid on a category page — one card
  * per (visible) child category. Same visual style as the homepage category
  * cards; shows the admin-uploaded category image (metadata.image) as a
- * centered watermark behind the text, when present.
+ * full-bleed watermark covering the whole card behind the text, when present.
  */
 export default function SubcategoryCards({
   subcategories,
@@ -49,14 +49,14 @@ export default function SubcategoryCards({
               </div>
 
               {image && (
-                <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
+                <div className="pointer-events-none absolute inset-0 z-0">
                   <Image
                     src={image}
                     alt=""
                     aria-hidden
-                    width={130}
-                    height={130}
-                    className="object-contain opacity-10 group-hover:opacity-25 transition-opacity duration-300"
+                    fill
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    className="object-cover opacity-10 group-hover:opacity-25 transition-opacity duration-300"
                   />
                 </div>
               )}
