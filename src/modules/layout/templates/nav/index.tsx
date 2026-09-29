@@ -16,6 +16,7 @@ export default async function Nav() {
     { label: t("training"), href: "/service" },
     { label: t("contact"), href: "/kontakt" },
     { label: t("informations"), href: "/informations" },
+    { label: t("magazin"), href: "/magazin" },
     { label: t("reparatur"), href: "/reparatur" },
   ]
   return (
