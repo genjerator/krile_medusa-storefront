@@ -3,9 +3,30 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import ProductImageGallery from "@modules/products/components/product-image-gallery"
 import ProductDetailActions from "@modules/products/components/product-detail-actions"
 import ProductDetailTabs from "@modules/products/components/product-detail-tabs"
+import { listProducts } from "@lib/data/products"
 
+/**
+ * Reads the optional add-on product ids off a product's metadata. Configurable
+ * machines (e.g. the MULTIVAC C 500) store `metadata.addon_product_ids` — an
+ * array of product ids offered as optional extras on the detail page. Products
+ * without it behave exactly as before.
+ */
+function getAddonIds(product: HttpTypes.StoreProduct): string[] {
+  const raw = (product.metadata as any)?.addon_product_ids
+  if (Array.isArray(raw)) return raw.filter((id): id is string => typeof id === "string")
+  if (typeof raw === "string") {
+    // Tolerate a JSON-encoded array or a comma-separated string.
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) return parsed.filter((id) => typeof id === "string")
+    } catch {
+      return raw.split(",").map((s) => s.trim()).filter(Boolean)
+    }
+  }
+  return []
+}
 
-export default function ProductDetailTemplate({
+export default async function ProductDetailTemplate({
   product,
   region,
   countryCode,
@@ -18,6 +39,19 @@ export default function ProductDetailTemplate({
 }) {
   const category = (product as any).categories?.[0]
   const categoryName = category?.name?.toUpperCase() ?? "PRODUKT"
+
+  // Load add-on products (with region pricing) only when this product declares
+  // them. Preserves the id order from metadata so they render as listed.
+  const addonIds = getAddonIds(product)
+  let addons: HttpTypes.StoreProduct[] = []
+  if (addonIds.length > 0) {
+    const { response } = await listProducts({
+      regionId: region.id,
+      queryParams: { id: addonIds, limit: addonIds.length },
+    }).catch(() => ({ response: { products: [], count: 0 } }))
+    const byId = new Map(response.products.map((p) => [p.id, p]))
+    addons = addonIds.map((id) => byId.get(id)).filter((p): p is HttpTypes.StoreProduct => !!p)
+  }
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 medium:px-6 py-4 medium:py-8 pb-24 medium:pb-8">
@@ -51,7 +85,7 @@ export default function ProductDetailTemplate({
 
         {/* Right: actions */}
         <div className="w-full medium:w-[440px] medium:shrink-0">
-          <ProductDetailActions product={product} region={region} />
+          <ProductDetailActions product={product} region={region} addons={addons} />
         </div>
       </div>
 

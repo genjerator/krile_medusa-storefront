@@ -4,8 +4,9 @@ import { useState, useEffect, useMemo } from "react"
 import { useParams, usePathname, useSearchParams, useRouter } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { isEqual } from "lodash"
-import { addToCart } from "@lib/data/cart"
+import { addToCart, addLineItems } from "@lib/data/cart"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { convertToLocale } from "@lib/util/money"
 import AngebotModal from "@modules/products/components/angebot-modal"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
@@ -18,9 +19,12 @@ const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["options"
 export default function ProductDetailActions({
   product,
   region,
+  addons = [],
 }: {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
+  /** Optional add-on products (e.g. machine options) offered on this page. */
+  addons?: HttpTypes.StoreProduct[]
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -31,6 +35,7 @@ export default function ProductDetailActions({
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [angebotOpen, setAngebotOpen] = useState(false)
+  const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set())
 
   // Preselect the whole variant when there's only one, and otherwise
   // preselect any option that has a single value (e.g. a lone Gebinde) so it
@@ -91,11 +96,65 @@ export default function ProductDetailActions({
 
   const sku = selectedVariant?.sku ?? product.variants?.[0]?.sku ?? `${(product.handle ?? "").toUpperCase().slice(0, 8)}-001`
 
+  // ─── Add-ons (optional extras, e.g. machine options) ───────────────────────
+  // Each add-on is a single-variant product; we surface its first variant and
+  // cheapest price. Products without add-ons skip all of this entirely.
+  const addonRows = useMemo(
+    () =>
+      addons
+        .map((addon) => {
+          const variant = addon.variants?.[0]
+          const price = getProductPrice({ product: addon }).cheapestPrice
+          return {
+            id: addon.id!,
+            title: addon.title ?? "",
+            variantId: variant?.id,
+            priceNumber: price?.calculated_price_number ?? 0,
+            priceLabel: price?.calculated_price ?? null,
+          }
+        })
+        .filter((row) => !!row.variantId),
+    [addons]
+  )
+
+  const currencyCode =
+    selectedVariant?.calculated_price?.currency_code ?? region.currency_code
+
+  const basePriceNumber = displayPrice?.calculated_price_number ?? 0
+  const addonsTotalNumber = addonRows
+    .filter((row) => selectedAddonIds.has(row.id))
+    .reduce((sum, row) => sum + row.priceNumber, 0)
+  const totalNumber = basePriceNumber + addonsTotalNumber
+  const hasConfig = addonRows.length > 0
+  const totalLabel = convertToLocale({ amount: totalNumber, currency_code: currencyCode })
+
+  const toggleAddon = (id: string) =>
+    setSelectedAddonIds((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+
   const handleAddToCart = async () => {
     if (!selectedVariant?.id) return
     setIsAdding(true)
     try {
-      await addToCart({ variantId: selectedVariant.id, quantity, countryCode })
+      const chosenAddons = addonRows.filter((row) => selectedAddonIds.has(row.id))
+      if (chosenAddons.length > 0) {
+        await addLineItems({
+          countryCode,
+          items: [
+            { variantId: selectedVariant.id, quantity },
+            ...chosenAddons.map((row) => ({
+              variantId: row.variantId!,
+              quantity,
+              metadata: { addon_of: selectedVariant.id },
+            })),
+          ],
+        })
+      } else {
+        await addToCart({ variantId: selectedVariant.id, quantity, countryCode })
+      }
     } finally {
       setIsAdding(false)
     }
@@ -142,6 +201,42 @@ export default function ProductDetailActions({
             )
           })}
 
+        {/* Optional add-ons (machine options). Only rendered for configurable
+            products that ship an `addons` list — every other product is
+            unaffected. */}
+        {hasConfig && (
+          <div className="border-t border-ui-border-base pt-4">
+            <p className="text-sm font-semibold text-ui-fg-base mb-3">
+              Optionen <span className="text-ui-fg-muted font-normal">(optional)</span>
+            </p>
+            <ul className="space-y-2">
+              {addonRows.map((row) => {
+                const checked = selectedAddonIds.has(row.id)
+                return (
+                  <li key={row.id}>
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleAddon(row.id)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-ui-border-base text-blue-600 focus:ring-blue-600"
+                      />
+                      <span className="flex-1 text-sm text-ui-fg-base leading-snug group-hover:text-blue-700">
+                        {row.title}
+                      </span>
+                      {row.priceLabel && (
+                        <span className="text-sm font-medium text-ui-fg-base whitespace-nowrap">
+                          + {row.priceLabel}
+                        </span>
+                      )}
+                    </label>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
+
         {/* Quantity + delivery */}
         <div className="flex items-center gap-4">
           <span className="text-sm text-ui-fg-subtle w-28 shrink-0">Menge</span>
@@ -156,6 +251,15 @@ export default function ProductDetailActions({
           </div> */}
         </div>
       </div>
+
+      {/* Running total — only for configurable products, once a variant is
+          picked. Base (selected variant) + all checked options. */}
+      {hasConfig && selectedVariant && (
+        <div className="flex items-center justify-between border-t border-ui-border-base pt-4">
+          <span className="text-sm text-ui-fg-subtle">Gesamt</span>
+          <span className="text-2xl font-bold text-blue-700">{totalLabel}</span>
+        </div>
+      )}
 
       {/* CTA buttons — sticky on mobile */}
       <div className="space-y-3 medium:static fixed bottom-0 left-0 right-0 medium:p-0 p-3 bg-white medium:bg-transparent border-t medium:border-0 border-ui-border-base z-40">

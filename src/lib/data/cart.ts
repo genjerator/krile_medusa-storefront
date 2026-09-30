@@ -124,10 +124,12 @@ export async function addToCart({
   variantId,
   quantity,
   countryCode,
+  metadata,
 }: {
   variantId: string
   quantity: number
   countryCode: string
+  metadata?: Record<string, unknown>
 }) {
   if (!variantId) {
     throw new Error("Missing variant ID when adding to cart")
@@ -149,6 +151,7 @@ export async function addToCart({
       {
         variant_id: variantId,
         quantity,
+        ...(metadata ? { metadata } : {}),
       },
       {},
       headers
@@ -161,6 +164,62 @@ export async function addToCart({
       revalidateTag(fulfillmentCacheTag)
     })
     .catch(medusaError)
+}
+
+/**
+ * Adds several line items to the cart in one shot (single cart resolution +
+ * one cache revalidation). Used by configurable products (e.g. a machine plus
+ * its optional add-ons) so the main variant and every selected add-on land in
+ * the same cart together. Items are added in order, so pass the main variant
+ * first — add-on items carry `metadata.addon_of` = the main variant id so the
+ * cart/order can group them under the parent.
+ */
+export async function addLineItems({
+  countryCode,
+  items,
+}: {
+  countryCode: string
+  items: {
+    variantId: string
+    quantity: number
+    metadata?: Record<string, unknown>
+  }[]
+}) {
+  const validItems = items.filter((i) => i.variantId && i.quantity > 0)
+  if (validItems.length === 0) {
+    throw new Error("No valid line items to add to cart")
+  }
+
+  const cart = await getOrSetCart(countryCode)
+  if (!cart) {
+    throw new Error("Error retrieving or creating cart")
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  // Sequential (not parallel) so line items keep a stable order and the backend
+  // isn't hit with concurrent writes to the same cart.
+  for (const item of validItems) {
+    await sdk.store.cart
+      .createLineItem(
+        cart.id,
+        {
+          variant_id: item.variantId,
+          quantity: item.quantity,
+          ...(item.metadata ? { metadata: item.metadata } : {}),
+        },
+        {},
+        headers
+      )
+      .catch(medusaError)
+  }
+
+  const cartCacheTag = await getCacheTag("carts")
+  revalidateTag(cartCacheTag)
+  const fulfillmentCacheTag = await getCacheTag("fulfillment")
+  revalidateTag(fulfillmentCacheTag)
 }
 
 export async function updateLineItem({

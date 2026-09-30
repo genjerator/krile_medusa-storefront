@@ -16,7 +16,7 @@ export default function ProductDetailTabs({
   const formatValue = (v: unknown): string => {
     if (v === true) return "●"
     if (v === false) return "–"
-    if (v === "optional") return t("values.optional")
+    if (v === "optional") return t.has("values.optional") ? t("values.optional") : "optional"
     return String(v)
   }
 
@@ -26,8 +26,7 @@ export default function ProductDetailTabs({
     if (!key.includes("__")) continue
     const [section, field] = key.split("__")
     if (!sections[section]) sections[section] = []
-    let label: string
-    try { label = t(`fields.${field}`) } catch { label = field }
+    const label = t.has(`fields.${field}`) ? t(`fields.${field}`) : field
     sections[section].push({ field, label, value: formatValue(value) })
   }
 
@@ -80,7 +79,7 @@ export default function ProductDetailTabs({
               {Object.entries(sections).map(([section, rows]) => (
                 <div key={section}>
                   <h5 className="font-bold text-sm text-ui-fg-base mb-2 pb-1 border-b border-ui-border-base">
-                    {(() => { try { return t(`sections.${section}`) } catch { return section } })()}
+                    {t.has(`sections.${section}`) ? t(`sections.${section}`) : section}
                   </h5>
                   <table className="w-full text-sm">
                     <tbody>
