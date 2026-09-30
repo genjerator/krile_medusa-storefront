@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next"
 import { getBaseURL } from "@lib/util/env"
 import { sdk } from "@lib/config"
+import { listAllArticleSlugs } from "@lib/data/articles"
 
 const BASE_URL = getBaseURL()
 const LOCALE = "de"
@@ -10,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/${LOCALE}`, priority: 1.0, changeFrequency: "weekly" },
     { url: `${BASE_URL}/${LOCALE}/products`, priority: 0.9, changeFrequency: "daily" },
     { url: `${BASE_URL}/${LOCALE}/store`, priority: 0.8, changeFrequency: "daily" },
+    { url: `${BASE_URL}/${LOCALE}/magazin`, priority: 0.7, changeFrequency: "weekly" },
     { url: `${BASE_URL}/${LOCALE}/kontakt`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${BASE_URL}/${LOCALE}/service`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${BASE_URL}/${LOCALE}/training`, priority: 0.6, changeFrequency: "monthly" },
@@ -48,5 +50,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
     .catch(() => [])
 
-  return [...staticPages, ...productPages, ...categoryPages]
+  const articlePages = await listAllArticleSlugs()
+    .then((articles) =>
+      articles.map((a) => ({
+        url: `${BASE_URL}/${LOCALE}/magazin/${a.slug}`,
+        lastModified: a.published_at ? new Date(a.published_at) : undefined,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }))
+    )
+    .catch(() => [])
+
+  return [...staticPages, ...productPages, ...categoryPages, ...articlePages]
 }
