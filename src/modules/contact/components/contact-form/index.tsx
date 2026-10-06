@@ -11,6 +11,9 @@ export default function ContactForm() {
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [message, setMessage] = useState("")
+  // Honeypot — hidden from real users; bots that auto-fill every field set it,
+  // and the backend then silently drops the submission.
+  const [website, setWebsite] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,6 +32,7 @@ export default function ContactForm() {
           email,
           message,
           ...(phone && { phone }),
+          ...(website && { website }),
           locale: window.location.pathname.split("/")[1] || undefined,
           source_url: window.location.href,
         },
@@ -52,6 +56,19 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      {/* Honeypot: off-screen + aria-hidden + not tabbable. Real users never fill it. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
       <div className="grid sm:grid-cols-2 gap-6">
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-ui-fg-base" htmlFor="name">

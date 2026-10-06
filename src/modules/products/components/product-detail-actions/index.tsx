@@ -224,11 +224,6 @@ export default function ProductDetailActions({
                       <span className="flex-1 text-sm text-ui-fg-base leading-snug group-hover:text-blue-700">
                         {row.title}
                       </span>
-                      {row.priceLabel && (
-                        <span className="text-sm font-medium text-ui-fg-base whitespace-nowrap">
-                          + {row.priceLabel}
-                        </span>
-                      )}
                     </label>
                   </li>
                 )

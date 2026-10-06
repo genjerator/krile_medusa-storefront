@@ -24,6 +24,8 @@ export default function AngebotModal({
   const [phone, setPhone] = useState("")
   const [company, setCompany] = useState("")
   const [message, setMessage] = useState("")
+  // Honeypot — hidden; bots fill it, backend then silently drops the submission.
+  const [website, setWebsite] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
