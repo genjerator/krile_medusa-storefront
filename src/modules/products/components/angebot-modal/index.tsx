@@ -42,7 +42,7 @@ export default function AngebotModal({
 
       await sdk.client.fetch("/store/inquiries", {
         method: "POST",
-        body: { product_id: productId, name, email, phone: phone || undefined, message: fullMessage, locale, source_url: window.location.href },
+        body: { product_id: productId, name, email, phone: phone || undefined, message: fullMessage, ...(website ? { website } : {}), locale, source_url: window.location.href },
       })
       setSuccess(true)
     } catch {
@@ -89,6 +89,11 @@ export default function AngebotModal({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+            {/* Honeypot: off-screen, aria-hidden, not tabbable. Real users never fill it. */}
+            <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+              <label htmlFor="website">Website</label>
+              <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t("nameLabel")}</label>
               <input
