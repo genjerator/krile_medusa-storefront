@@ -33,7 +33,7 @@ export default function SubcategoryCards({
             <LocalizedClientLink
               key={sub.id}
               href={`/categories/${sub.handle}`}
-              className={cardClass}
+              className={`${cardClass} !border-2 !border-[#0F1E46]/35 hover:!border-[#0F1E46]/60`}
             >
               <div className="relative z-10">
                 <h3
@@ -65,7 +65,7 @@ export default function SubcategoryCards({
                       the text (strongest at the top-left, where the heading and
                       description sit) so the copy stays legible even when the
                       image behind it is fully opaque. */}
-                  <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-br from-white/90 via-white/60 to-white/20 group-hover:via-white/50 transition-colors duration-300" />
+                  <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-br from-white/95 via-white/85 to-white/55 group-hover:to-white/45 transition-colors duration-300" />
                 </>
               )}
             </LocalizedClientLink>
