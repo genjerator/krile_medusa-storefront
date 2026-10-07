@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import { useParams, usePathname, useSearchParams, useRouter } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { isEqual } from "lodash"
@@ -40,10 +40,31 @@ export default function ProductDetailActions({
   // Preselect the whole variant when there's only one, and otherwise
   // preselect any option that has a single value (e.g. a lone Gebinde) so it
   // resolves a variant without the shopper touching a dropdown.
+  // Apply the initial default ONCE. Without this guard, selecting a pump updates
+  // the URL (v_id sync) → re-render with a fresh `addons` prop → the effect would
+  // re-run and snap the choice back to the default.
+  const didDefault = useRef(false)
   useEffect(() => {
-    if (product.variants?.length === 1) {
-      setOptions(optionsAsKeymap(product.variants[0].options) ?? {})
+    if (didDefault.current) return
+    const variants = product.variants ?? []
+
+    if (variants.length === 1) {
+      setOptions(optionsAsKeymap(variants[0].options) ?? {})
+      didDefault.current = true
       return
+    }
+    // Configurator (pump machine): default to the CHEAPEST variant so a base
+    // price shows and "In den Warenkorb" is enabled without picking a pump first.
+    if (addons.length > 0 && variants.length > 1) {
+      const cheapest = variants
+        .map((v) => ({ v, amount: (v.calculated_price as any)?.calculated_amount as number | undefined }))
+        .filter((x): x is { v: typeof x.v; amount: number } => typeof x.amount === "number")
+        .sort((a, b) => a.amount - b.amount)[0]
+      if (cheapest) {
+        setOptions(optionsAsKeymap(cheapest.v.options) ?? {})
+        didDefault.current = true
+        return
+      }
     }
     const singles = (product.options ?? []).reduce(
       (acc: Record<string, string>, opt) => {
@@ -54,8 +75,9 @@ export default function ProductDetailActions({
     )
     if (Object.keys(singles).length) {
       setOptions((prev) => ({ ...singles, ...prev }))
+      didDefault.current = true
     }
-  }, [product.variants, product.options])
+  }, [product.variants, product.options, addons])
 
   const selectedVariant = useMemo(() =>
     product.variants?.find((v) => isEqual(optionsAsKeymap(v.options), options)),
@@ -191,7 +213,7 @@ export default function ProductDetailActions({
                     value={options[opt.id] ?? ""}
                     onChange={(e) => setOptions((prev) => ({ ...prev, [opt.id]: e.target.value }))}
                   >
-                    <option value="">Bitte auswählen</option>
+                    {!options[opt.id] && <option value="">Bitte auswählen</option>}
                     {values.map((v) => (
                       <option key={v.id} value={v.value}>{v.value}</option>
                     ))}
