@@ -210,11 +210,38 @@
   },
   "vacuumConfigurator": {
     "metaTitle": "Configure vacuum bags",
-    "metaDescription": "Custom vacuum bags: choose colour, thickness, width and height and order directly.",
+    "metaDescription": "Custom vacuum bags: choose colour, type, width and height and order directly.",
     "heading": "Custom vacuum bags",
-    "intro": "Put together your vacuum bags individually: choose colour, thickness, width and height. The price is shown instantly for the selected combination. Sold in packs.",
+    "intro": "Put together your vacuum bags individually: choose colour, type, width and height. The price is shown instantly for the selected combination. Sold in packs.",
     "unavailable": "The configurator is currently unavailable. Please contact us for a quote.",
     "color": "Colour",
+    "type": "Type",
+    "typeInfo": {
+      "std-90": {
+        "name": "Standard smooth 90 µm",
+        "desc": "Smooth PA/PE seal-edge bags (EasyVac PRO) for chamber vacuum sealers."
+      },
+      "std-120": {
+        "name": "Standard smooth 120 µm",
+        "desc": "Thicker smooth PA/PE bags (120 µm) for heavy or sharp-edged products."
+      },
+      "gepraegt": {
+        "name": "Structured / Embossed 90 µm",
+        "desc": "Embossed bags (Combifresh) for bar and external (non-chamber) vacuum sealers."
+      },
+      "koch": {
+        "name": "Cooking bags 90 µm",
+        "desc": "Cooking / sous-vide bags (SF 90), heat-resistant up to 121 °C (max. 4 h), smooth."
+      },
+      "koch-gepraegt": {
+        "name": "Cooking bags, embossed 90 µm",
+        "desc": "Embossed cooking / sous-vide bags, up to 121 °C, for bar vacuum sealers."
+      },
+      "recyclebar": {
+        "name": "Recyclable MONO-PE 85 µm",
+        "desc": "Recyclable mono-PE bag (CombiNext) — suitable for recycling collection."
+      }
+    },
     "thickness": "Thickness",
     "width": "Width",
     "height": "Height",

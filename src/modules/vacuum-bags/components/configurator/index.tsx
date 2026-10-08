@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
-import { useTranslations, useLocale } from "next-intl"
+import { useTranslations, useLocale, useMessages } from "next-intl"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
 import {
@@ -12,7 +12,7 @@ import {
 
 type Selection = {
   color: string
-  thickness_um: number
+  type: string
   width_mm: number
   height_mm: number
 }
@@ -29,6 +29,8 @@ const LOCALE_TAG: Record<string, string> = {
   ru: "ru-RU",
 }
 
+const isTransparent = (slug?: string | null) => !slug || slug === "transparent"
+
 export default function VacuumBagConfigurator({
   options,
   countryCode,
@@ -38,29 +40,31 @@ export default function VacuumBagConfigurator({
   countryCode: string
   baseImage?: string | null
 }) {
-  const { combinations, colors, pack_size } = options
+  const { combinations, colors, types, pack_size } = options
 
   const t = useTranslations("vacuumConfigurator")
   const locale = useLocale()
   const money = (amount: number, currency_code: string) =>
     convertToLocale({ amount, currency_code, locale: LOCALE_TAG[locale] ?? "de-DE" })
 
-  // ─── Cascading value helpers (color → thickness → width → height) ──────────
+  // Localized type name/description (keyed by slug), falling back to the DB value
+  // (German) for locales without an override.
+  const messages = useMessages() as any
+  const typeInfo = messages?.vacuumConfigurator?.typeInfo ?? {}
+  const typeLabel = (slug?: string | null, fallback?: string | null) =>
+    typeInfo[slug ?? ""]?.name ?? fallback ?? ""
+  const typeDesc = (slug?: string | null, fallback?: string | null) =>
+    typeInfo[slug ?? ""]?.desc ?? fallback ?? ""
+
+  // ─── Cascading value helpers (type → width → height). Colour is cosmetic and
+  //     does not affect availability or price. ────────────────────────────────
   const uniqSorted = (arr: number[]) => [...new Set(arr)].sort((a, b) => a - b)
-  const thicknessesFor = (color: string) =>
-    uniqSorted(combinations.filter((c) => c.color === color).map((c) => c.thickness_um))
-  const widthsFor = (color: string, um: number) =>
+  const widthsFor = (type: string) =>
+    uniqSorted(combinations.filter((c) => c.type === type).map((c) => c.width_mm))
+  const heightsFor = (type: string, w: number) =>
     uniqSorted(
       combinations
-        .filter((c) => c.color === color && c.thickness_um === um)
-        .map((c) => c.width_mm)
-    )
-  const heightsFor = (color: string, um: number, w: number) =>
-    uniqSorted(
-      combinations
-        .filter(
-          (c) => c.color === color && c.thickness_um === um && c.width_mm === w
-        )
+        .filter((c) => c.type === type && c.width_mm === w)
         .map((c) => c.height_mm)
     )
 
@@ -68,13 +72,13 @@ export default function VacuumBagConfigurator({
   const normalize = (desired: Selection): Selection => {
     const color =
       colors.find((c) => c.slug === desired.color)?.slug ?? colors[0]?.slug ?? ""
-    const ths = thicknessesFor(color)
-    const thickness_um = ths.includes(desired.thickness_um) ? desired.thickness_um : ths[0]
-    const ws = widthsFor(color, thickness_um)
+    const type =
+      types.find((ty) => ty.slug === desired.type)?.slug ?? types[0]?.slug ?? ""
+    const ws = widthsFor(type)
     const width_mm = ws.includes(desired.width_mm) ? desired.width_mm : ws[0]
-    const hs = heightsFor(color, thickness_um, width_mm)
+    const hs = heightsFor(type, width_mm)
     const height_mm = hs.includes(desired.height_mm) ? desired.height_mm : hs[0]
-    return { color, thickness_um, width_mm, height_mm }
+    return { color, type, width_mm, height_mm }
   }
 
   const initialColor =
@@ -82,11 +86,16 @@ export default function VacuumBagConfigurator({
     colors.find((c) => c.is_default)?.slug ??
     colors[0]?.slug ??
     ""
+  const initialType =
+    types.find((ty) => ty.slug === options.default_type)?.slug ??
+    types.find((ty) => ty.is_default)?.slug ??
+    types[0]?.slug ??
+    ""
 
   const [sel, setSel] = useState<Selection>(() =>
     normalize({
       color: initialColor,
-      thickness_um: NaN,
+      type: initialType,
       width_mm: NaN,
       height_mm: NaN,
     })
@@ -104,17 +113,15 @@ export default function VacuumBagConfigurator({
   }
 
   // Dropdown value lists for the current selection.
-  const thicknessOptions = thicknessesFor(sel.color)
-  const widthOptions = widthsFor(sel.color, sel.thickness_um)
-  const heightOptions = heightsFor(sel.color, sel.thickness_um, sel.width_mm)
+  const widthOptions = widthsFor(sel.type)
+  const heightOptions = heightsFor(sel.type, sel.width_mm)
 
-  // Exact price row for the (normalized → always valid) selection.
+  // Exact price row (colour-independent) for the normalized selection.
   const priceRow = useMemo(
     () =>
       combinations.find(
         (c) =>
-          c.color === sel.color &&
-          c.thickness_um === sel.thickness_um &&
+          c.type === sel.type &&
           c.width_mm === sel.width_mm &&
           c.height_mm === sel.height_mm
       ),
@@ -122,8 +129,21 @@ export default function VacuumBagConfigurator({
   )
 
   const selectedColor = colors.find((c) => c.slug === sel.color)
-  const previewColor = colors.find((c) => c.slug === hoverColor) ?? selectedColor
-  const mainImage = previewColor?.image_url ?? baseImage ?? null
+  const selectedType = types.find((ty) => ty.slug === sel.type)
+  const hoveredColor = colors.find((c) => c.slug === hoverColor)
+
+  // Image precedence: a hovered swatch wins; then a chosen coloured film; then the
+  // type photo (glatt/geprägt); then Transparent's own photo; then the base image.
+  const mainImage =
+    hoveredColor?.image_url ??
+    (selectedColor && !isTransparent(selectedColor.slug)
+      ? selectedColor.image_url
+      : null) ??
+    selectedType?.image_url ??
+    selectedColor?.image_url ??
+    baseImage ??
+    null
+  const previewName = hoveredColor?.name ?? selectedColor?.name ?? ""
 
   const handleAdd = async () => {
     if (!priceRow) return
@@ -131,7 +151,7 @@ export default function VacuumBagConfigurator({
     setError(null)
     const res = await addVacuumBagToCart({
       color: sel.color,
-      thickness_um: sel.thickness_um,
+      type: sel.type,
       width_mm: sel.width_mm,
       height_mm: sel.height_mm,
       quantity,
@@ -156,7 +176,7 @@ export default function VacuumBagConfigurator({
         {mainImage ? (
           <Image
             src={mainImage}
-            alt={t("imageAlt", { color: previewColor?.name ?? "" })}
+            alt={t("imageAlt", { color: previewName })}
             fill
             sizes="(min-width: 768px) 40vw, 90vw"
             className="object-contain p-6 transition-opacity duration-200"
@@ -164,7 +184,7 @@ export default function VacuumBagConfigurator({
         ) : (
           <div
             className="w-2/3 h-2/3 rounded-lg border border-ui-border-base"
-            style={{ backgroundColor: previewColor?.hex ?? "#e5e7eb" }}
+            style={{ backgroundColor: selectedColor?.hex ?? "#e5e7eb" }}
             aria-hidden
           />
         )}
@@ -202,23 +222,48 @@ export default function VacuumBagConfigurator({
           </div>
         </div>
 
-        {/* Stärke / Breite / Höhe */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Typ (product line) + Menge */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-ui-fg-base">{t("thickness")}</span>
+            <span className="text-sm font-medium text-ui-fg-base">{t("type")}</span>
             <select
               className={selectClass}
-              value={sel.thickness_um}
-              onChange={(e) => update({ thickness_um: Number(e.target.value) })}
+              value={sel.type}
+              onChange={(e) => update({ type: e.target.value })}
             >
-              {thicknessOptions.map((t) => (
-                <option key={t} value={t}>
-                  {t} µm
+              {types.map((ty) => (
+                <option key={ty.slug} value={ty.slug}>
+                  {typeLabel(ty.slug, ty.name)}
                 </option>
               ))}
             </select>
+            {typeDesc(selectedType?.slug, selectedType?.description) && (
+              <span className="text-xs text-ui-fg-subtle">
+                {typeDesc(selectedType?.slug, selectedType?.description)}
+              </span>
+            )}
           </label>
 
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-ui-fg-base">
+              {t("quantityLabel", { packSize: pack_size })}
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={1000}
+              value={quantity}
+              onChange={(e) => {
+                setAdded(false)
+                setQuantity(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))
+              }}
+              className={selectClass}
+            />
+          </label>
+        </div>
+
+        {/* Breite + Höhe */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-ui-fg-base">{t("width")}</span>
             <select
@@ -249,24 +294,6 @@ export default function VacuumBagConfigurator({
             </select>
           </label>
         </div>
-
-        {/* Menge (packs) */}
-        <label className="flex flex-col gap-1 max-w-[10rem]">
-          <span className="text-sm font-medium text-ui-fg-base">
-            {t("quantityLabel", { packSize: pack_size })}
-          </span>
-          <input
-            type="number"
-            min={1}
-            max={1000}
-            value={quantity}
-            onChange={(e) => {
-              setAdded(false)
-              setQuantity(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))
-            }}
-            className={selectClass}
-          />
-        </label>
 
         {/* Price */}
         <div className="flex flex-col gap-0.5 border-t border-ui-border-base pt-4">

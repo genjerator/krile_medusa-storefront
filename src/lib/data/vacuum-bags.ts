@@ -13,8 +13,18 @@ export type VacuumBagColor = {
   is_default: boolean
 }
 
+export type VacuumBagType = {
+  slug: string
+  name: string
+  thickness_um: number
+  description: string | null
+  image_url: string | null
+  is_default: boolean
+}
+
+// Colour is cosmetic — price depends only on (type, width, height).
 export type VacuumBagCombination = {
-  color: string
+  type: string
   thickness_um: number
   width_mm: number
   height_mm: number
@@ -25,8 +35,9 @@ export type VacuumBagCombination = {
 export type VacuumBagOptions = {
   pack_size: number
   default_color: string | null
+  default_type: string | null
   colors: VacuumBagColor[]
-  thicknesses: number[]
+  types: VacuumBagType[]
   widths: number[]
   heights: number[]
   combinations: VacuumBagCombination[]
@@ -58,14 +69,14 @@ export async function getVacuumBagOptions(): Promise<VacuumBagOptions | null> {
  */
 export async function addVacuumBagToCart({
   color,
-  thickness_um,
+  type,
   width_mm,
   height_mm,
   quantity,
   countryCode,
 }: {
   color: string
-  thickness_um: number
+  type: string
   width_mm: number
   height_mm: number
   quantity: number
@@ -86,7 +97,7 @@ export async function addVacuumBagToCart({
       body: {
         cart_id: cart.id,
         color,
-        thickness_um,
+        type,
         width_mm,
         height_mm,
         quantity,

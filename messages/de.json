@@ -210,11 +210,38 @@
   },
   "vacuumConfigurator": {
     "metaTitle": "Vakuumiertüten konfigurieren",
-    "metaDescription": "Vakuumiertüten nach Maß: Farbe, Stärke, Breite und Höhe wählen und direkt bestellen.",
+    "metaDescription": "Vakuumiertüten nach Maß: Farbe, Ausführung, Breite und Höhe wählen und direkt bestellen.",
     "heading": "Vakuumiertüten nach Maß",
-    "intro": "Stellen Sie Ihre Vakuumiertüten individuell zusammen: Wählen Sie Farbe, Stärke sowie Breite und Höhe. Der Preis wird sofort für die gewählte Kombination angezeigt. Verkauf erfolgt in Packungen.",
+    "intro": "Stellen Sie Ihre Vakuumiertüten individuell zusammen: Wählen Sie Farbe, Ausführung sowie Breite und Höhe. Der Preis wird sofort für die gewählte Kombination angezeigt. Verkauf erfolgt in Packungen.",
     "unavailable": "Der Konfigurator ist derzeit nicht verfügbar. Bitte kontaktieren Sie uns für ein Angebot.",
     "color": "Farbe",
+    "type": "Ausführung",
+    "typeInfo": {
+      "std-90": {
+        "name": "Standard glatt 90 µm",
+        "desc": "Glatte PA/PE-Siegelrandbeutel (EasyVac PRO) für Kammer-Vakuumierer."
+      },
+      "std-120": {
+        "name": "Standard glatt 120 µm",
+        "desc": "Stärkere glatte PA/PE-Beutel (120 µm) für schwere oder kantige Produkte."
+      },
+      "gepraegt": {
+        "name": "Strukturiert / Geprägt 90 µm",
+        "desc": "Geprägte Beutel (Combifresh) für Balken- und Außen-Vakuumierer ohne Kammer."
+      },
+      "koch": {
+        "name": "Kochbeutel 90 µm",
+        "desc": "Koch- / Sous-vide-Beutel (SF 90), hitzebeständig bis 121 °C (max. 4 h), glatt."
+      },
+      "koch-gepraegt": {
+        "name": "Kochbeutel geprägt 90 µm",
+        "desc": "Geprägte Koch- / Sous-vide-Beutel, bis 121 °C, für Balken-Vakuumierer."
+      },
+      "recyclebar": {
+        "name": "Recyclebar MONO-PE 85 µm",
+        "desc": "Recycelbarer Mono-PE-Beutel (CombiNext) — für die Wertstoffsammlung geeignet."
+      }
+    },
     "thickness": "Stärke",
     "width": "Breite",
     "height": "Höhe",
