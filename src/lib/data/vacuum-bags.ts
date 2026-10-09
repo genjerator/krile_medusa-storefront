@@ -22,8 +22,10 @@ export type VacuumBagType = {
   is_default: boolean
 }
 
-// Colour is cosmetic — price depends only on (type, width, height).
+// Each row is a full (colour, type, width, height) → price. Transparent spans the
+// whole matrix; other colours only their specific rows.
 export type VacuumBagCombination = {
+  color: string
   type: string
   thickness_um: number
   width_mm: number
@@ -32,8 +34,16 @@ export type VacuumBagCombination = {
   currency_code: string
 }
 
+export type VacuumBagSmallPack = {
+  size: number // e.g. 100
+  divisor: number // base_pack_size / size (e.g. 10)
+  surcharge: number // multiplier applied after the divide (e.g. 1.7325 = +5% then +65%)
+}
+
 export type VacuumBagOptions = {
-  pack_size: number
+  pack_size: number // base pack (matrix price is per this many Stück), e.g. 1000
+  pack_sizes?: number[] // selectable pack sizes, e.g. [1000, 100]
+  small_pack?: VacuumBagSmallPack // how the small pack price is derived from the base
   default_color: string | null
   default_type: string | null
   colors: VacuumBagColor[]
@@ -73,6 +83,7 @@ export async function addVacuumBagToCart({
   width_mm,
   height_mm,
   quantity,
+  pack_size,
   countryCode,
 }: {
   color: string
@@ -80,6 +91,7 @@ export async function addVacuumBagToCart({
   width_mm: number
   height_mm: number
   quantity: number
+  pack_size?: number
   countryCode: string
 }): Promise<{ success: boolean; message?: string }> {
   const cart = await getOrSetCart(countryCode)
@@ -101,6 +113,7 @@ export async function addVacuumBagToCart({
         width_mm,
         height_mm,
         quantity,
+        pack_size,
       },
       headers,
     })

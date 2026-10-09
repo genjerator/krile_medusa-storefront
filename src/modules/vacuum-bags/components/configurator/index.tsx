@@ -31,6 +31,8 @@ const LOCALE_TAG: Record<string, string> = {
 
 const isTransparent = (slug?: string | null) => !slug || slug === "transparent"
 
+const round2 = (n: number) => Math.round(n * 100) / 100
+
 export default function VacuumBagConfigurator({
   options,
   countryCode,
@@ -40,7 +42,9 @@ export default function VacuumBagConfigurator({
   countryCode: string
   baseImage?: string | null
 }) {
-  const { combinations, colors, types, pack_size } = options
+  const { combinations, colors, types, pack_size, pack_sizes, small_pack } = options
+  // Selectable pack sizes (base first, e.g. [1000, 100]); base is the default.
+  const packSizes = pack_sizes?.length ? pack_sizes : [pack_size]
 
   const t = useTranslations("vacuumConfigurator")
   const locale = useLocale()
@@ -56,27 +60,36 @@ export default function VacuumBagConfigurator({
   const typeDesc = (slug?: string | null, fallback?: string | null) =>
     typeInfo[slug ?? ""]?.desc ?? fallback ?? ""
 
-  // ─── Cascading value helpers (type → width → height). Colour is cosmetic and
-  //     does not affect availability or price. ────────────────────────────────
-  const uniqSorted = (arr: number[]) => [...new Set(arr)].sort((a, b) => a - b)
-  const widthsFor = (type: string) =>
-    uniqSorted(combinations.filter((c) => c.type === type).map((c) => c.width_mm))
-  const heightsFor = (type: string, w: number) =>
+  // ─── Cascading value helpers (colour → type → width → height). Availability and
+  //     price now depend on the colour: Transparent spans the whole matrix, other
+  //     colours only their specific rows; a colour with no rows is "coming soon". ──
+  const uniq = (arr: string[]) => Array.from(new Set(arr))
+  const uniqSorted = (arr: number[]) => Array.from(new Set(arr)).sort((a, b) => a - b)
+  const combosFor = (color: string) => combinations.filter((c) => c.color === color)
+  const typesFor = (color: string) => uniq(combosFor(color).map((c) => c.type))
+  const widthsFor = (color: string, type: string) =>
+    uniqSorted(combosFor(color).filter((c) => c.type === type).map((c) => c.width_mm))
+  const heightsFor = (color: string, type: string, w: number) =>
     uniqSorted(
-      combinations
+      combosFor(color)
         .filter((c) => c.type === type && c.width_mm === w)
         .map((c) => c.height_mm)
     )
 
-  /** Clamp a desired selection to a fully-valid one (no dead-ends). */
+  /** Clamp a desired selection to a fully-valid one for its colour (no dead-ends).
+   *  A colour with no priced rows keeps the other fields as-is (price row is null → UI
+   *  shows "coming soon"). */
   const normalize = (desired: Selection): Selection => {
     const color =
       colors.find((c) => c.slug === desired.color)?.slug ?? colors[0]?.slug ?? ""
-    const type =
-      types.find((ty) => ty.slug === desired.type)?.slug ?? types[0]?.slug ?? ""
-    const ws = widthsFor(type)
+    const ts = typesFor(color)
+    if (ts.length === 0) {
+      return { color, type: desired.type, width_mm: desired.width_mm, height_mm: desired.height_mm }
+    }
+    const type = ts.includes(desired.type) ? desired.type : ts[0]
+    const ws = widthsFor(color, type)
     const width_mm = ws.includes(desired.width_mm) ? desired.width_mm : ws[0]
-    const hs = heightsFor(type, width_mm)
+    const hs = heightsFor(color, type, width_mm)
     const height_mm = hs.includes(desired.height_mm) ? desired.height_mm : hs[0]
     return { color, type, width_mm, height_mm }
   }
@@ -101,6 +114,8 @@ export default function VacuumBagConfigurator({
     })
   )
   const [quantity, setQuantity] = useState(1)
+  // Pack size (Stück per pack). Base pack (e.g. 1000) is the default.
+  const [packSize, setPackSize] = useState<number>(pack_size)
   const [hoverColor, setHoverColor] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
   const [added, setAdded] = useState(false)
@@ -112,15 +127,19 @@ export default function VacuumBagConfigurator({
     setSel((prev) => normalize({ ...prev, ...patch }))
   }
 
-  // Dropdown value lists for the current selection.
-  const widthOptions = widthsFor(sel.type)
-  const heightOptions = heightsFor(sel.type, sel.width_mm)
+  // Dropdown value lists for the current colour + selection.
+  const typeOptions = typesFor(sel.color) // type slugs available for this colour
+  const widthOptions = widthsFor(sel.color, sel.type)
+  const heightOptions = heightsFor(sel.color, sel.type, sel.width_mm)
+  // Is the selected colour actually sold? If not → "coming soon".
+  const colorHasOptions = typeOptions.length > 0
 
-  // Exact price row (colour-independent) for the normalized selection.
+  // Exact price row (colour + type + width + height) for the normalized selection.
   const priceRow = useMemo(
     () =>
       combinations.find(
         (c) =>
+          c.color === sel.color &&
           c.type === sel.type &&
           c.width_mm === sel.width_mm &&
           c.height_mm === sel.height_mm
@@ -128,8 +147,14 @@ export default function VacuumBagConfigurator({
     [combinations, sel]
   )
 
+  const typeBySlug = useMemo(() => {
+    const m = new Map<string, (typeof types)[number]>()
+    for (const ty of types) m.set(ty.slug, ty)
+    return m
+  }, [types])
+
   const selectedColor = colors.find((c) => c.slug === sel.color)
-  const selectedType = types.find((ty) => ty.slug === sel.type)
+  const selectedType = typeBySlug.get(sel.type)
   const hoveredColor = colors.find((c) => c.slug === hoverColor)
 
   // Image precedence: a hovered swatch wins; then a chosen coloured film; then the
@@ -155,6 +180,7 @@ export default function VacuumBagConfigurator({
       width_mm: sel.width_mm,
       height_mm: sel.height_mm,
       quantity,
+      pack_size: packSize,
       countryCode,
     })
     setAdding(false)
@@ -166,7 +192,13 @@ export default function VacuumBagConfigurator({
   }
 
   const currency = priceRow?.currency_code ?? "eur"
-  const unitPrice = priceRow?.price ?? 0
+  // Matrix price is per base pack (e.g. 1000). The small pack (e.g. 100) is derived
+  // from it with the same formula the backend charges (base / divisor × surcharge).
+  const basePackPrice = priceRow?.price ?? 0
+  const unitPrice =
+    small_pack && packSize === small_pack.size
+      ? round2((basePackPrice / small_pack.divisor) * small_pack.surcharge)
+      : basePackPrice
   const totalPrice = unitPrice * quantity
 
   return (
@@ -222,6 +254,18 @@ export default function VacuumBagConfigurator({
           </div>
         </div>
 
+        {/* Colour not sold yet → "coming soon" instead of the options/price. */}
+        {!colorHasOptions && (
+          <div className="rounded-base border border-ui-border-base bg-ui-bg-subtle px-4 py-6 text-sm">
+            <p className="font-medium text-ui-fg-base">{selectedColor?.name}: bald verfügbar</p>
+            <p className="text-ui-fg-subtle mt-1">
+              Diese Farbe ist in Kürze bestellbar. Bitte wählen Sie vorerst eine andere Farbe.
+            </p>
+          </div>
+        )}
+
+        {colorHasOptions && (
+          <>
         {/* Typ (product line) + Menge */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
           <label className="flex flex-col gap-1">
@@ -231,11 +275,14 @@ export default function VacuumBagConfigurator({
               value={sel.type}
               onChange={(e) => update({ type: e.target.value })}
             >
-              {types.map((ty) => (
-                <option key={ty.slug} value={ty.slug}>
-                  {typeLabel(ty.slug, ty.name)}
-                </option>
-              ))}
+              {typeOptions.map((slug) => {
+                const ty = typeBySlug.get(slug)
+                return (
+                  <option key={slug} value={slug}>
+                    {typeLabel(slug, ty?.name)}
+                  </option>
+                )
+              })}
             </select>
             {typeDesc(selectedType?.slug, selectedType?.description) && (
               <span className="text-xs text-ui-fg-subtle">
@@ -246,7 +293,7 @@ export default function VacuumBagConfigurator({
 
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-ui-fg-base">
-              {t("quantityLabel", { packSize: pack_size })}
+              {t("quantityLabel", { packSize })}
             </span>
             <input
               type="number"
@@ -295,6 +342,41 @@ export default function VacuumBagConfigurator({
           </label>
         </div>
 
+        {/* Packungsgröße — radio buttons (both visible), base pack default */}
+        {packSizes.length > 1 && (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ui-fg-base">Packungsgröße</span>
+            <div className="flex flex-wrap gap-3">
+              {packSizes.map((ps) => {
+                const isSel = ps === packSize
+                return (
+                  <label
+                    key={ps}
+                    className={`flex items-center gap-2 rounded-base border px-3 py-2 text-sm cursor-pointer transition ${
+                      isSel
+                        ? "border-brand-navy ring-2 ring-brand-navy/30"
+                        : "border-ui-border-base hover:border-ui-border-interactive"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="pack-size"
+                      value={ps}
+                      checked={isSel}
+                      onChange={() => {
+                        setAdded(false)
+                        setPackSize(ps)
+                      }}
+                      className="accent-brand-navy"
+                    />
+                    <span>{ps.toLocaleString(LOCALE_TAG[locale] ?? "de-DE")} Stück</span>
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Price */}
         <div className="flex flex-col gap-0.5 border-t border-ui-border-base pt-4">
           {priceRow ? (
@@ -303,7 +385,7 @@ export default function VacuumBagConfigurator({
                 {money(totalPrice, currency)}
               </span>
               <span className="text-sm text-ui-fg-subtle">
-                {money(unitPrice, currency)} {t("perPack", { packSize: pack_size })}
+                {money(unitPrice, currency)} {t("perPack", { packSize })}
                 {quantity > 1 ? ` ${t("packsSuffix", { quantity })}` : ""}
               </span>
             </>
@@ -338,6 +420,8 @@ export default function VacuumBagConfigurator({
           </div>
         )}
         {error && <span className="text-sm text-red-600">{error}</span>}
+          </>
+        )}
       </div>
     </div>
   )

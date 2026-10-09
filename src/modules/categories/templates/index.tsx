@@ -12,6 +12,10 @@ import SearchBox from "@modules/store/components/search-box"
 import { descriptionToHtml } from "@lib/util/description-html"
 import { getSectionComponent } from "@modules/categories/templates/sections"
 import SubcategoryCards from "@modules/categories/components/subcategory-cards"
+import VakuumiertutenConfiguratorSection from "@modules/categories/templates/sections/vakuumiertuten-configurator"
+
+// Categories that render a custom tool instead of the product grid.
+const CONFIGURATOR_CATEGORY_HANDLES = new Set(["vakuumiertuten-rollen"])
 
 // Optional override: on these parent categories, show only this curated set
 // of subcategory cards (in the given order) instead of all children. Any
@@ -97,6 +101,9 @@ export default function CategoryTemplate({
   const TopSection = getSectionComponent(topBlockKey)
   const topLocale = countryCode.slice(0, 2).toLowerCase()
 
+  // This category shows the vacuum-bag configurator instead of a product grid.
+  const isConfigurator = CONFIGURATOR_CATEGORY_HANDLES.has(category.handle)
+
   return (
     <div>
       {/* Header banner */}
@@ -106,16 +113,18 @@ export default function CategoryTemplate({
             <h1 className="text-2xl medium:text-4xl font-bold">
               {category.name}
             </h1>
-            <Suspense fallback={null}>
-              <ProductCount
-                sortBy={sort}
-                page={pageNumber}
-                countryCode={countryCode}
-                categoryId={categoryIds}
-                q={q}
-                className="text-white/70 text-base font-normal"
-              />
-            </Suspense>
+            {!isConfigurator && (
+              <Suspense fallback={null}>
+                <ProductCount
+                  sortBy={sort}
+                  page={pageNumber}
+                  countryCode={countryCode}
+                  categoryId={categoryIds}
+                  q={q}
+                  className="text-white/70 text-base font-normal"
+                />
+              </Suspense>
+            )}
           </div>
           {category.description && (
             <p className="text-white/70 text-sm leading-relaxed mb-4">
@@ -149,14 +158,16 @@ export default function CategoryTemplate({
                 <span className="text-white/90 font-medium">{category.name}</span>
               </nav>
             </div>
-            <div className="flex items-center gap-4 flex-wrap">
-              <Suspense fallback={null}>
-                <SearchBox />
-              </Suspense>
-              <Suspense fallback={null}>
-                <SortSelect sortBy={sort} />
-              </Suspense>
-            </div>
+            {!isConfigurator && (
+              <div className="flex items-center gap-4 flex-wrap">
+                <Suspense fallback={null}>
+                  <SearchBox />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <SortSelect sortBy={sort} />
+                </Suspense>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -169,8 +180,14 @@ export default function CategoryTemplate({
 
         {/* Main layout */}
         <div className="flex flex-col medium:flex-row gap-6 medium:gap-8">
-          {/* Products grid — below categories on mobile */}
+          {/* Products grid — below categories on mobile. For configurator
+              categories this area shows the configurator instead of the grid. */}
           <div className="flex-1 min-w-0 order-2">
+            {isConfigurator ? (
+              <Suspense fallback={<SkeletonProductGrid numberOfProducts={1} />}>
+                <VakuumiertutenConfiguratorSection countryCode={countryCode} />
+              </Suspense>
+            ) : (
             <Suspense fallback={<SkeletonProductGrid numberOfProducts={category.products?.length ?? 8} />}>
               {/* Optional content pinned above the products (admin-managed via the
           category's `content_block_top` metadata key). A `section-*` value
@@ -196,6 +213,7 @@ export default function CategoryTemplate({
                 q={q}
               />
             </Suspense>
+            )}
           </div>
 
           {/* Sidebar — between blue bar and grid on mobile, left on desktop */}
