@@ -32,9 +32,11 @@ const AUTOPLAY_MS = 6000
 export default function HeroV2({
   showKemptenFestBanner = false,
   showHolidayBanner = false,
+  showOberschwabenschauBanner = false,
 }: {
   showKemptenFestBanner?: boolean
   showHolidayBanner?: boolean
+  showOberschwabenschauBanner?: boolean
 } = {}) {
   const t = useTranslations("heroV2")
   const [current, setCurrent] = useState(0)
@@ -70,8 +72,22 @@ export default function HeroV2({
         onTouchEnd={onTouchEnd}
       >
         {/* Announcement banners — overlaid on top of the slider */}
-        {(showKemptenFestBanner || showHolidayBanner) && (
+        {(showKemptenFestBanner || showHolidayBanner || showOberschwabenschauBanner) && (
           <div className="absolute top-0 inset-x-0 z-30 flex flex-col">
+            {showOberschwabenschauBanner && (
+              <div className="bg-[#8fb140]/95 backdrop-blur-sm text-[#19260a] text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
+                <span className="text-xs small:text-sm font-semibold">
+                  Besuchen Sie uns auf der Oberschwabenschau Ravensburg — 14. bis 18.10.2026.
+                </span>
+                <a
+                  href="#oberschwabenschau"
+                  onClick={(e) => onBannerLinkClick(e, "#oberschwabenschau")}
+                  className="text-xs small:text-sm font-bold underline underline-offset-2 hover:no-underline whitespace-nowrap"
+                >
+                  Mehr erfahren →
+                </a>
+              </div>
+            )}
             {showKemptenFestBanner && (
               <div className="bg-[#dc2626]/95 backdrop-blur-sm text-white text-center px-4 py-2 small:py-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5">
                 <span className="text-xs small:text-sm font-medium">

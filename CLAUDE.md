@@ -25,12 +25,21 @@ Connection string (local dev defaults, from the backend's `.env`):
 `postgres://postgres:postgres@localhost:5432/medusa-v2`
 
 Run backend scripts from the backend dir with `npx medusa exec ./src/scripts/<file>.ts`.
-## Storefront diary
+## Client change diary (REQUIRED after every commit)
 
-Changes in this repo are logged to a shared diary in the backend repo:
-`/Users/genjerator/Projects/krile_medusa/storefront-diary.md`. A git
-`post-commit` hook here auto-appends a factual entry on every commit.
-**After you (Claude) create a commit in this repo during a session, enrich the
-just-added diary entry** with a short paragraph on the *why*, notable decisions,
-and follow-ups. Keep the auto-generated factual lines; append context below them.
-Do not rewrite older entries.
+There is a **human-friendly diary for the client** at the absolute path
+`/Users/genjerator/Projects/storefront-diary.md` (the parent `Projects` folder).
+**Whenever you (Claude) create a commit in this repo during a session, immediately
+add a plain-language entry to that client diary** under today's date
+(`## <Month Day, Year>`) in the **### Krile Online Shop** subsection. If today's
+date heading already exists, append bullets under that subsection instead of making
+a new date. Write for a non-technical client: describe the user-facing effect, no
+jargon, no commit hashes, no file names. Newest dates at the bottom; never rewrite
+past entries.
+
+**Every** commit in this repo must result in a client-diary entry — including
+commits made directly in the terminal, not only ones Claude makes. A separate raw
+commit log inside the backend repo is auto-maintained by a git `post-commit` hook
+and captures terminal commits too; near the start of a session (or when asked),
+reconcile the client diary against `git log` and fill any missing days (skip purely
+technical commits with no user-facing effect).

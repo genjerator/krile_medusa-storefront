@@ -4,8 +4,10 @@ import CategoryCards from "@modules/home/components/category-cards"
 import Benefits from "@modules/home/components/benefits"
 import FeaturedFour from "@modules/home/components/featured-four"
 import HolidayNotice from "@modules/home/components/holiday-notice"
+import OberschwabenschauNotice from "@modules/home/components/oberschwabenschau-notice"
 import { getRegion } from "@lib/data/regions"
 import { isCollectiveHolidayActive } from "@lib/util/holiday"
+import { isOberschwabenschauActive } from "@lib/util/oberschwabenschau"
 
 export const metadata: Metadata = {
   title: "Vakuumverpackungsmaschinen für die Industrie",
@@ -39,13 +41,18 @@ export default async function Home(props: {
   if (!region) return null
 
   const isHoliday = isCollectiveHolidayActive()
+  const isOberschwabenschau = isOberschwabenschauActive()
 
   return (
     <>
-      <HeroV2 showHolidayBanner={isHoliday} />
+      <HeroV2
+        showHolidayBanner={isHoliday}
+        showOberschwabenschauBanner={isOberschwabenschau}
+      />
       <CategoryCards />
       <Benefits />
       {isHoliday && <HolidayNotice />}
+      {isOberschwabenschau && <OberschwabenschauNotice />}
       <FeaturedFour />
     </>
   )
