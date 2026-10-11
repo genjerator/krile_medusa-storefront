@@ -104,6 +104,24 @@ export default function CategoryTemplate({
   // This category shows the vacuum-bag configurator instead of a product grid.
   const isConfigurator = CONFIGURATOR_CATEGORY_HANDLES.has(category.handle)
 
+  // Optional CMS/section content (admin-managed via the category's
+  // `content_block_top` metadata key). A `section-*` value renders a code-driven
+  // section template; any other value renders the DB content block's HTML.
+  // Placement: on configurator pages it renders BELOW the configurator (e.g. the
+  // vacuum-bag accordion); on normal category pages it stays ABOVE the grid.
+  const topContent = TopSection ? (
+    <div className="py-8">
+      <TopSection locale={topLocale} />
+    </div>
+  ) : topBlockHtml ? (
+    <div className="py-8">
+      <div
+        className="max-w-3xl text-ui-fg-base [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:underline [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:font-semibold [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-ui-border-base [&_th]:bg-ui-bg-subtle [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-ui-border-base [&_td]:px-3 [&_td]:py-2 [&_td]:align-top"
+        dangerouslySetInnerHTML={{ __html: descriptionToHtml(topBlockHtml) }}
+      />
+    </div>
+  ) : null
+
   return (
     <div>
       {/* Header banner */}
@@ -184,35 +202,28 @@ export default function CategoryTemplate({
               categories this area shows the configurator instead of the grid. */}
           <div className="flex-1 min-w-0 order-2">
             {isConfigurator ? (
-              <Suspense fallback={<SkeletonProductGrid numberOfProducts={1} />}>
-                <VakuumiertutenConfiguratorSection countryCode={countryCode} />
-              </Suspense>
+              <>
+                {/* Configurator replaces the grid; the section content (accordion)
+                    renders BELOW it. */}
+                <Suspense fallback={<SkeletonProductGrid numberOfProducts={1} />}>
+                  <VakuumiertutenConfiguratorSection countryCode={countryCode} />
+                </Suspense>
+                {topContent}
+              </>
             ) : (
-            <Suspense fallback={<SkeletonProductGrid numberOfProducts={category.products?.length ?? 8} />}>
-              {/* Optional content pinned above the products (admin-managed via the
-          category's `content_block_top` metadata key). A `section-*` value
-          renders a code-driven section template; any other value renders the
-          DB content block's HTML. */}
-              {TopSection ? (
-                <div className="py-8">
-                  <TopSection locale={topLocale} />
-                </div>
-              ) : topBlockHtml ? (
-                <div className="py-8">
-                  <div
-                    className="max-w-3xl text-ui-fg-base [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_em]:italic [&_a]:underline [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:font-semibold [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-ui-border-base [&_th]:bg-ui-bg-subtle [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-ui-border-base [&_td]:px-3 [&_td]:py-2 [&_td]:align-top"
-                    dangerouslySetInnerHTML={{ __html: descriptionToHtml(topBlockHtml) }}
+              <>
+                {/* Normal category: section content stays above the product grid. */}
+                {topContent}
+                <Suspense fallback={<SkeletonProductGrid numberOfProducts={category.products?.length ?? 8} />}>
+                  <ProductsGrid
+                    sortBy={sort}
+                    page={pageNumber}
+                    countryCode={countryCode}
+                    categoryId={categoryIds}
+                    q={q}
                   />
-                </div>
-              ) : null}
-              <ProductsGrid
-                sortBy={sort}
-                page={pageNumber}
-                countryCode={countryCode}
-                categoryId={categoryIds}
-                q={q}
-              />
-            </Suspense>
+                </Suspense>
+              </>
             )}
           </div>
 

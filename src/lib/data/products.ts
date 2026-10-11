@@ -13,11 +13,13 @@ export const listProducts = async ({
   queryParams,
   countryCode,
   regionId,
+  skipAuth = false,
 }: {
   pageParam?: number
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductListParams
   countryCode?: string
   regionId?: string
+  skipAuth?: boolean
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -46,9 +48,12 @@ export const listProducts = async ({
     }
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
+  // Skip reading the auth cookie when asked. getAuthHeaders() calls cookies(),
+  // which forces the CALLING route into dynamic rendering. Public, cacheable
+  // pages (e.g. the product detail page) pass skipAuth so they can stay
+  // statically cached (ISR) and avoid hitting Medusa on every request. The
+  // auth header only affects per-customer data, which anonymous pages don't use.
+  const headers = skipAuth ? {} : { ...(await getAuthHeaders()) }
 
   const next = {
     ...(await getCacheOptions("products")),
