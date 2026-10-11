@@ -19,7 +19,11 @@ export const retrieveCustomer =
   async (): Promise<HttpTypes.StoreCustomer | null> => {
     const authHeaders = await getAuthHeaders()
 
-    if (!authHeaders) return null
+    // getAuthHeaders() returns {} (not null) when there is no session cookie, and
+    // {} is truthy — so the old `if (!authHeaders)` never short-circuited, and
+    // every anonymous page load fired a wasted /store/customers/me call (401) to
+    // Medusa. Skip the call entirely unless we actually have an auth token.
+    if (!("authorization" in authHeaders)) return null
 
     const headers = {
       ...authHeaders,
