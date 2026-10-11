@@ -1,9 +1,4 @@
-// Publicly cacheable product page (ISR). The selected variant (?v_id=) is
-// handled entirely client-side (useSearchParams), and the data fetches run
-// anonymously (skipAuth) so no cookies() call forces this route dynamic.
-// Cached HTML is served without touching Medusa. On-demand freshness comes from
-// the backend via /api/revalidate (products tag + layout). Tune the window below.
-export const revalidate = 3600
+export const dynamic = "force-dynamic"
 
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -30,7 +25,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const product = await listProducts({
     countryCode: params.countryCode,
     queryParams: { handle: params.handle },
-    skipAuth: true,
   }).then(({ response }) => response.products[0])
 
   if (!product) notFound()
@@ -57,7 +51,6 @@ export default async function ProductPage(props: Props) {
       handle: params.handle,
       fields: "*categories,*variants,*variants.calculated_price,*images,*options,*options.values,+metadata",
     },
-    skipAuth: true,
   }).then(({ response }) => response.products[0])
 
   if (!product) notFound()
