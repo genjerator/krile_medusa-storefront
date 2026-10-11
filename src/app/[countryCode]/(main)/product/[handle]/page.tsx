@@ -1,4 +1,12 @@
+// The (main) layout reads cookies() (cart/customer), so this route must render
+// dynamically — keep force-dynamic to avoid any static-generation attempt (that
+// caused a 500 previously). But force-dynamic also disables fetch caching by
+// default, which made every request re-fetch from Medusa. fetchCache overrides
+// that for THIS segment so the product data fetch is served from Next's Data
+// Cache (Medusa untouched on repeat hits). Logged-in users carry an auth header,
+// which Next won't cache — so they correctly bypass this.
 export const dynamic = "force-dynamic"
+export const fetchCache = "force-cache"
 
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
