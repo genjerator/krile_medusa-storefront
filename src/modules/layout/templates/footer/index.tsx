@@ -1,16 +1,14 @@
-import { listCategories } from "@lib/data/categories"
 import { Text } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SourceMarker from "@modules/common/components/source-marker"
 
 export default async function Footer() {
-  const productCategories = await listCategories()
-
-  const topLevelCategories = productCategories?.filter(
-    (c) => !c.parent_category
-  ) ?? []
-
+  // NOTE: the footer category list is currently commented out below, so we no
+  // longer fetch categories here. listCategories() pulled ~1.8 MB from Medusa
+  // (it requests *products for every category) on EVERY page render via the
+  // layout — a large, uncacheable, unused call. Re-add a slim fetch (name/handle
+  // only) here if the category list is restored.
   return (
     <footer className="border-t border-ui-border-base w-full">
       <div className="content-container flex flex-col w-full gap-3">

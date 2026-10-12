@@ -75,8 +75,15 @@ export function buildMetadata({
     ogUrl = `${getBaseURL()}${localePath(canonicalLocale)}`
   }
 
+  // Keep the <title> within the ~70-char limit search engines recommend. Append
+  // the " | Planeta Industries" brand suffix only when the result still fits;
+  // otherwise use the bare title. `absolute` bypasses the root layout's
+  // "%s | Planeta Industries" template so the suffix is never added twice.
+  const brandedTitle = `${title} | ${SITE_NAME}`
+  const metaTitle = brandedTitle.length <= 70 ? brandedTitle : title
+
   return {
-    title,
+    title: { absolute: metaTitle },
     description,
     ...(alternates ? { alternates } : {}),
     openGraph: {

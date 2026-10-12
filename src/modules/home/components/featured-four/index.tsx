@@ -21,7 +21,6 @@ export default function FeaturedFour() {
   const t = useTranslations("featuredFour")
   const [isDesktop, setIsDesktop] = useState(true)
   const [visibleCount, setVisibleCount] = useState(3)
-  const [preloadVideos, setPreloadVideos] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia(`(min-width: ${SMALL}px)`)
@@ -32,40 +31,6 @@ export default function FeaturedFour() {
     update(mq)
     mq.addEventListener("change", update)
     return () => mq.removeEventListener("change", update)
-  }, [])
-
-  // Start downloading videos in the background only after the page has finished
-  // loading and the browser is idle, so they don't slow down the initial render.
-  useEffect(() => {
-    let idleId: number | undefined
-
-    const startBackgroundLoad = () => {
-      const ric = (window as any).requestIdleCallback as
-        | ((cb: () => void) => number)
-        | undefined
-      if (ric) {
-        idleId = ric(() => setPreloadVideos(true))
-      } else {
-        idleId = window.setTimeout(() => setPreloadVideos(true), 1500)
-      }
-    }
-
-    if (document.readyState === "complete") {
-      startBackgroundLoad()
-    } else {
-      window.addEventListener("load", startBackgroundLoad, { once: true })
-    }
-
-    return () => {
-      window.removeEventListener("load", startBackgroundLoad)
-      const cic = (window as any).cancelIdleCallback as
-        | ((id: number) => void)
-        | undefined
-      if (idleId !== undefined) {
-        if (cic) cic(idleId)
-        else clearTimeout(idleId)
-      }
-    }
   }, [])
 
   const initialCount = isDesktop ? 3 : 1
@@ -91,7 +56,10 @@ export default function FeaturedFour() {
                 poster={video.poster}
                 controls
                 aria-label={video.title}
-                preload={preloadVideos ? "auto" : "none"}
+                // Don't download the video until the user presses play — the poster
+                // shows immediately. Previously these were eagerly preloaded on idle,
+                // pulling tens of MB of customer videos on every homepage visit.
+                preload="none"
                 className="w-full h-full object-cover"
               />
             </ContentBox>
