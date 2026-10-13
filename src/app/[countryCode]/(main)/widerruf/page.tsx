@@ -3,7 +3,8 @@ import LegalPage from "@modules/legal/components/legal-page"
 
 export const metadata: Metadata = {
   title: "Widerrufsbelehrung",
-  description: "Widerrufsrecht für Verbraucher und Muster-Widerrufsformular.",
+  description:
+    "Widerrufsbelehrung von Planeta Industries: Ihr 14-tägiges Widerrufsrecht als Verbraucher, Fristen, Rücksendung und das Muster-Widerrufsformular zum Download.",
 }
 
 export default function WiderrufPage() {

@@ -4,7 +4,7 @@ import LegalPage from "@modules/legal/components/legal-page"
 export const metadata: Metadata = {
   title: "Datenschutzerklärung",
   description:
-    "Informationen zur Verarbeitung personenbezogener Daten auf dieser Website.",
+    "Datenschutzerklärung von Planeta Industries: wie wir personenbezogene Daten verarbeiten, welche Cookies wir nutzen, Ihre Rechte und der Datenschutz-Kontakt.",
 }
 
 export default function DatenschutzPage() {

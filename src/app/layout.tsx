@@ -80,6 +80,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               "logo": "https://www.planetaindustries.de/planeta_logo.png",
               "description": "Hochleistungs-Vakuumverpackungsmaschinen für die Industrieproduktion. Entwickelt für Lebensmittel-, Pharma- und Industrieumgebungen.",
 
+              // Links this Organization to the same company's profiles elsewhere
+              // (social, directories) so search engines merge mentions. Add more
+              // URLs here as you create them (Facebook, LinkedIn, YouTube, …).
+              "sameAs": [
+                "https://www.instagram.com/planeta.deutschland"
+              ],
+
               "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer service",

@@ -3,7 +3,8 @@ import ContactForm from "@modules/contact/components/contact-form"
 
 export const metadata: Metadata = {
   title: "Kontakt",
-  description: "Kontaktieren Sie uns.",
+  description:
+    "Kontaktieren Sie Planeta Industries per Telefon, E-Mail oder Kontaktformular – wir beraten Sie gern zu Vakuumverpackungsmaschinen, Service und Ersatzteilen.",
 }
 
 export default function KontaktPage() {

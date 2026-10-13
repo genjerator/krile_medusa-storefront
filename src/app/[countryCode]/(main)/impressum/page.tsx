@@ -3,7 +3,8 @@ import LegalPage from "@modules/legal/components/legal-page"
 
 export const metadata: Metadata = {
   title: "Impressum",
-  description: "Impressum und Anbieterkennzeichnung.",
+  description:
+    "Impressum und Anbieterkennzeichnung von Planeta Industries: Anschrift, Kontaktdaten, Handelsregister, Umsatzsteuer-ID und verantwortliche Ansprechpartner.",
 }
 
 export default function ImpressumPage() {

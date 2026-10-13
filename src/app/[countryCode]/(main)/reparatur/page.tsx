@@ -3,7 +3,8 @@ import ReparaturForm from "@modules/reparatur/components/reparatur-form"
 
 export const metadata: Metadata = {
   title: "Reparaturformular",
-  description: "Reparaturanfrage online ausfüllen und absenden.",
+  description:
+    "Reparatur-Service von Planeta Industries: Reparaturanfrage online ausfüllen und absenden – schnelle, fachgerechte Instandsetzung Ihrer Geräte und Maschinen.",
 }
 
 export default function ReparaturPage() {

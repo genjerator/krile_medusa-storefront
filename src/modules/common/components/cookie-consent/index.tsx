@@ -6,6 +6,10 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { sdk } from "@lib/config"
 
 const GA_ID = "G-CN1PX0WWDT"
+// Microsoft Clarity project id (heatmaps + session recordings). Get it from
+// clarity.microsoft.com → your project → Settings → "Clarity project id".
+// Loaded only after cookie consent (like GA). Empty string = Clarity disabled.
+const CLARITY_ID = "yx53nx1foq"
 const STORAGE_KEY = "cookie-consent"
 // Ensures the "shown" event is counted once per visitor, not on every re-mount.
 const SHOWN_KEY = "cookie-consent-shown"
@@ -62,6 +66,18 @@ export default function CookieConsent() {
               gtag('config', '${GA_ID}');
             `}
           </Script>
+          {/* Microsoft Clarity — only loaded after consent, and only if an id is set */}
+          {CLARITY_ID && (
+            <Script id="ms-clarity" strategy="afterInteractive">
+              {`
+                (function(c,l,a,r,i,t,y){
+                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "${CLARITY_ID}");
+              `}
+            </Script>
+          )}
         </>
       )}
 

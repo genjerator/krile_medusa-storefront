@@ -3,7 +3,8 @@ import LegalTabs from "./legal-tabs"
 
 export const metadata: Metadata = {
   title: "Informationen",
-  description: "Allgemeine Informationen, Zahlungsmethoden und Bankverbindung von Planeta Industries.",
+  description:
+    "Informationen von Planeta Industries: Zahlungsmethoden, Bankverbindung, Versand- und Lieferbedingungen sowie rechtliche Hinweise rund um Ihre Bestellung.",
 }
 
 export default function InformationsPage() {

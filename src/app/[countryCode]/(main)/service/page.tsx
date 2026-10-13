@@ -3,7 +3,8 @@ import ServiceList from "./service-list"
 
 export const metadata: Metadata = {
   title: "Service",
-  description: "Service",
+  description:
+    "After-Sales-Service von Planeta Industries: Wartung, Reparaturen, Ersatzteile und Remote-Support für Ihre Vakuumverpackungsmaschinen – schnell und zuverlässig.",
 }
 
 export default function ServicePage() {

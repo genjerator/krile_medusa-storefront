@@ -4,7 +4,8 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 export const metadata: Metadata = {
   title: "AGB",
-  description: "Allgemeine Geschäftsbedingungen für Bestellungen im Online-Shop.",
+  description:
+    "Allgemeine Geschäftsbedingungen von Planeta Industries: Bestellung, Preise, Lieferung, Zahlung, Eigentumsvorbehalt, Gewährleistung und Widerruf im Online-Shop.",
 }
 
 export default function AgbPage() {
