@@ -136,7 +136,7 @@ function ArticleCardView({ article, countryCode }: { article: ArticleCard; count
       <div className="mi-cover">
         {article.cover_image ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={article.cover_image} alt={article.title ?? ""} loading="lazy" />
+          <img src={article.cover_image} alt={article.title ?? ""} width={640} height={400} loading="lazy" />
         ) : (
           <div className="channel" />
         )}

@@ -62,7 +62,7 @@ export default async function AuthorPage(props: Props) {
       <header className="flex items-start gap-5">
         {author.photo_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={author.photo_url} alt={author.name} className="w-20 h-20 rounded-full object-cover" />
+          <img src={author.photo_url} alt={author.name} width={80} height={80} className="w-20 h-20 rounded-full object-cover" />
         ) : null}
         <div>
           <h1 className="heading-product text-ui-fg-base">{author.name}</h1>
