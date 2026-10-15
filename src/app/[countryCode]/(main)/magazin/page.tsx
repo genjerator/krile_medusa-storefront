@@ -5,7 +5,10 @@ import { listArticles, type ArticleCard } from "@lib/data/articles"
 
 export const revalidate = 300
 
-type Props = { params: Promise<{ countryCode: string }> }
+type Props = {
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ preview?: string; krile?: string }>
+}
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { countryCode } = await props.params
@@ -66,7 +69,40 @@ const CSS = `
 
 export default async function MagazinIndexPage(props: Props) {
   const { countryCode } = await props.params
-  const { articles } = await listArticles(countryCode, { limit: 24 })
+  const sp = await props.searchParams
+  // Preview mode (?preview=true, also 1/draft, or ?krile=true) lists DRAFT and
+  // not-yet-published articles too, so editors can review them before publishing.
+  const preview =
+    ["true", "1", "draft"].includes(sp?.preview ?? "") || sp?.krile === "true"
+  const isEn = countryCode === "en"
+  const { articles } = await listArticles(countryCode, { limit: 24, preview })
+
+  // Localised page copy: English for /en, German for everything else.
+  const copy = countryCode === "en"
+    ? {
+        title: "Vacuum Packaging, Kitchen & Equipment Guides",
+        sub: "Practical guides, expert tips and interesting stories about vacuum packaging, vacuum machines, food preservation, kitchen equipment and professional solutions from Planeta Industries.",
+        empty: "No articles yet.",
+        topics: [
+          ["Vacuum Packaging & Vacuum Machines", "Articles about vacuum sealing, vacuum packaging machines, vacuum bags, chamber vacuum machines and practical applications."],
+          ["Food Preservation & Storage", "Tips for keeping meat, cheese, vegetables and other foods fresh for longer with vacuum packaging and proper storage."],
+          ["Kitchen Tips & Equipment", "Practical advice about kitchen equipment, food preparation, storage and everyday use of vacuum technology."],
+          ["Professional Vacuum Packaging", "Information about vacuum packaging for restaurants, hotels, food production and other professional applications."],
+          ["Planeta News & Interesting Stories", "News, product stories, technology, films and other interesting topics related to Planeta and vacuum technology."],
+        ],
+      }
+    : {
+        title: "Ratgeber rund um Vakuumieren, Küche & Geräte",
+        sub: "Praktische Ratgeber, Experten-Tipps und interessante Geschichten rund um Vakuumverpackung, Vakuumiergeräte, das Haltbarmachen von Lebensmitteln, Küchenausstattung und professionelle Lösungen von Planeta Industries.",
+        empty: "Noch keine Artikel.",
+        topics: [
+          ["Vakuumverpackung & Vakuumiergeräte", "Artikel über das Vakuumieren, Vakuumier- und Verpackungsmaschinen, Vakuumbeutel, Kammervakuumierer und praktische Anwendungen."],
+          ["Lebensmittel haltbar machen & Lagerung", "Tipps, um Fleisch, Käse, Gemüse und andere Lebensmittel mit Vakuumverpackung und richtiger Lagerung länger frisch zu halten."],
+          ["Küchentipps & Ausstattung", "Praktische Hinweise zu Küchenausstattung, Zubereitung, Lagerung und dem täglichen Einsatz der Vakuumtechnik."],
+          ["Professionelle Vakuumverpackung", "Informationen zur Vakuumverpackung für Restaurants, Hotels, Lebensmittelproduktion und weitere professionelle Anwendungen."],
+          ["Planeta News & Wissenswertes", "Neuigkeiten, Produktgeschichten, Technik, Filme und weitere interessante Themen rund um Planeta und die Vakuumtechnik."],
+        ],
+      }
 
   return (
     <div className="mvh">
@@ -74,50 +110,37 @@ export default async function MagazinIndexPage(props: Props) {
       <div className="mi-wrap">
         <header>
           <span className="mi-eyebrow">Magazin</span>
-          <h1 className="mi-title">Vacuum Packaging, Kitchen &amp; Equipment Guides</h1>
-          <p className="mi-sub">
-            Practical guides, expert tips and interesting stories about vacuum
-            packaging, vacuum machines, food preservation, kitchen equipment and
-            professional solutions from Planeta Industries.
-          </p>
+          <h1 className="mi-title">{copy.title}</h1>
+          <p className="mi-sub">{copy.sub}</p>
         </header>
+
+        {preview ? (
+          <p style={{
+            margin: "0 0 20px", padding: "10px 14px", borderRadius: 6,
+            background: "#FBEFE8", border: "1px solid #E7C3B4", color: "#8A3A24",
+            fontSize: ".95rem", fontWeight: 600,
+          }}>
+            {isEn
+              ? "Preview mode — drafts and scheduled articles are shown."
+              : "Vorschau-Modus — Entwürfe und geplante Artikel werden angezeigt."}
+          </p>
+        ) : null}
 
         <div className="mi-rule" />
 
         {articles.length === 0 ? (
-          <p className="mi-empty">Noch keine Artikel.</p>
+          <p className="mi-empty">{copy.empty}</p>
         ) : (
           <div className="mi-grid">
             {articles.map((a) => (
-              <ArticleCardView key={a.id} article={a} countryCode={countryCode} />
+              <ArticleCardView key={a.id} article={a} countryCode={countryCode} preview={preview} />
             ))}
           </div>
         )}
 
         <div className="mi-rule" />
         <section className="mi-topics">
-          {[
-            [
-              "Vacuum Packaging & Vacuum Machines",
-              "Articles about vacuum sealing, vacuum packaging machines, vacuum bags, chamber vacuum machines and practical applications.",
-            ],
-            [
-              "Food Preservation & Storage",
-              "Tips for keeping meat, cheese, vegetables and other foods fresh for longer with vacuum packaging and proper storage.",
-            ],
-            [
-              "Kitchen Tips & Equipment",
-              "Practical advice about kitchen equipment, food preparation, storage and everyday use of vacuum technology.",
-            ],
-            [
-              "Professional Vacuum Packaging",
-              "Information about vacuum packaging for restaurants, hotels, food production and other professional applications.",
-            ],
-            [
-              "Planeta News & Interesting Stories",
-              "News, product stories, technology, films and other interesting topics related to Planeta and vacuum technology.",
-            ],
-          ].map(([heading, text]) => (
+          {copy.topics.map(([heading, text]) => (
             <div key={heading}>
               <h2>{heading}</h2>
               <p>{text}</p>
@@ -129,11 +152,22 @@ export default async function MagazinIndexPage(props: Props) {
   )
 }
 
-function ArticleCardView({ article, countryCode }: { article: ArticleCard; countryCode: string }) {
+function ArticleCardView({ article, countryCode, preview }: { article: ArticleCard; countryCode: string; preview?: boolean }) {
   const date = formatDate(article.published_at, countryCode)
+  const isDraft = preview && article.status === "draft"
+  const previewHref = preview ? "?krile=true" : ""
   return (
-    <Link href={`/${countryCode}/magazin/${article.slug}`} className="mi-card">
-      <div className="mi-cover">
+    <Link href={`/${countryCode}/magazin/${article.slug}${previewHref}`} className="mi-card">
+      <div className="mi-cover" style={{ position: "relative" }}>
+        {isDraft ? (
+          <span style={{
+            position: "absolute", top: 10, left: 10, zIndex: 1,
+            padding: "3px 9px", borderRadius: 4, background: "#B8402C", color: "#fff",
+            fontSize: ".72rem", fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase",
+          }}>
+            {countryCode === "en" ? "Draft" : "Entwurf"}
+          </span>
+        ) : null}
         {article.cover_image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={article.cover_image} alt={article.title ?? ""} width={640} height={400} loading="lazy" />

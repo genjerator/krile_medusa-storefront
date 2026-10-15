@@ -12,6 +12,8 @@ export type ArticleCard = {
   category: string | null
   published_at: string | null
   author: ArticleAuthor | null
+  /** Only present in preview mode (draft listing). */
+  status?: "draft" | "published" | null
 }
 
 export type ArticleFull = ArticleCard & {
@@ -35,18 +37,28 @@ export type ArticleAuthor = {
 
 const REVALIDATE = 300 // ISR: refresh published content every 5 min
 
-/** List published articles for the magazine index (newest first). */
+/**
+ * List articles for the magazine index (newest first). With `preview`, DRAFT and
+ * not-yet-published articles are listed too (via `?preview=true`), fetched
+ * uncached so changes show immediately.
+ */
 export const listArticles = async (
   locale: string,
-  opts: { limit?: number; offset?: number } = {}
+  opts: { limit?: number; offset?: number; preview?: boolean } = {}
 ): Promise<{ articles: ArticleCard[]; count: number }> => {
   const limit = opts.limit ?? 12
   const offset = opts.offset ?? 0
+  const preview = opts.preview ?? false
+  const url = `/store/articles?lang=${locale}&limit=${limit}&offset=${offset}${
+    preview ? "&preview=true" : ""
+  }`
   return sdk.client
-    .fetch<{ articles: ArticleCard[]; count: number }>(
-      `/store/articles?lang=${locale}&limit=${limit}&offset=${offset}`,
-      { method: "GET", next: { revalidate: REVALIDATE, tags: ["articles"] } }
-    )
+    .fetch<{ articles: ArticleCard[]; count: number }>(url, {
+      method: "GET",
+      ...(preview
+        ? { cache: "no-store" as const }
+        : { next: { revalidate: REVALIDATE, tags: ["articles"] } }),
+    })
     .catch(() => ({ articles: [], count: 0 }))
 }
 
