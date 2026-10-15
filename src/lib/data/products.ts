@@ -161,6 +161,50 @@ export const listProductsWithSort = async ({
 }
 
 /**
+ * Fetch a single product by handle REGARDLESS of status (published or draft) via
+ * the backend's /store/draft-products escape hatch. Returns the product with its
+ * `status` field so the detail page can render a draft as a read-only preview
+ * (viewable by direct link, but not orderable). Returns null when no product
+ * matches. Never used for listings/search — drafts stay out of those.
+ */
+export const retrieveProductByHandleAnyStatus = async ({
+  handle,
+  countryCode,
+  regionId,
+}: {
+  handle: string
+  countryCode?: string
+  regionId?: string
+}): Promise<HttpTypes.StoreProduct | null> => {
+  let region: HttpTypes.StoreRegion | undefined | null
+  if (countryCode) region = await getRegion(countryCode)
+  else if (regionId) region = await retrieveRegion(regionId)
+  if (!region) return null
+
+  const headers = { ...(await getAuthHeaders()) }
+  const next = { ...(await getCacheOptions("products")) }
+
+  return sdk.client
+    .fetch<{ product: HttpTypes.StoreProduct }>(
+      `/store/draft-products/${encodeURIComponent(handle)}`,
+      {
+        method: "GET",
+        query: {
+          region_id: region.id,
+          currency_code: region.currency_code,
+          fields:
+            "*categories,*variants,*variants.calculated_price,*images,*options,*options.values,+metadata,+tags",
+        },
+        headers,
+        next,
+        cache: "force-cache",
+      }
+    )
+    .then(({ product }) => product ?? null)
+    .catch(() => null)
+}
+
+/**
  * Resolve a product tag by its exact `value` (e.g. "Wurst & Charcuterie") to its
  * id, so pretty tag URLs (/products/tag/<value>) can filter by tag_id. Returns
  * null when no tag matches.

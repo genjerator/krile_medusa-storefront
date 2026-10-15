@@ -20,11 +20,14 @@ export default function ProductDetailActions({
   product,
   region,
   addons = [],
+  orderable = true,
 }: {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   /** Optional add-on products (e.g. machine options) offered on this page. */
   addons?: HttpTypes.StoreProduct[]
+  /** False for draft (Entwurf) previews — hides the "In den Warenkorb" button. */
+  orderable?: boolean
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -280,17 +283,25 @@ export default function ProductDetailActions({
 
       {/* CTA buttons — sticky on mobile */}
       <div className="space-y-3 medium:static fixed bottom-0 left-0 right-0 medium:p-0 p-3 bg-white medium:bg-transparent border-t medium:border-0 border-ui-border-base z-40">
-        <button
-          onClick={handleAddToCart}
-          disabled={!inStock || !selectedVariant || isAdding || !isValidVariant}
-          className="w-full bg-brand-navy text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          {isAdding ? "Wird hinzugefügt..." : !selectedVariant ? "Variante auswählen" : !inStock ? "Nicht verfügbar" : "In den Warenkorb"}
-        </button>
-        {showAngebot && (
+        {/* Draft (Entwurf) preview: the product is viewable via its direct link
+            but not orderable, so we hide the cart button and show a notice. */}
+        {!orderable ? (
+          <div className="w-full rounded-lg border border-ui-border-base bg-ui-bg-subtle py-3 px-6 text-center text-sm font-medium text-ui-fg-subtle">
+            Dieses Produkt ist derzeit nicht bestellbar.
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            disabled={!inStock || !selectedVariant || isAdding || !isValidVariant}
+            className="w-full bg-brand-navy text-white py-3 px-6 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {isAdding ? "Wird hinzugefügt..." : !selectedVariant ? "Variante auswählen" : !inStock ? "Nicht verfügbar" : "In den Warenkorb"}
+          </button>
+        )}
+        {orderable && showAngebot && (
           <button
             type="button"
             onClick={() => setAngebotOpen(true)}

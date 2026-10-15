@@ -31,11 +31,14 @@ export default async function ProductDetailTemplate({
   region,
   countryCode,
   images,
+  orderable = true,
 }: {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   countryCode: string
   images: HttpTypes.StoreProductImage[]
+  /** False for draft previews — hides the "In den Warenkorb" button. */
+  orderable?: boolean
 }) {
   const category = (product as any).categories?.[0]
   const categoryName = category?.name?.toUpperCase() ?? "PRODUKT"
@@ -85,7 +88,7 @@ export default async function ProductDetailTemplate({
 
         {/* Right: actions */}
         <div className="w-full medium:w-[440px] medium:shrink-0">
-          <ProductDetailActions product={product} region={region} addons={addons} />
+          <ProductDetailActions product={product} region={region} addons={addons} orderable={orderable} />
         </div>
       </div>
 
