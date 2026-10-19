@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server"
 import { getVacuumBagOptions } from "@lib/data/vacuum-bags"
 import { listProducts } from "@lib/data/products"
+import { Suspense } from "react"
 import VacuumBagConfigurator from "@modules/vacuum-bags/components/configurator"
+import BrandedBagSection from "@modules/vacuum-bags/components/branded-bag-section"
 
 // The single configurable product that backs the matrix (same as the standalone
 // /vakuumiertuten-rollen page).
@@ -45,6 +47,11 @@ export default async function VakuumiertutenConfiguratorSection({
       ) : (
         <p className="text-sm text-ui-fg-subtle">{t("unavailable")}</p>
       )}
+
+      {/* Branded-bag logo tool — feature-flagged: only visible with ?logo=true. */}
+      <Suspense fallback={null}>
+        <BrandedBagSection />
+      </Suspense>
     </div>
   )
 }
